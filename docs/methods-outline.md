@@ -1,5 +1,32 @@
 # Outline of Proposed Methods
 
+## Our question
+
+### 1) - Is there a relationship between lice on wild fish and lice on farms? 
+
+Need to establish a relationship between a) the number of lice on out-migrating juvenile salmon (DOES THIS NEED TO BE DONE FOR ALL WILD SALMON SPP SEPARATELY? STEPH DID THIS BY LUMPING ALL JUV SALMON IN HER PROC B PAPER) and b) the number of lice on farms. This would need to be done for all years we have both farm data and out migrating lice data. If we can identify a corrlation between the two values higher than some pre-defined threshold (HOW TO CHOOSE THIS? SOME SORT OF R^2 > 0.4?) 
+
+Therefore, we could re-do Marty's PNAS paper analysis looking at the number of lice on farmed fish (THIS WOULD BE WITH BATI DATA?) and then also the amount of lice on out-migrating fish (Steph's Ecol. App. paper) (IS THIS SALMON COAST DATA?)
+
+Then, using the GLMM framework steph has already done in her Proc B paper, we can simply change that to a Bayesian approach, where we have data on the number of lice on fish $i$ in week $j$ of year $k$, in location $q$. So the expected value can be formulated 
+
+$$ \phi(E(Y_{ijkq}|\textbf{X}_{ijkq},b_j,b_q)) \sim \beta_1 \textbf{X}_{ijkq} + (\beta_0 + b_{j,0j} + b_{k,0i})$$
+
+
+where $\phi$ is the link function, $\beta_1$ is the fixed effect for year and the $b$ values are random intercepts for week ($j$) and location ($q$). Then we define the priors as: 
+
+
+$$
+\pi(\beta_0) = N(0,x_1) \\ 
+\pi(\beta_1) = N(0,x_2) \\
+\pi(b_j) = N(0,\tau^2) \\
+\pi(b_k) = N(0,\tau^2) \\
+\pi(\tau^2) = IG(0,0.025) 
+$$
+
+
+
+
 ## Summary of Steph's Paper (Peacock et al. 2013 - Ecol App)
 
 * Abundance of *Leps* per wild juv. pink salmon per year were calculated from weekly monitoring data using a GLMM 
