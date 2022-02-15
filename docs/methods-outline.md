@@ -27,4 +27,5 @@
     * $\theta_t$ = spatially coherent variation among *all* pop'ns -- normal var, $\mu = 0$, variance is estiamted 
     *  $\theta{a,t}$ = spatially coherent variation among pop'ns w/in a management area 
     *  $\epsilon_{i,t}$ is random anual variation independent among populations
-    *   
+ * Linear version of this model:
+  $$ ln\left(\frac{R_{i,t}}{N_{i,t-2}}\right) = r - b_iN_{i,t-2} - cW_{a,t-2} + \theta_i + \theta_{a,t} + \epsilon_{i,t}$$
