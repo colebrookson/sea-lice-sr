@@ -10,7 +10,7 @@
 
 # set up =======================================================================
 
-function(df) {
+standardize_names = function(df) {
 
     # get current set of names
     current_names = names(df)
