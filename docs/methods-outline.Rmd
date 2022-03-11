@@ -1,3 +1,10 @@
+---
+title: "methods-outline"
+author: "Cole Brookson"
+date: "2/15/2022"
+output: word_document
+---
+
 # Outline of Proposed Methods
 
 ## Our question
@@ -16,13 +23,12 @@ $$ \phi(E(Y_{ijkq}|\textbf{X}_{ijkq},b_j,b_q)) \sim \beta_1 \textbf{X}_{ijkq} + 
 where $\phi$ is the link function, $\beta_1$ is the fixed effect for year and the $b$ values are random intercepts for week ($j$) and location ($q$). Then we define the priors as: 
 
 
-$$
-\pi(\beta_0) = N(0,x_1) \\ 
-\pi(\beta_1) = N(0,x_2) \\
-\pi(b_j) = N(0,\tau^2) \\
-\pi(b_k) = N(0,\tau^2) \\
-\pi(\tau^2) = IG(0,0.025) 
-$$
+$$\pi(\beta_0) = N(0,x_1) $$
+$$\pi(\beta_1) = N(0,x_2) $$
+$$\pi(b_j) = N(0,\tau^2) $$
+$$\pi(b_k) = N(0,\tau^2) $$
+$$\pi(\tau^2) = IG(0,0.025) $$
+
 
 So we fit this model for lice on wild fish, get average estimates, then relate that to the data from farm data, and evaluate to see if the correlation is high enough. 
 
@@ -51,37 +57,4 @@ The data in-hand cover the recruitment, the spawner abundance, and then the numb
 1) Obtain parameter estiamtes for all parameters with all available data
 2) Perform a hindcast test with the model using all data up to 2015. Since there is an existing hypothesis of what should happen in 2015, we can see how accurate the model is at predicting that year
 3) A leave-one out analysis with important years (likely just do it for all) to see which years may have disproportionate impacts on the dynamics we observe 
-4) Cole also wants to do a fun thing and build a S-R package for Julia hehe 
-
-
-
-
-## Summary of Steph's Paper (Peacock et al. 2013 - Ecol App)
-
-* Abundance of *Leps* per wild juv. pink salmon per year were calculated from weekly monitoring data using a GLMM 
-  * Fixed effects: year 
-  * Random effects: sample site + week 
-  * Z-I neg binom 
-* Relationship between total number of parasitide treatments and proportion of those treatments occurring in winter in the KTF and Broughton -- regression 
-* Yearly *leps* estimates were then related to:
-  * total lice on farmed salmon
-  * management changes 
-  * number of winter treatments 
-  * proportion of total treatments occuring during winter on farms in Broughton 
-* **Survival of pinks related to average number of lice per wild juv. salmon on the premise that that was related to both farm lice and adaptive changes in management -- this provides a covariate that captures actual effect on wild salmon survival**
-* Used hierarchical ricker: 
-  $$ R_{i,t} = N_{i,t-2} \text{exp} [r - b_iN_{i,t-2} - cW_{a,t-2} + \theta_i + \theta_{a,t} + \epsilon_{i,t}] $$
-    * $R_{i,t}$ = recruitment of pop $i$ in year $t$ 
-    * $N_{i,t}$ = abundance os spawners in pop $i$ in year $t-2$
-      * this is lagged 2 years for pinks cos of life cycle, would be different for other spp 
-    * $r$ = growth rate 
-    * $b_i$ = density dependence parameter for each pop $i$
-    * $W_{a,t-1}$ = average lice per wild juv. salmon in previous year 
-      * this comes from the GLMM
-    * $c$ is strength of the relationship between pink salmon survival and lice 
-      * estimated % mortality of pinks due to sea lice is $1- exp(-cW_{a,t-1})$
-    * $\theta_t$ = spatially coherent variation among *all* pop'ns -- normal var, $\mu = 0$, variance is estiamted 
-    *  $\theta{a,t}$ = spatially coherent variation among pop'ns w/in a management area 
-    *  $\epsilon_{i,t}$ is random anual variation independent among populations
- * Linear version of this model:
-  $$ ln\left(\frac{R_{i,t}}{N_{i,t-2}}\right) = r - b_iN_{i,t-2} - cW_{a,t-2} + \theta_i + \theta_{a,t} + \epsilon_{i,t}$$
+4) Cole also wants to do a fun thing and build a S-R package for Julia hehe s

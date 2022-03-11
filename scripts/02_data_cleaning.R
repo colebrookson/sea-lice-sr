@@ -29,9 +29,9 @@ lice_site_data_raw = readr::read_csv(here(paste0(lice_file_location,
 
 # naming standardization =======================================================
 
-names(farm_data)
-names(lice_data)
-names(lice_site_data)
+names(farm_data_raw)
+names(lice_data_raw)
+names(lice_site_data_raw)
 
 farm_data = standardize_names(farm_data_raw)
 lice_data = standardize_names(lice_data_raw)
@@ -73,3 +73,10 @@ timeline_scfs = lice_data %>%
 
 # bind these data together
 timeline_data = rbind(timeline_farm, timeline_scfs)
+
+
+
+# put two data sources together for regression =================================
+
+# look at ways lice are measured
+scfs_lice_cols = c("lep_cope", "chala")
