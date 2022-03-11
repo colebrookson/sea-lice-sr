@@ -22,7 +22,7 @@ lice_file_location = "./data/louse-data/Sea-lice-database-master/Data/"
 # pull in data files 
 farm_data_raw = readr::read_csv(here("./data/raw/BATI_farm_louse_data_RAW.csv"))
 farm_locations_raw = readr::read_csv(here("./data/raw/farm-locations.csv"))
-lice_data_raw = readr::read_csv(here(paste0(lice_file_location,
+scfs_data_raw = readr::read_csv(here(paste0(lice_file_location,
                                 "BroughtonSeaLice_fishData.csv")))
 lice_site_data_raw = readr::read_csv(here(paste0(lice_file_location,
                                 "BroughtonSeaLice_siteData.csv")))
@@ -30,15 +30,15 @@ lice_site_data_raw = readr::read_csv(here(paste0(lice_file_location,
 # naming standardization =======================================================
 
 names(farm_data_raw)
-names(lice_data_raw)
+names(scfs_data_raw)
 names(lice_site_data_raw)
 
 farm_data = standardize_names(farm_data_raw)
-lice_data = standardize_names(lice_data_raw)
+scfs_data = standardize_names(scfs_data_raw)
 lice_site_data = standardize_names(lice_site_data_raw)
 
 # change "location" to farm for the lice data 
-names(lice_data)[names(lice_data) == "location"] = "farm"
+names(scfs_data)[names(scfs_data) == "location"] = "farm"
 
 # take average of information across temporal sampling period ==================
 
@@ -47,7 +47,7 @@ names(lice_data)[names(lice_data) == "location"] = "farm"
 # make date at first of every month or at the day given 
 farm_data$date_first = with(farm_data, 
                     lubridate::ymd(sprintf("%d-%02d-%02d", year, month, 1)))
-lice_data$date = with(lice_data,
+scfs_data$date = with(scfs_data,
                     lubridate::ymd(sprintf("%d-%02d-%02d", year, month, day)))
 
 # group by columns we want and keep the unique ones 
@@ -65,7 +65,7 @@ timeline_farm[which(timeline_farm$farm == "Glacier Falls"),"farm"] = "Glacier"
 timeline_farm[which(timeline_farm$farm == "Wicklow Point"),"farm"] = "Wicklow"
 
 # group for the salmon coast data too
-timeline_scfs = lice_data %>% 
+timeline_scfs = scfs_data %>% 
     dplyr::select(farm, date) %>%
     dplyr::group_by(farm, date) %>%
     dplyr::mutate(data = "scfs") %>%
@@ -79,4 +79,19 @@ timeline_data = rbind(timeline_farm, timeline_scfs)
 # put two data sources together for regression =================================
 
 # look at ways lice are measured
-scfs_lice_cols = c("lep_cope", "chala")
+scfs_lice_cols = c("lep_cope", "chala", "chalb", "lep_pamale", "lep_pafemale",
+                    "lep_male", "lep_nongravid", "lep_gravid", "cal_cope", 
+                    "cal_mot", "cal_gravid", "unid_cope", "chal_unid", 
+                    "unid_pa", "unid_adult")
+scfs_leps_cols = c("lep_cope", "chala", "chalb", "lep_pamale", "lep_pafemale",
+                    "lep_male", "lep_nongravid", "lep_gravid")
+scfs_cals = c("cal_cope", "cal_mot", "cal_gravid", "unid_cope", "chal_unid")
+
+# sum across the lice spp cols
+scfs_data = scfs_data %>% 
+    dplyr::rowwise() %>%
+    dplyr::mutate(lep_all = lep_cope, lep_pamale, lep_pafemale, lep_male, 
+                            lep_nongravid, lep_gravid,
+                    cal_all = cal_cope, cal_mot, cal_gravid)
+summary(scfs_data$lep_all)
+
