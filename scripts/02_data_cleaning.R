@@ -13,6 +13,8 @@
 library(tidyverse)
 library(here)
 
+source(here("./src/02_data_cleaning_funs.R"))
+
 lice_file_location = "./data/louse-data/Sea-lice-database-master/Data/"
 
 farm_data = read_csv(here("./data/raw/BATI_farm_louse_data_RAW.csv"))
@@ -22,23 +24,9 @@ lice_data = read_csv(here(paste0(lice_file_location,
 lice_site_data = read_csv(here(paste0(lice_file_location,
                                 "BroughtonSeaLice_siteData.csv")))
 
-# ensure names of the same items are the same in both datasets
+# naming standardization =======================================================
 names(farm_data)
 names(lice_data)
 names(lice_site_data)
-
-function(df) {
-
-    # get current set of names
-    current_names = names(df)
-    # loop through, pull the name out, change "." to "_"
-    for(name in seq_len(length(current_names))) {
-        current_names[name] = gsub("\\.", "_", current_names[name])
-    }
-    # rename the dataframe
-    names(df) = current_names
-
-
-}
 
 df = farm_data
