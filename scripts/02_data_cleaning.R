@@ -39,3 +39,5 @@ lice_site_data = standardize_names(lice_site_data_raw)
 
 # take average of information across temporal sampling period ==================
 
+# 
+unique(farm_data$date)
