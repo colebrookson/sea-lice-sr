@@ -22,4 +22,23 @@ lice_data = read_csv(here(paste0(lice_file_location,
 lice_site_data = read_csv(here(paste0(lice_file_location,
                                 "BroughtonSeaLice_siteData.csv")))
 
-unique(lice_site_data$location)
+# ensure names of the same items are the same in both datasets
+names(farm_data)
+names(lice_data)
+names(lice_site_data)
+
+function(df) {
+
+    # get current set of names
+    current_names = names(df)
+    # loop through, pull the name out, change "." to "_"
+    for(name in seq_len(length(current_names))) {
+        current_names[name] = gsub("\\.", "_", current_names[name])
+    }
+    # rename the dataframe
+    names(df) = current_names
+
+
+}
+
+df = farm_data
