@@ -100,7 +100,13 @@ scfs_data = scfs_data %>%
                                 unid_cope, chal_unid, unid_pa, unid_adult,
                                 na.rm = TRUE))
 
-# create long version of the scfs data for plotting in an overlay
+# create long version of the scfs data for plotting in an overlay plot 
+# group this by day 
+scfs_date_grouped = scfs_data %>% 
+        group_by(date) %>%
+        summarize(mean_all = mean(all_lice),
+                    mean_lep = mean(all_lep),
+                    mean_cal = mean(all_cal))
 lice_type = c(rep("all", nrow(scfs_data)),
                                 rep("cals", nrow(scfs_data)),
                                 rep("leps", nrow(scfs_data)))
@@ -109,9 +115,10 @@ lice_counts = c(scfs_data$all_lep,
                             scfs_data$all_lice)
 scfs_lice_long = data.frame(lice_type, lice_counts)
 
-
 head(scfs_lice_long)
 hist(scfs_data$lice_all)
-ggplot(data = scfs_data) + 
-    geom_overlay()
 
+cal_plus
+ggplot(data = scfs_lice_long) + 
+    geom_density(aes(x = lice_counts, fill = lice_type)) +
+    xlim(0, 10)
