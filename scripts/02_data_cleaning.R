@@ -91,8 +91,8 @@ scfs_cals = c("cal_cope", "cal_mot", "cal_gravid")
 scfs_data = scfs_data %>% 
     dplyr::rowwise() %>%
     dplyr::mutate(all_lep = sum(lep_cope, lep_pamale, lep_pafemale, lep_male, 
-                            lep_nongravid, lep_gravid, na.rm=TRUE),
-                    all_cal = sum(cal_cope, cal_mot, cal_gravid, 
+                            lep_nongravid, lep_gravid, na.rm = TRUE),
+                    all_cal = sum(cal_cope, cal_mot, cal_gravid,
                                     na.rm = TRUE), 
                     all_lice = sum(lep_cope, chala, chalb, lep_pamale, 
                                 lep_pafemale, lep_male, lep_nongravid, 
@@ -101,12 +101,15 @@ scfs_data = scfs_data %>%
                                 na.rm = TRUE))
 
 # create long version of the scfs data for plotting in an overlay
-scfs_lice_long = data.frame(lice_counts = rbind(scfs_data$all_lep, 
+lice_type = c(rep("all", nrow(scfs_data)),
+                                rep("cals", nrow(scfs_data)),
+                                rep("leps", nrow(scfs_data)))
+lice_counts = c(scfs_data$all_lep,
                             scfs_data$all_cal, 
-                            scfs_data$all_lice), 
-                            lice_type = c(rep("all", nrow(scfs_data)), 
-                                rep("cals", nrow(scfs_data)), 
-                                rep("leps", nrow(scfs_data))))
+                            scfs_data$all_lice)
+scfs_lice_long = data.frame(lice_type, lice_counts)
+
+
 head(scfs_lice_long)
 hist(scfs_data$lice_all)
 ggplot(data = scfs_data) + 
