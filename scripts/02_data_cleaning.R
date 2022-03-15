@@ -74,8 +74,6 @@ timeline_scfs = scfs_data %>%
 # bind these data together
 timeline_data = rbind(timeline_farm, timeline_scfs)
 
-
-
 # put two data sources together for regression =================================
 
 # look at ways lice are measured
@@ -99,6 +97,33 @@ scfs_data = scfs_data %>%
                                 lep_gravid, cal_cope, cal_mot, cal_gravid, 
                                 unid_cope, chal_unid, unid_pa, unid_adult,
                                 na.rm = TRUE))
+
+# set up both data with only the information we want & write it out
+scfs_regress = data.frame(scfs_data %>% 
+    select(all_lice, all_lep, all_cal, month, year, day, date, farm))
+write_csv(scfs_regress,
+    here("./data/regression-data/scfs-regression-data.csv"))
+
+farm_regress = farm_data %>% 
+    select(lep_av, cal_av, farm, year, month)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # create long version of the scfs data for plotting in an overlay plot 
 # group this by day 
