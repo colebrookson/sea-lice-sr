@@ -14,6 +14,7 @@ library(tidyverse)
 library(here)
 library(bayesplot)
 library(rstan)
+library(glmmTMB)
 
 farm_regress = read_csv(here("./data/regression-data/farm-regression-data.csv"))
 scfs_regress = read_csv(here("./data/regression-data/scfs-regression-data.csv"))
@@ -38,4 +39,8 @@ stan_glm_nb = stan_glm(all_lep ~ year + (1 | week) + (1 | farm),
                     prior_intercept = normal(0, 5),
                     seed = 1234)
 
+# repeat with glmmTMB
+stan_tmb_poi = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
+                       data = scfs_regress, family = "nbinom2")
+saveRDS(stan_tmb_poi, here("./data/model-outputs/poisson-glmmTMB-fit.RDS"))
 
