@@ -31,3 +31,11 @@ stan_glm_poi = stan_glm(all_lep ~ year + (1 | week) + (1 | farm),
                     prior = normal(0, 2.5),
                     prior_intercept = normal(0, 5),
                     seed = 1234)
+
+stan_glm_nb = stan_glm(all_lep ~ year + (1 | week) + (1 | farm),
+                    data = scfs_regress, family = neg_binom_2, 
+                    prior = normal(0, 2.5),
+                    prior_intercept = normal(0, 5),
+                    seed = 1234)
+
+
