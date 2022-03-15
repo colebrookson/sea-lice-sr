@@ -102,6 +102,11 @@ scfs_data = scfs_data %>%
 scfs_regress = data.frame(scfs_data %>% 
     dplyr::select(all_lice, all_lep, all_cal, month, year, day, date, farm))
 
+# ensure all counts are integer valued
+scfs_regress$all_lep = as.integer(scfs_regress$all_lep)
+scfs_regress$all_cal = as.integer(scfs_regress$all_cal)
+scfs_regress$all_lice = as.integer(scfs_regress$all_lice)
+
 # need to make a column for week 
 scfs_regress$week = lubridate::week(lubridate::ymd(scfs_data$date))
 
