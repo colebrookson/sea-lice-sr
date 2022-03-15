@@ -42,8 +42,6 @@ names(scfs_data)[names(scfs_data) == "location"] = "farm"
 
 # take average of information across temporal sampling period ==================
 
-# TUTORIAL: https://benalexkeen.com/creating-a-timeline-graphic-using-r-and-ggplot2/
-
 # make date at first of every month or at the day given 
 farm_data$date_first = with(farm_data, 
                     lubridate::ymd(sprintf("%d-%02d-%02d", year, month, 1)))
@@ -102,12 +100,20 @@ scfs_data = scfs_data %>%
 
 # scfs data
 scfs_regress = data.frame(scfs_data %>% 
-    select(all_lice, all_lep, all_cal, month, year, day, date, farm))
-write_csv(scfs_regress,
+    dplyr::select(all_lice, all_lep, all_cal, month, year, day, date, farm))
+
+# need to make a column for week 
+scfs_regress$week = lubridate::week(lubridate::ymd(scfs_data$date))
+
+# write data
+readr::write_csv(scfs_regress,
     here("./data/regression-data/scfs-regression-data.csv"))
 
 # farm data
 farm_regress = farm_data %>% 
     select(lep_av, cal_av, farm, year, month)
-write_csv(farm_regress,
+readr::write_csv(farm_regress,
     here("./data/regression-data/farm-regression-data.csv"))
+
+
+# TUTORIAL: https://benalexkeen.com/creating-a-timeline-graphic-using-r-and-ggplot2/
