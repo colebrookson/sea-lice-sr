@@ -98,52 +98,16 @@ scfs_data = scfs_data %>%
                                 unid_cope, chal_unid, unid_pa, unid_adult,
                                 na.rm = TRUE))
 
-# set up both data with only the information we want & write it out
+# set up both data with only the information we want & write it out ============
+
+# scfs data
 scfs_regress = data.frame(scfs_data %>% 
     select(all_lice, all_lep, all_cal, month, year, day, date, farm))
 write_csv(scfs_regress,
     here("./data/regression-data/scfs-regression-data.csv"))
 
+# farm data
 farm_regress = farm_data %>% 
     select(lep_av, cal_av, farm, year, month)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# create long version of the scfs data for plotting in an overlay plot 
-# group this by day 
-scfs_date_grouped = scfs_data %>% 
-        group_by(date) %>%
-        summarize(mean_all = mean(all_lice),
-                    mean_lep = mean(all_lep),
-                    mean_cal = mean(all_cal))
-lice_type = c(rep("all", nrow(scfs_data)),
-                                rep("cals", nrow(scfs_data)),
-                                rep("leps", nrow(scfs_data)))
-lice_counts = c(scfs_data$all_lep,
-                            scfs_data$all_cal, 
-                            scfs_data$all_lice)
-scfs_lice_long = data.frame(lice_type, lice_counts)
-
-head(scfs_lice_long)
-hist(scfs_data$lice_all)
-
-cal_plus
-ggplot(data = scfs_lice_long) + 
-    geom_density(aes(x = lice_counts, fill = lice_type)) +
-    xlim(0, 10)
+write_csv(farm_regress,
+    here("./data/regression-data/farm-regression-data.csv"))
