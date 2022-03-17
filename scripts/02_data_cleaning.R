@@ -126,7 +126,7 @@ scfs_regress_chal_inc$week =
 # make farm/week combo 
 scfs_regress_chal_inc = scfs_regress_chal_inc %>% 
         dplyr::rowwise() %>%
-        dplyr::mutate(farm_week = paste0(farm, week))
+        dplyr::mutate(farm_year = paste0(farm, year))
 
 # write data
 readr::write_csv(scfs_regress_chal_inc,
