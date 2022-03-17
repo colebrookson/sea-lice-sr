@@ -120,10 +120,16 @@ scfs_regress_chal_inc = data.frame(scfs_data_chal_inc %>%
     dplyr::select(all_lice, all_lep, all_cal, month, year, day, date, farm))
 
 # need to make a column for week 
-scfs_regress$week = lubridate::week(lubridate::ymd(scfs_regress$date))
+scfs_regress_chal_inc$week = 
+    lubridate::week(lubridate::ymd(scfs_regress_chal_inc$date))
+
+# make farm/week combo 
+scfs_regress_chal_inc = scfs_regress_chal_inc %>% 
+        dplyr::rowwise() %>%
+        dplyr::mutate(farm_week = paste0(farm, week))
 
 # write data
-readr::write_csv(scfs_regress,
+readr::write_csv(scfs_regress_chal_inc,
     here("./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
 
 
