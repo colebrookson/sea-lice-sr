@@ -74,6 +74,12 @@ timeline_data = rbind(timeline_farm, timeline_scfs)
 
 # put two data sources together for regression =================================
 
+# farm data
+farm_regress = farm_data %>% 
+    select(lep_av, cal_av, farm, year, month)
+readr::write_csv(farm_regress,
+    here("./data/regression-data/farm-regression-data.csv"))
+
 # look at ways lice are measured
 scfs_lice_cols = c("lep_cope", "chala", "chalb", "lep_pamale", "lep_pafemale",
                     "lep_male", "lep_nongravid", "lep_gravid", "cal_cope", 
@@ -83,8 +89,8 @@ scfs_leps_cols = c("lep_cope", "chala", "chalb", "lep_pamale", "lep_pafemale",
                     "lep_male", "lep_nongravid", "lep_gravid")
 scfs_cals = c("cal_cope", "cal_mot", "cal_gravid")
 
-# sum across the lice spp cols
-scfs_data = scfs_data %>% 
+# sum across the lice spp cols -- INCLUDING CHALIMUS
+scfs_data_chal_inc = scfs_data %>% 
     dplyr::rowwise() %>%
     dplyr::mutate(all_lep = sum(lep_cope, lep_pamale, lep_pafemale, lep_male, 
                             lep_nongravid, lep_gravid, na.rm = TRUE),
@@ -95,25 +101,32 @@ scfs_data = scfs_data %>%
                                 lep_gravid, cal_cope, cal_mot, cal_gravid, 
                                 unid_cope, chal_unid, unid_pa, unid_adult,
                                 na.rm = TRUE))
-
+# sum across the lice spp cols -- DO NOT INCLUDE CHALIMUS
+scfs_data_chal_exc = scfs_data %>% 
+    dplyr::rowwise() %>%
+    dplyr::mutate(all_lep = sum(lep_cope, lep_pamale, lep_pafemale, lep_male, 
+                            lep_nongravid, lep_gravid, na.rm = TRUE),
+                    all_cal = sum(cal_cope, cal_mot, cal_gravid,
+                                    na.rm = TRUE), 
+                    all_lice = sum(lep_cope, chala, chalb, lep_pamale, 
+                                lep_pafemale, lep_male, lep_nongravid, 
+                                lep_gravid, cal_cope, cal_mot, cal_gravid, 
+                                unid_cope, chal_unid, unid_pa, unid_adult,
+                                na.rm = TRUE))
 # set up both data with only the information we want & write it out ============
 
 # scfs data
-scfs_regress = data.frame(scfs_data %>% 
+scfs_regress_chal_inc = data.frame(scfs_data_chal_inc %>% 
     dplyr::select(all_lice, all_lep, all_cal, month, year, day, date, farm))
 
 # need to make a column for week 
-scfs_regress$week = lubridate::week(lubridate::ymd(scfs_data$date))
+scfs_regress$week = lubridate::week(lubridate::ymd(scfs_regress$date))
 
 # write data
 readr::write_csv(scfs_regress,
-    here("./data/regression-data/scfs-regression-data.csv"))
+    here("./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
 
-# farm data
-farm_regress = farm_data %>% 
-    select(lep_av, cal_av, farm, year, month)
-readr::write_csv(farm_regress,
-    here("./data/regression-data/farm-regression-data.csv"))
+
 
 
 # TUTORIAL: https://benalexkeen.com/creating-a-timeline-graphic-using-r-and-ggplot2/
