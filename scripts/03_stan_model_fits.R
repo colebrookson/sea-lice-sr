@@ -54,24 +54,38 @@ plot(stan_glm_poi, plotfun = "trace")
 # use glmmTMB to do this as well ===============================================
 
 # fit models using the different approaches 
-tmb_glmm_poi = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year), 
-                    data = scfs_regress, 
+tmb_glmm_poi = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year),
+                    data = scfs_regress,
                     family = poisson,
                     ziformula =  ~0
 )
-tmb_glmm_zip = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year), 
-                    data = scfs_regress, 
+saveRDS(tmb_glmm_poi, here(".data/model-outputs/tmb-glmm-poi.RDS"))
+tmb_glmm_zip = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year),
+                    data = scfs_regress,
                     family = poisson,
                     ziformula =  ~1
 )
-tmb_glmm_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year), 
-                    data = scfs_regress, 
+saveRDS(tmb_glmm_zip, here(".data/model-outputs/tmb-glmm-zip.RDS"))
+tmb_glmm_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year),
+                    data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~0
 )
-tmb_glmm_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year), 
-                    data = scfs_regress, 
+saveRDS(tmb_glmm_nb, here(".data/model-outputs/tmb-glmm-nb.RDS"))
+tmb_glmm_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year),
+                    data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~1
 )
-str(scfs_regress)
+saveRDS(tmb_glmm_zinb, here(".data/model-outputs/tmb-glmm-zinb.RDS"))
+
+
+AIC(tmb_glmm_poi, tmb_glmm_zip, tmb_glmm_nb, tmb_glmm_zinb)
+
+# notes
+# random is for week -- farm could be included as a fixed effect,
+# could just compare the results - if the mean effect is different between them,
+# 
+# if you include the chalimus around, it would have to be done on a year/site 
+# ratio. Essentially ONLY within the sampling event - because that matters 
+# within a sampling event 
