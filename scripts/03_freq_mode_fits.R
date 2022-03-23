@@ -40,7 +40,7 @@ tmb_glmm_1_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                     data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~0,
-                    control = glmmTMBControl(optimizer = optim, 
+                    control = glmmTMBControl(optimizer = optim,
                                              optArgs = list(method = "BFGS"),
                                              parallel = n_cores)
 )
@@ -49,7 +49,7 @@ tmb_glmm_1_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                     data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~1,
-                    control = glmmTMBControl(optimizer = optim, 
+                    control = glmmTMBControl(optimizer = optim,
                                              optArgs = list(method = "BFGS"),
                                              parallel = n_cores)
 )
@@ -60,7 +60,7 @@ tmb_glmm_2_nb = glmmTMB(all_lep ~ year + farm + (1 | week),
                     data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~0,
-                    control = glmmTMBControl(optimizer = optim, 
+                    control = glmmTMBControl(optimizer = optim,
                                              optArgs = list(method = "BFGS"),
                                              parallel = n_cores)
 )
@@ -69,13 +69,74 @@ tmb_glmm_2_zinb = glmmTMB(all_lep ~ year + farm + (1 | week),
                     data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~1,
-                    control = glmmTMBControl(optimizer = optim, 
+                    control = glmmTMBControl(optimizer = optim,
                                              optArgs = list(method = "BFGS"),
                                              parallel = n_cores)
 )
 saveRDS(tmb_glmm_2_zinb, here("./data/model-outputs/tmb-glmm-ap2-zinb.RDS"))
 
+# check AIC values
 AIC(tmb_glmm_1_nb, tmb_glmm_1_zinb, tmb_glmm_2_nb, tmb_glmm_2_zinb)
+
+## BEGIN NOTE ###############################
+# So we see that the best models for both the approach 1 and approach 2 options 
+# are the non-zero inflated options (probably since it's a type II negative 
+# binomial), so we'll stick with those for now. IMPORTANTLY, the difference in 
+# AIC between approach 1) and 2) isn't that large (~10 AIC points) so the 
+# previously-used method will be retained.
+## END NOTE ###############################
+
+# compare methods for optimization
+
+# default method is the one from above - quasi-Newtonian
+tmb_bfgs = tmb_glmm_1_nb
+
+# CG method is conjugate gradient method 
+tmb_cg = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
+                    data = scfs_regress,
+                    family = nbinom2,
+                    ziformula =  ~0,
+                    control = glmmTMBControl(optimizer = optim,
+                                             optArgs = list(method = "CG"),
+                                             parallel = n_cores)
+)
+saveRDS(tmb_cg, here("./data/model-outputs/tmb-cg.RDS"))
+
+# L-BFGS-B is a limited-memory modification of the BFGS quasi-Newtonian method
+tmb_lbfgsb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
+                    data = scfs_regress,
+                    family = nbinom2,
+                    ziformula =  ~0,
+                    control = glmmTMBControl(optimizer = optim,
+                                             optArgs = list(
+                                                 method = "L-BFGS-B"),
+                                             parallel = n_cores)
+)
+saveRDS(tmb_lbfgsb, here("./data/model-outputs/tmb-lbfgsb.RDS"))
+
+# SANN is a version of simulated annealing 
+tmb_sann = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
+                    data = scfs_regress,
+                    family = nbinom2,
+                    ziformula =  ~0,
+                    control = glmmTMBControl(optimizer = optim,
+                                             optArgs = list(
+                                                 method = "SANN"),
+                                             parallel = n_cores)
+)
+saveRDS(tmb_sann, here("./data/model-outputs/tmb-sann.RDS"))
+
+# Brent is for one-dimensional problems 
+tmb_brent = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
+                    data = scfs_regress,
+                    family = nbinom2,
+                    ziformula =  ~0,
+                    control = glmmTMBControl(optimizer = optim,
+                                             optArgs = list(
+                                                 method = "Brent"),
+                                             parallel = n_cores)
+)
+saveRDS(tmb_brent, here("./data/model-outputs/tmb-brent.RDS"))
 
 # read in and inspect model objects ============================================
 
@@ -91,7 +152,12 @@ tmb_2_simres = simulateResiduals(tmb_2)
 plot(tmb_1_simres)
 plot(tmb_2_simres)
 
+
+
 basic = glmmTMB(all_lep ~ year,
                 data = scfs_regress,
                 family = nbinom2,
-                control = glmmTMBControl(optimizer = optim, optArgs = list(method = "BFGS")))
+                control = glmmTMBControl(optimizer = optim, 
+                optArgs = list(method = "BFGS")))
+basic_res = simulateResiduals(basic)
+plot(basic_res)
