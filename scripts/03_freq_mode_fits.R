@@ -30,6 +30,9 @@ scfs_regress$week = as.factor(as.character(scfs_regress$week))
 
 # use glmmTMB ==================================================================
 
+# set up parallel fitting option
+n_cores = min(parallel::detectCores(), 8)
+
 # fit models using the different approaches 
 
 # approach 1 - location as random effect
@@ -38,7 +41,8 @@ tmb_glmm_1_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                     family = nbinom2,
                     ziformula =  ~0,
                     control = glmmTMBControl(optimizer = optim, 
-                                             optArgs = list(method = "BFGS"))
+                                             optArgs = list(method = "BFGS"),
+                                             parallel = n_cores)
 )
 saveRDS(tmb_glmm_1_nb, here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
 tmb_glmm_1_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
@@ -46,7 +50,8 @@ tmb_glmm_1_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                     family = nbinom2,
                     ziformula =  ~1,
                     control = glmmTMBControl(optimizer = optim, 
-                                             optArgs = list(method = "BFGS"))
+                                             optArgs = list(method = "BFGS"),
+                                             parallel = n_cores)
 )
 saveRDS(tmb_glmm_1_zinb, here("./data/model-outputs/tmb-glmm-ap1-zinb.RDS"))
 
@@ -56,7 +61,8 @@ tmb_glmm_2_nb = glmmTMB(all_lep ~ year + farm + (1 | week),
                     family = nbinom2,
                     ziformula =  ~0,
                     control = glmmTMBControl(optimizer = optim, 
-                                             optArgs = list(method = "BFGS"))
+                                             optArgs = list(method = "BFGS"),
+                                             parallel = n_cores)
 )
 saveRDS(tmb_glmm_2_nb, here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))
 tmb_glmm_2_zinb = glmmTMB(all_lep ~ year + farm + (1 | week),
@@ -64,7 +70,8 @@ tmb_glmm_2_zinb = glmmTMB(all_lep ~ year + farm + (1 | week),
                     family = nbinom2,
                     ziformula =  ~1,
                     control = glmmTMBControl(optimizer = optim, 
-                                             optArgs = list(method = "BFGS"))
+                                             optArgs = list(method = "BFGS"),
+                                             parallel = n_cores)
 )
 saveRDS(tmb_glmm_2_zinb, here("./data/model-outputs/tmb-glmm-ap2-zinb.RDS"))
 
