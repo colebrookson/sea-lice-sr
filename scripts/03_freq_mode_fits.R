@@ -122,21 +122,16 @@ tmb_sann = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                     control = glmmTMBControl(optimizer = optim,
                                              optArgs = list(
                                                  method = "SANN"),
-                                             parallel = n_cores)
+                                             parallel = 10)
 )
 saveRDS(tmb_sann, here("./data/model-outputs/tmb-sann.RDS"))
 
-# Brent is for one-dimensional problems 
-tmb_brent = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
-                    data = scfs_regress,
-                    family = nbinom2,
-                    ziformula =  ~0,
-                    control = glmmTMBControl(optimizer = optim,
-                                             optArgs = list(
-                                                 method = "Brent"),
-                                             parallel = n_cores)
-)
-saveRDS(tmb_brent, here("./data/model-outputs/tmb-brent.RDS"))
+tmb_bfgs = readRDS(here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
+tmb_cg = readRDS(here("./data/model-outputs/tmb-cg.RDS"))
+tmb_lbfgsb = readRDS(here("./data/model-outputs/tmb-lbfgsb.RDS"))
+tmb_sann = readRDS(here("./data/model-outputs/tmb-sann.RDS"))
+
+AIC(tmb_bfgs, tmb_cg, tmb_lbfgsb, tmb_sann, tmb_brent)
 
 # read in and inspect model objects ============================================
 

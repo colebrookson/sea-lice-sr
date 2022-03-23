@@ -1,0 +1,7 @@
+---
+title: "glmm-writeup"
+author: "Cole Brookson"
+date: "18-03-2022"
+output: word_document
+---
+
