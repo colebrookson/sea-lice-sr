@@ -12,10 +12,8 @@
 
 library(tidyverse)
 library(here)
-library(bayesplot)
-library(rstan)
-library(rstanarm)
 library(glmmTMB)
+library(DHARMa)
 
 farm_regress = read_csv(here("./data/regression-data/farm-regression-data.csv"))
 scfs_regress = read_csv(
@@ -28,34 +26,45 @@ scfs_regress$all_lice = as.integer(scfs_regress$all_lice)
 scfs_regress$year = as.factor(as.character(scfs_regress$year))
 scfs_regress$farm_year = as.factor(as.character(scfs_regress$farm_year))
 scfs_regress$farm = as.factor(as.character(scfs_regress$farm))
+scfs_regress$week = as.factor(as.character(scfs_regress$week))
 
-# use glmmTMB to do this as well ===============================================
+# use glmmTMB ==================================================================
 
 # fit models using the different approaches 
-tmb_glmm_poi = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year),
-                    data = scfs_regress,
-                    family = poisson,
-                    ziformula =  ~0
-)
-saveRDS(tmb_glmm_poi, here(".data/model-outputs/tmb-glmm-poi.RDS"))
-tmb_glmm_zip = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year),
-                    data = scfs_regress,
-                    family = poisson,
-                    ziformula =  ~1
-)
-saveRDS(tmb_glmm_zip, here(".data/model-outputs/tmb-glmm-zip.RDS"))
-tmb_glmm_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year),
+
+# approach 1 - location as random effect
+tmb_glmm_1_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                     data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~0
 )
-saveRDS(tmb_glmm_nb, here(".data/model-outputs/tmb-glmm-nb.RDS"))
-tmb_glmm_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_year),
+saveRDS(tmb_glmm_1_nb, here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
+tmb_glmm_1_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                     data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~1
 )
-saveRDS(tmb_glmm_zinb, here(".data/model-outputs/tmb-glmm-zinb.RDS"))
+saveRDS(tmb_glmm_1_zinb, here("./data/model-outputs/tmb-glmm-ap1-zinb.RDS"))
+
+# aproach 2 - location as fixed effect
+tmb_glmm_2_nb = glmmTMB(all_lep ~ year + farm + (1 | week),
+                    data = scfs_regress,
+                    family = nbinom2,
+                    ziformula =  ~0
+)
+saveRDS(tmb_glmm_2_nb, here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))
+tmb_glmm_2_zinb = glmmTMB(all_lep ~ year + farm + (1 | week),
+                    data = scfs_regress,
+                    family = nbinom2,
+                    ziformula =  ~1
+)
+saveRDS(tmb_glmm_2_zinb, here("./data/model-outputs/tmb-glmm-ap2-zinb.RDS"))
+
+# read in and inspect model objects ============================================
 
 
-AIC(tmb_glmm_poi, tmb_glmm_zip, tmb_glmm_nb, tmb_glmm_zinb)
+tmb_1 = readRDS(here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
+tmb_2 = readRDS(here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))
+
+tmb_1_simres = simulateResiduals(tmb_1)
+tmb_2_simres = simulateResiduals(tmb_2)
