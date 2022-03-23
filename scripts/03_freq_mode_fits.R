@@ -131,7 +131,7 @@ tmb_cg = readRDS(here("./data/model-outputs/tmb-cg.RDS"))
 tmb_lbfgsb = readRDS(here("./data/model-outputs/tmb-lbfgsb.RDS"))
 tmb_sann = readRDS(here("./data/model-outputs/tmb-sann.RDS"))
 
-AIC(tmb_bfgs, tmb_cg, tmb_lbfgsb, tmb_sann, tmb_brent)
+AIC(tmb_bfgs, tmb_cg, tmb_lbfgsb, tmb_sann)
 
 # read in and inspect model objects ============================================
 
