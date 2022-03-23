@@ -49,7 +49,7 @@ saveRDS(tmb_glmm_1_zinb, here("./data/model-outputs/tmb-glmm-ap1-zinb.RDS"))
 # aproach 2 - location as fixed effect
 tmb_glmm_2_nb = glmmTMB(all_lep ~ year + farm + (1 | week),
                     data = scfs_regress,
-                    family = poisson,
+                    family = nbinom2,
                     ziformula =  ~0
 )
 saveRDS(tmb_glmm_2_nb, here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))

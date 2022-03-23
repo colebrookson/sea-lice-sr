@@ -40,7 +40,7 @@ lice_site_data = standardize_names(lice_site_data_raw)
 # change "location" to farm for the lice data 
 names(scfs_data)[names(scfs_data) == "location"] = "farm"
 
-# take average of information across temporal sampling period ==================
+# take average of info across temporal sampling period =========================
 
 # make date at first of every month or at the day given 
 farm_data$date_first = with(farm_data, 
@@ -123,10 +123,9 @@ scfs_regress_chal_inc = data.frame(scfs_data_chal_inc %>%
 scfs_regress_chal_inc$week = 
     lubridate::week(lubridate::ymd(scfs_regress_chal_inc$date))
 
-# make farm/week combo 
+# exclude data from weeks 28, 33, 9 
 scfs_regress_chal_inc = scfs_regress_chal_inc %>% 
-        dplyr::rowwise() %>%
-        dplyr::mutate(farm_year = paste0(farm, year))
+    dplyr::filter(week %notin% c(28, 33, 9))
 
 # write data
 readr::write_csv(scfs_regress_chal_inc,
