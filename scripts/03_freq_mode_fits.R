@@ -14,6 +14,7 @@ library(tidyverse)
 library(here)
 library(glmmTMB)
 library(DHARMa)
+library(lme4)
 
 farm_regress = read_csv(here("./data/regression-data/farm-regression-data.csv"))
 scfs_regress = read_csv(
@@ -24,7 +25,6 @@ scfs_regress$all_lep = as.integer(scfs_regress$all_lep)
 scfs_regress$all_cal = as.integer(scfs_regress$all_cal)
 scfs_regress$all_lice = as.integer(scfs_regress$all_lice)
 scfs_regress$year = as.factor(as.character(scfs_regress$year))
-scfs_regress$farm_year = as.factor(as.character(scfs_regress$farm_year))
 scfs_regress$farm = as.factor(as.character(scfs_regress$farm))
 scfs_regress$week = as.factor(as.character(scfs_regress$week))
 
@@ -36,13 +36,17 @@ scfs_regress$week = as.factor(as.character(scfs_regress$week))
 tmb_glmm_1_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                     data = scfs_regress,
                     family = nbinom2,
-                    ziformula =  ~0
+                    ziformula =  ~0,
+                    control = glmmTMBControl(optimizer = optim, 
+                                             optArgs = list(method = "BFGS"))
 )
 saveRDS(tmb_glmm_1_nb, here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
 tmb_glmm_1_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                     data = scfs_regress,
                     family = nbinom2,
-                    ziformula =  ~1
+                    ziformula =  ~1,
+                    control = glmmTMBControl(optimizer = optim, 
+                                             optArgs = list(method = "BFGS"))
 )
 saveRDS(tmb_glmm_1_zinb, here("./data/model-outputs/tmb-glmm-ap1-zinb.RDS"))
 
@@ -50,15 +54,21 @@ saveRDS(tmb_glmm_1_zinb, here("./data/model-outputs/tmb-glmm-ap1-zinb.RDS"))
 tmb_glmm_2_nb = glmmTMB(all_lep ~ year + farm + (1 | week),
                     data = scfs_regress,
                     family = nbinom2,
-                    ziformula =  ~0
+                    ziformula =  ~0,
+                    control = glmmTMBControl(optimizer = optim, 
+                                             optArgs = list(method = "BFGS"))
 )
 saveRDS(tmb_glmm_2_nb, here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))
 tmb_glmm_2_zinb = glmmTMB(all_lep ~ year + farm + (1 | week),
                     data = scfs_regress,
                     family = nbinom2,
-                    ziformula =  ~1
+                    ziformula =  ~1,
+                    control = glmmTMBControl(optimizer = optim, 
+                                             optArgs = list(method = "BFGS"))
 )
 saveRDS(tmb_glmm_2_zinb, here("./data/model-outputs/tmb-glmm-ap2-zinb.RDS"))
+
+AIC(tmb_glmm_1_nb, tmb_glmm_1_zinb, tmb_glmm_2_nb, tmb_glmm_2_zinb)
 
 # read in and inspect model objects ============================================
 
@@ -73,3 +83,8 @@ tmb_2_simres = simulateResiduals(tmb_2)
 # plot residuals 
 plot(tmb_1_simres)
 plot(tmb_2_simres)
+
+basic = glmmTMB(all_lep ~ year,
+                data = scfs_regress,
+                family = nbinom2,
+                control = glmmTMBControl(optimizer = optim, optArgs = list(method = "BFGS")))
