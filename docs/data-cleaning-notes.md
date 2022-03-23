@@ -10,3 +10,8 @@
 ## Relating Lice Data
 
 So the farm data have total and average counts separated out for both leps and cals, but the SCFS data are more comprehensive, and include more columns. For now I'm just summing all values that relate to either species and then an additional column that sums every single type of louse measurement. 
+
+## Wild Lice Data
+
+* Note that weeks 28, 33, and 9 were removed as they had too few observations (3, 9, and 18) respectively. 
+

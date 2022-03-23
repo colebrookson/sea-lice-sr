@@ -49,7 +49,7 @@ saveRDS(tmb_glmm_1_zinb, here("./data/model-outputs/tmb-glmm-ap1-zinb.RDS"))
 # aproach 2 - location as fixed effect
 tmb_glmm_2_nb = glmmTMB(all_lep ~ year + farm + (1 | week),
                     data = scfs_regress,
-                    family = nbinom2,
+                    family = poisson,
                     ziformula =  ~0
 )
 saveRDS(tmb_glmm_2_nb, here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))
@@ -62,9 +62,14 @@ saveRDS(tmb_glmm_2_zinb, here("./data/model-outputs/tmb-glmm-ap2-zinb.RDS"))
 
 # read in and inspect model objects ============================================
 
-
+# read in model objects
 tmb_1 = readRDS(here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
 tmb_2 = readRDS(here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))
 
+# simulate residuals
 tmb_1_simres = simulateResiduals(tmb_1)
 tmb_2_simres = simulateResiduals(tmb_2)
+
+# plot residuals 
+plot(tmb_1_simres)
+plot(tmb_2_simres)
