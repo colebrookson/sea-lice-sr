@@ -14,7 +14,6 @@ library(tidyverse)
 library(here)
 library(glmmTMB)
 library(DHARMa)
-library(lme4)
 
 farm_regress = read_csv(here("./data/regression-data/farm-regression-data.csv"))
 scfs_regress = read_csv(
