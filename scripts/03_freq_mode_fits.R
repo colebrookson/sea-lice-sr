@@ -146,13 +146,3 @@ tmb_2_simres = simulateResiduals(tmb_2)
 # plot residuals 
 plot(tmb_1_simres)
 plot(tmb_2_simres)
-
-
-
-basic = glmmTMB(all_lep ~ year,
-                data = scfs_regress,
-                family = nbinom2,
-                control = glmmTMBControl(optimizer = optim, 
-                optArgs = list(method = "BFGS")))
-basic_res = simulateResiduals(basic)
-plot(basic_res)
