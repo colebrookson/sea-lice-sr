@@ -15,6 +15,7 @@ library(here)
 library(glmmTMB)
 library(lme4)
 library(PNWColors)
+library(mgcv)
 
 # pull in themes
 source(here("./src/01_plot_themes.R"))
@@ -67,15 +68,39 @@ comp_data = data.frame(
     all_farms_measure = all_farms$leps,
     focal_farms_measure = focal_farms$leps
 )
-farm_grouping_regress = lm(all_farms_measure ~ focal_farms_measure,
+farm_grouping_regress = stats::lm(all_farms_measure ~ focal_farms_measure,
                             data = comp_data)
+saveRDS(farm_grouping_regress, 
+    here("./data/model-outputs/farm-grouping-comparisons.RDS"))
 summary(farm_grouping_regress)
 
-# compare between farm data and wild data 
+# Compare farm and wild data with models =======================================
+
 predict_data$all_farms = c(NA, NA, all_farms$leps)
 predict_data$focal_farms = c(NA, NA, focal_farms$leps)
 predict_data$log_all_farms = log10(predict_data$all_farms)
 predict_data$log_focal_farms = log10(predict_data$focal_farms)
+
+# write all sets of models
+wild_to_all_farms =  mgcv::gam(all_lep ~ s(all_farms),
+                        data = predict_data)
+saveRDS(wild_to_all_farms, 
+    here("./data/model-outputs/wild-lice-to-all-farms-gam.RDS"))
+wild_to_focal_farms =  mgcv::gam(all_lep ~ s(focal_farms),
+                        data = predict_data)
+saveRDS(wild_to_focal_farms, 
+    here("./data/model-outputs/wild-lice-to-focal-farms-gam.RDS"))
+log_wild_to_log_all_farms = stats::lm(log_all_lep ~ log_all_farms,
+                        data = predict_data)
+saveRDS(log_wild_to_log_all_farms, 
+    here("./data/model-outputs/log-wild-lice-to-log-all-farms-lm.RDS"))
+log_wild_to_log_focal_farms = stats::lm(log_all_lep ~ log_focal_farms,
+                        data = predict_data)
+saveRDS(log_wild_to_log_focal_farms, 
+    here("./data/model-outputs/log-wild-lice-to-log-focal-farms-lm.RDS"))
+
+
+
 
 predict_data_long = data.frame(
     year = as.numeric(rep(predict_data$year, 6)),
