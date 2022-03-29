@@ -14,6 +14,7 @@ library(tidyverse)
 library(here)
 library(glmmTMB)
 library(lme4)
+library(PNWColors)
 
 # pull in themes
 source(here("./src/01_plot_themes.R"))
@@ -70,23 +71,85 @@ farm_grouping_regress = lm(all_farms_measure ~ focal_farms_measure,
                             data = comp_data)
 summary(farm_grouping_regress)
 
-ggplot(data = comp_data, aes(x = all_farms_measure, y = focal_farms_measure)) +
-    geom_point(fill = ) + 
-    geom_smooth(method = "lm") +
-    labs(x = "All Farms", y = "Focal Farms") +
-    theme_farm_grouping()
+# compare between farm data and wild data 
+predict_data$all_farms = c(NA, NA, all_farms$leps)
+predict_data$focal_farms = c(NA, NA, focal_farms$leps)
+predict_data$log_all_farms = log10(predict_data$all_farms)
+predict_data$log_focal_farms = log10(predict_data$focal_farms)
 
-# plot regression
-comp_data_years = data.frame(
-    year = rep(all_farms$year, 2),
-    value = c(comp_data$all_farms_measure, comp_data$focal_farms_measure),
-    set = as.factor(c(rep("All Farms", nrow(comp_data)),
-            rep("Focal Farms", nrow(comp_data)))
+predict_data_long = data.frame(
+    year = as.numeric(rep(predict_data$year, 6)),
+    measure = factor(c(rep("Wild Leps", 21),
+                rep("Wild Leps (Log10)", 21),
+                rep("All Farm Leps", 21),
+                rep("All Farm Leps (Log10)", 21),
+                rep("Focal Farm Leps", 21),
+                rep("Focal Farm Leps (Log10)", 21)),
+                levels = c("Wild Leps",
+                       "All Farm Leps",
+                       "Focal Farm Leps",
+                       "Wild Leps (Log10)",
+                       "All Farm Leps (Log10)",
+                       "Focal Farm Leps (Log10)")),
+    value = c(predict_data$all_lep, 
+              predict_data$log_all_lep,
+              predict_data$all_farms,
+              predict_data$log_all_farms,
+              predict_data$focal_farms,
+              predict_data$log_focal_farms)
 )
-ggplot() + 
-    geom_point(data = comp_data_years,
-            aes(x = year, y = value, fill = set), 
+
+ggplot(data = predict_data_long) +
+    geom_point(aes(x = year, y = value, fill = value), 
+                shape = 21, 
                 colour = "black",
-                shape = 21,
-                size = 2) + 
-    geom_smooth(data = aes(x = allmethod=lm, se = TRUE)
+                size = 3.5) + 
+    stat_smooth(aes(x = year, y = value),
+                    colour = "black") +
+    facet_wrap(~measure,
+        nrow = 2, ncol = 3, scales = "free") +
+    labs(x = "Year", y = "Number of Lice per Fish") +
+    scale_fill_gradientn(
+        colours = rev(PNWColors::pnw_palette("Sunset2",
+                                        type = "continuous"))) +
+    theme_raw_comp()
+
+
+
+
+
+
+
+
+
+
+# make and save plots ==========================================================
+
+farm_grouping_comp = ggplot(data = comp_data, 
+        aes(x = all_farms_measure, y = focal_farms_measure)) +
+    geom_point(aes(fill = all_farms_measure), 
+                shape = 21, 
+                colour = "black",
+                size = 3.5) + 
+    geom_smooth(method = "lm",
+                colour = "black",
+                size = 2,
+                linetype = "dashed") +
+    labs(x = "All Farms", y = "Focal Farms") +
+    scale_fill_gradientn(
+        colours = rev(PNWColors::pnw_palette("Sunset2",
+                                        type = "continuous"))) +
+    theme_farm_grouping() + 
+    annotate(geom = "text", 
+                x = 3.5, 
+                y = 3.9, 
+                label = paste("R^2 ==", 0.535), 
+                size = 7,
+                parse = TRUE)
+ggsave(filename = here("./figs/farm-grouping-comparison.png"),
+        plot = farm_grouping_comp,
+        width = 10,
+        height = 8,
+        dpi = 600)
+
+
