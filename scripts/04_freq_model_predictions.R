@@ -16,9 +16,11 @@ library(glmmTMB)
 library(lme4)
 library(PNWColors)
 library(mgcv)
+library(patchwork)
 
-# pull in themes
+# pull in themes & some functions
 source(here("./src/01_plot_themes.R"))
+source(here("./src/02_data_cleaning_funs.R"))
 
 farm_regress = readr::read_csv(
     here("./data/regression-data/farm-regression-data.csv"))
@@ -81,41 +83,41 @@ predict_data$focal_farms = c(NA, NA, focal_farms$leps)
 predict_data$log_all_farms = log10(predict_data$all_farms)
 predict_data$log_focal_farms = log10(predict_data$focal_farms)
 
+# exclude years no farm data for 
+predict_data = predict_data %>% 
+    dplyr::filter(year %notin% c("2001", "2002"))
+
 # write all sets of models
 wild_to_all_farms =  mgcv::gam(all_lep ~ s(all_farms),
                         data = predict_data)
+summary(wild_to_all_farms)
 saveRDS(wild_to_all_farms, 
     here("./data/model-outputs/wild-lice-to-all-farms-gam.RDS"))
 wild_to_focal_farms =  mgcv::gam(all_lep ~ s(focal_farms),
                         data = predict_data)
+summary(wild_to_focal_farms)
 saveRDS(wild_to_focal_farms, 
     here("./data/model-outputs/wild-lice-to-focal-farms-gam.RDS"))
 log_wild_to_log_all_farms = stats::lm(log_all_lep ~ log_all_farms,
                         data = predict_data)
+summary(log_wild_to_log_all_farms)
 saveRDS(log_wild_to_log_all_farms, 
     here("./data/model-outputs/log-wild-lice-to-log-all-farms-lm.RDS"))
 log_wild_to_log_focal_farms = stats::lm(log_all_lep ~ log_focal_farms,
                         data = predict_data)
+summary(log_wild_to_log_focal_farms)
 saveRDS(log_wild_to_log_focal_farms, 
     here("./data/model-outputs/log-wild-lice-to-log-focal-farms-lm.RDS"))
 
-
-
-
+# do some data wrangling 
 predict_data_long = data.frame(
     year = as.numeric(rep(predict_data$year, 6)),
-    measure = factor(c(rep("Wild Leps", 21),
-                rep("Wild Leps (Log10)", 21),
-                rep("All Farm Leps", 21),
-                rep("All Farm Leps (Log10)", 21),
-                rep("Focal Farm Leps", 21),
-                rep("Focal Farm Leps (Log10)", 21)),
-                levels = c("Wild Leps",
-                       "All Farm Leps",
-                       "Focal Farm Leps",
-                       "Wild Leps (Log10)",
-                       "All Farm Leps (Log10)",
-                       "Focal Farm Leps (Log10)")),
+    measure = c(rep("Wild Leps", 19),
+                rep("Wild Leps (Log10)", 19),
+                rep("All Farm Leps", 19),
+                rep("All Farm Leps (Log10)", 19),
+                rep("Focal Farm Leps", 19),
+                rep("Focal Farm Leps (Log10)", 19)),
     value = c(predict_data$all_lep, 
               predict_data$log_all_lep,
               predict_data$all_farms,
@@ -123,8 +125,112 @@ predict_data_long = data.frame(
               predict_data$focal_farms,
               predict_data$log_focal_farms)
 )
+# reorder the factor
+predict_data_long$measure = factor(predict_data_long$measure, 
+    levels = c("Wild Leps",
+                       "All Farm Leps",
+                       "Focal Farm Leps",
+                       "Wild Leps (Log10)",
+                       "All Farm Leps (Log10)",
+                       "Focal Farm Leps (Log10)"))
+# cut out the log values for this plot 
+predict_data_long = predict_data_long %>% 
+    filter(measure %in% c("Wild Leps",
+                            "All Farm Leps",
+                            "Focal Farm Leps"))
+predict_data_long_wild = predict_data_long %>% 
+    filter(measure == "Wild Leps")
 
-ggplot(data = predict_data_long) +
+# plots ======================================================================== 
+p1 = ggplot(data = predict_data, 
+        aes(x = all_farms, y = all_lep, fill = all_lep)) +
+    geom_point(
+        shape = 21,
+        colour = "black",
+        size = 4) + 
+    stat_smooth(method = mgcv::gam, formula = y ~ s(x)) +
+    scale_fill_gradientn(
+        colours = rev(PNWColors::pnw_palette("Sunset2",
+                                        type = "continuous"))) + 
+    labs(x = "Lice on All Farms", 
+            y = "Lice on Wild Fish", 
+            title = "All Farms") + 
+    theme_mod_comp() + 
+    annotate(geom = "text", 
+                x = 3.5, 
+                y = 1.0, 
+                label = paste("R^2 ==", 0.367), 
+                size = 7,
+                parse = TRUE)
+
+p2 = ggplot(data = predict_data, 
+        aes(x = focal_farms, y = all_lep, fill = all_lep)) +
+    geom_point(
+        shape = 21,
+        colour = "black",
+        size = 4) + 
+    stat_smooth(method = mgcv::gam, formula = y ~ s(x)) +
+    scale_fill_gradientn(
+        colours = rev(PNWColors::pnw_palette("Sunset2",
+                                        type = "continuous"))) + 
+    labs(x = "Lice on Focal Farms", 
+            y = "Lice on Wild Fish", 
+            title = "Focal Farms") + 
+    theme_mod_comp() + 
+    annotate(geom = "text", 
+                x = 2.75, 
+                y = 1.0, 
+                label = paste("R^2 ==", -0.0409), 
+                size = 7,
+                parse = TRUE)
+p3 = ggplot(data = predict_data, 
+        aes(x = log_all_farms, y = log_all_lep, fill = log_all_lep)) +
+    geom_point(
+        shape = 21,
+        colour = "black",
+        size = 4) + 
+    stat_smooth(method = stats::lm, formula = y ~ x) +
+    scale_fill_gradientn(
+        colours = rev(PNWColors::pnw_palette("Sunset2",
+                                        type = "continuous"))) + 
+    labs(x = "Lice on All Farms (Log 10)", 
+            y = "Lice on Wild Fish (Log 10)", 
+            title = "All Farms (Log 10)") + 
+    theme_mod_comp() + 
+    annotate(geom = "text", 
+                x = 0.4, 
+                y = 0.75, 
+                label = paste("R^2 ==", 0.114), 
+                size = 7,
+                parse = TRUE)
+p4 = ggplot(data = predict_data, 
+        aes(x = log_focal_farms, y = log_all_lep, fill = log_all_lep)) +
+    geom_point(
+        shape = 21,
+        colour = "black",
+        size = 4) + 
+    stat_smooth(method = stats::lm, formula = y ~ x) +
+    scale_fill_gradientn(
+        colours = rev(PNWColors::pnw_palette("Sunset2",
+                                        type = "continuous"))) + 
+    labs(x = "Lice on Focal Farms (Log 10)", 
+            y = "Lice on Wild Fish (Log 10)", 
+            title = "Focal Farms (Log 10)") + 
+    theme_mod_comp() + 
+    annotate(geom = "text", 
+                x = 0.4, 
+                y = 0.75, 
+                label = paste("R^2 ==", -0.038), 
+                size = 7,
+                parse = TRUE)
+
+p_all = (p1 + p2) / (p3 + p4)
+ggsave(filename = here("./figs/wild-to-farm-models-comparison.png"),
+        plot = p_all,
+        width = 15,
+        height = 15,
+        dpi = 600)
+raw_data_timeline = ggplot(data = predict_data_long) +
     geom_point(aes(x = year, y = value, fill = value), 
                 shape = 21, 
                 colour = "black",
@@ -132,12 +238,35 @@ ggplot(data = predict_data_long) +
     stat_smooth(aes(x = year, y = value),
                     colour = "black") +
     facet_wrap(~measure,
-        nrow = 2, ncol = 3, scales = "free") +
+        nrow = 2, ncol = 3, scales = "fixed") +
     labs(x = "Year", y = "Number of Lice per Fish") +
     scale_fill_gradientn(
         colours = rev(PNWColors::pnw_palette("Sunset2",
                                         type = "continuous"))) +
     theme_raw_comp()
+ggsave(filename = here("./figs/wild-to-farm-raw-data-comparison.png"),
+        plot = raw_data_timeline,
+        width = 20,
+        height = 8,
+        dpi = 600)
+
+just_wild_timeline = ggplot(data = predict_data_long_wild) +
+    geom_point(aes(x = year, y = value, fill = value), 
+                shape = 21, 
+                colour = "black",
+                size = 3.5) + 
+    stat_smooth(aes(x = year, y = value),
+                    colour = "black") +
+    labs(x = "Year", y = "Number of Lice per Fish", title = "Wild Leps") +
+    scale_fill_gradientn(
+        colours = rev(PNWColors::pnw_palette("Sunset2",
+                                        type = "continuous"))) +
+    theme_raw_comp()
+ggsave(filename = here("./figs/just-wild-raw-comparison.png"),
+        plot = just_wild_timeline,
+        width = 10,
+        height = 8,
+        dpi = 600)
 
 
 
