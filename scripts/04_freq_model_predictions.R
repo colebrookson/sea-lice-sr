@@ -141,7 +141,7 @@ predict_data_long = predict_data_long %>%
 predict_data_long_wild = predict_data_long %>% 
     filter(measure == "Wild Leps")
 
-# plots ======================================================================== 
+# plots ========================================================================
 p1 = ggplot(data = predict_data, 
         aes(x = all_farms, y = all_lep, fill = all_lep)) +
     geom_point(

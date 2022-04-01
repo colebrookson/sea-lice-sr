@@ -72,6 +72,14 @@ timeline_scfs = scfs_data %>%
 # bind these data together
 timeline_data = rbind(timeline_farm, timeline_scfs)
 
+# Gary Mary PNAS (2010) data processing ========================================
+
+##### BEGIN NOTE #######################
+# Note that the data in this section are downloaded directly from the related 
+# PNAS paper (https://doi.org/10.1073/pnas.1009573108) (we downloaded and store
+# the data instead of including a `wget` or the like for simplicity)
+##### END NOTE #######################
+
 # put two data sources together for regression =================================
 
 # farm data
