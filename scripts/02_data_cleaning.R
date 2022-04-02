@@ -40,6 +40,38 @@ lice_site_data = standardize_names(lice_site_data_raw)
 # change "location" to farm for the lice data 
 names(scfs_data)[names(scfs_data) == "location"] = "farm"
 
+
+# Gary Mary PNAS (2010) data processing ========================================
+
+##### BEGIN NOTE #######################
+# Note that the data in this section are downloaded directly from the related 
+# PNAS paper (https://doi.org/10.1073/pnas.1009573108) (we downloaded and store
+# the data instead of including a `wget` or the like for simplicity)
+##### END NOTE #######################
+
+# read in xlsx sheet of interest
+raw_marty_data = readxl::read_excel(
+    path = here("./data/raw/marty-2010-data/sd01.xlsx"),
+    sheet = 2
+)
+# match up farm name to number 
+farm_nums = sort(unique(raw_marty_data$`Farm # on  Map`))
+farm_names = c(
+    NA,
+    NA,
+    "Cecil Island",
+    "Cypress Harbour",
+    "Sir Edmund Bay",
+    "Cliff Bay",
+    
+)
+
+# Updated data from public source ==============================================
+updated_farm_data = read_csv(here(
+    "./data/raw/canadian-gov-open-data/fish-farm-sea-louse-counts-data.csv"
+))
+
+
 # take average of info across temporal sampling period =========================
 
 # make date at first of every month or at the day given 
@@ -71,31 +103,6 @@ timeline_scfs = scfs_data %>%
 
 # bind these data together
 timeline_data = rbind(timeline_farm, timeline_scfs)
-
-# Gary Mary PNAS (2010) data processing ========================================
-
-##### BEGIN NOTE #######################
-# Note that the data in this section are downloaded directly from the related 
-# PNAS paper (https://doi.org/10.1073/pnas.1009573108) (we downloaded and store
-# the data instead of including a `wget` or the like for simplicity)
-##### END NOTE #######################
-
-# read in xlsx sheet of interest
-raw_marty_data = readxl::read_excel(
-    path = here("./data/raw/marty-2010-data/sd01.xlsx"),
-    sheet = 2
-)
-# match up farm name to number 
-farm_nums = sort(unique(raw_marty_data$`Farm # on  Map`))
-farm_names = c(
-    NA,
-    NA,
-    "Cecil Island",
-    "Cypress Harbour",
-    "Sir Edmund Bay",
-    "Cliff Bay",
-    
-)
 
 
 # put two data sources together for regression =================================

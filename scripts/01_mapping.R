@@ -21,8 +21,9 @@ library(PNWColors)
 # include themes script
 source(here("./src/01_plot_themes.R"))
 
-farm_data = read_csv(here("./data/raw/BATI_farm_louse_data_RAW.csv"))
-farm_locations = read_csv(here("./data/raw/farm-locations.csv"))
+farm_data = read_csv(here(
+    "./data/raw/canadian-gov-open-data/fish-farm-sea-louse-counts-data.csv"
+))
 
 lice_file_location = "./data/louse-data/Sea-lice-database-master/Data/"
 lice_site_data = read_csv(here(paste0(lice_file_location,
@@ -30,26 +31,33 @@ lice_site_data = read_csv(here(paste0(lice_file_location,
 
 # pull together data for mapping ===============================================
 
-# get size of each farm
-farm_summarized = farm_data %>% # nolint
-    rowwise() %>%
-    dplyr::mutate(all_lice = lep.av + cal.av) %>%
-    dplyr::group_by(farm) %>%
-    dplyr::summarize(mean_size = mean(all_lice))
-# add location data
-farm_loc_mean = inner_join(
-    x = farm_summarized,
-    y = farm_locations,
-    by = "farm"
-)
+# only keep columns of interest 
+farm_data_sum = farm_data %>% 
+    dplyr::filter(
+        `Finfish Aquaculture Reporting Zone` == "Broughton Archipelago") %>%
+    dplyr::select(`Site Common Name`, Longitude, Latitude, 
+        `Average L. salmonis motiles per fish`) %>%
+    dplyr::rename(farm = `Site Common Name`, 
+            lat = Latitude,
+            long = Longitude,
+            avg_leps = `Average L. salmonis motiles per fish`
+            ) %>% 
+    dplyr::mutate(farm = as.factor(farm)) %>% 
+    dplyr::group_by(farm, lat, long) %>% 
+    dplyr::summarize(
+        mean_leps = mean(avg_leps, na.rm = TRUE)
+    ) %>%
+    dplyr::filter(lat > 0) %>% 
+    dplyr::ungroup() # put back to `chr` for the ifelse
+
 # add sampling status
 sampled = c("Wicklow Point", "Burdwood", "Glacier Falls")
-farm_loc_mean = farm_loc_mean %>%
+farm_loc = farm_data_sum %>%
     mutate(sampled =
-        ifelse(farm_loc_mean$farm %in% sampled,
+        ifelse(farm_data_sum$farm %in% sampled,
                 "sampled", # if
                 "unsampled")) # else
-sampled_farms = farm_loc_mean %>%
+sampled_farms = farm_loc %>%
     filter(sampled == "sampled")
 
 # get map data
@@ -71,12 +79,12 @@ system_map = ggplot() +
         size = 0.01,
         fill = "grey65") +
     coord_cartesian(xlim = c(-127, -126.1), ylim = c(50.5, 50.9)) +
-    geom_point(data = farm_loc_mean,
+    geom_point(data = farm_loc,
                 aes(x = long, y = lat,
-                    size = mean_size,
-                    fill = mean_size),
+                    size = mean_leps,
+                    fill = mean_leps),
                     shape = 21) +
-    geom_text_repel(data = farm_loc_mean,
+    geom_text_repel(data = farm_loc,
                     aes(x = long, y = lat, label = farm, colour = sampled)) +
     scale_fill_gradientn("Mean # of Lice per Fish",
                             colors = size_pal, guide = "legend",
