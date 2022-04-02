@@ -80,6 +80,24 @@ timeline_data = rbind(timeline_farm, timeline_scfs)
 # the data instead of including a `wget` or the like for simplicity)
 ##### END NOTE #######################
 
+# read in xlsx sheet of interest
+raw_marty_data = readxl::read_excel(
+    path = here("./data/raw/marty-2010-data/sd01.xlsx"),
+    sheet = 2
+)
+# match up farm name to number 
+farm_nums = sort(unique(raw_marty_data$`Farm # on  Map`))
+farm_names = c(
+    NA,
+    NA,
+    "Cecil Island",
+    "Cypress Harbour",
+    "Sir Edmund Bay",
+    "Cliff Bay",
+    
+)
+
+
 # put two data sources together for regression =================================
 
 # farm data
