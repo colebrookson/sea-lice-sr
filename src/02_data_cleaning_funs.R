@@ -12,6 +12,99 @@
 
 `%notin%` = Negate(`%in%`)
 
+bind_map_data = function(raw_df, sampled) {
+
+    raw_df_cleaned = raw_df %>% 
+
+        # filter to only area of interest
+        dplyr::filter(
+            `Finfish Aquaculture Reporting Zone` == "Broughton Archipelago"
+        ) %>%
+
+        # keep names we want to group by
+        dplyr::select(
+            `Site Common Name`, Longitude, Latitude,
+            `Average L. salmonis motiles per fish`
+        ) %>%
+
+        # rename columns so they're consistent with how they're plotted
+        dplyr::rename(
+            farm = `Site Common Name`,
+            lat = Latitude,
+            long = Longitude,
+            avg_leps = `Average L. salmonis motiles per fish`
+        ) %>%
+
+        # need to make farm into a factor so we can group by it
+        dplyr::mutate(
+            farm = as.factor(farm)
+        ) %>%
+
+        # group by to get the mean at the level we want
+        dplyr::group_by(
+            farm, lat, long
+        ) %>%
+
+        # summarize to get the mean across the groups 
+        dplyr::summarize(
+            mean_leps = mean(avg_leps, na.rm = TRUE)
+        ) %>%
+
+        # filter to get rid of the confusing wrong latitude values 
+        dplyr::filter(
+            lat > 0
+        ) %>%
+
+        # ungroup because the ifelse needs a character not a factor
+        dplyr::ungroup()
+
+    ### add in a column denoting sampled versus unsampled farms 
+    raw_df_cleaned_sampled = raw_df_cleaned %>%
+
+        # make new column 
+        dplyr::mutate(
+            sampled =
+            ifelse(farm_data_sum$farm %in% sampled,
+                    "sampled", 
+                    "unsampled"
+            )
+        )
+
+    ### make separate object with only the sampled farms
+    sampled_farms_df = raw_df_cleaned_sampled %>% 
+        dplyr::filter(
+            sampled == "sampled"
+        )
+}
+# only keep columns of interest 
+farm_data_sum = farm_data %>% 
+    dplyr::filter(
+        `Finfish Aquaculture Reporting Zone` == "Broughton Archipelago") %>%
+    dplyr::select(`Site Common Name`, Longitude, Latitude, 
+        `Average L. salmonis motiles per fish`) %>%
+    dplyr::rename(farm = `Site Common Name`, 
+            lat = Latitude,
+            long = Longitude,
+            avg_leps = `Average L. salmonis motiles per fish`
+            ) %>% 
+    dplyr::mutate(farm = as.factor(farm)) %>% 
+    dplyr::group_by(farm, lat, long) %>% 
+    dplyr::summarize(
+        mean_leps = mean(avg_leps, na.rm = TRUE)
+    ) %>%
+    dplyr::filter(lat > 0) %>% 
+    dplyr::ungroup() # put back to `chr` for the ifelse
+
+# add sampling status
+sampled = c("Wicklow Point", "Burdwood", "Glacier Falls")
+farm_loc = farm_data_sum %>%
+    mutate(sampled =
+        ifelse(farm_data_sum$farm %in% sampled,
+                "sampled", # if
+                "unsampled")) # else
+sampled_farms = farm_loc %>%
+    filter(sampled == "sampled")
+
 standardize_names = function(df) {
 
     # get current set of names
