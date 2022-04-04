@@ -76,34 +76,6 @@ bind_map_data = function(raw_df, sampled) {
             sampled == "sampled"
         )
 }
-# only keep columns of interest 
-farm_data_sum = farm_data %>% 
-    dplyr::filter(
-        `Finfish Aquaculture Reporting Zone` == "Broughton Archipelago") %>%
-    dplyr::select(`Site Common Name`, Longitude, Latitude, 
-        `Average L. salmonis motiles per fish`) %>%
-    dplyr::rename(farm = `Site Common Name`, 
-            lat = Latitude,
-            long = Longitude,
-            avg_leps = `Average L. salmonis motiles per fish`
-            ) %>% 
-    dplyr::mutate(farm = as.factor(farm)) %>% 
-    dplyr::group_by(farm, lat, long) %>% 
-    dplyr::summarize(
-        mean_leps = mean(avg_leps, na.rm = TRUE)
-    ) %>%
-    dplyr::filter(lat > 0) %>% 
-    dplyr::ungroup() # put back to `chr` for the ifelse
-
-# add sampling status
-sampled = c("Wicklow Point", "Burdwood", "Glacier Falls")
-farm_loc = farm_data_sum %>%
-    mutate(sampled =
-        ifelse(farm_data_sum$farm %in% sampled,
-                "sampled", # if
-                "unsampled")) # else
-sampled_farms = farm_loc %>%
-    filter(sampled == "sampled")
 
 standardize_names = function(df) {
 
