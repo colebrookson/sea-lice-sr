@@ -77,6 +77,7 @@ bind_map_data = function(raw_df, sampled) {
         )
 
     return(raw_df_cleaned_sampled)
+
 }
 
 standardize_names = function(df) {
@@ -104,4 +105,68 @@ standardize_names = function(df) {
 
     #return dataframe renamed 
     return(df)
+}
+
+trim_marty_data = function(df) {
+
+    # vec of column names we want to keep 
+    names = c(
+        "#", "Farm # on  Map", "Month", "Year", "# fish", "Chalimus/ fish",
+        "Motile L.s./ fish", "Female L.s./ fish", "Caligus/ fish"
+    )
+
+    # vec of new names for these 
+    new_names = c(
+        "obs_num", "farm_num", "month", "year", "inventory", "chal_fish", 
+        "mot_lep_fish", "fem_lep_fish", "cal_fish"
+    )
+
+    # trim down data to only include names in the names vector & to get rid of 
+    # unneeded calculations at the bottom of the sheet
+    df_trimmed = df %>% 
+        dplyr::select(all_of(names)) %>% 
+        dplyr::slice(-(2507:nrow(df)))
+
+    # rename variables 
+    df_trimmed_renamed = df_trimmed %>% 
+        dplyr::rename_at(
+            vars(names) ~ new_names
+        )
+
+    # return 
+    return(df_trimmed)
+
+}
+
+farm_names = function(df) {
+
+    # vector of common names of the farm 
+    farm_name = c(
+    "Simmonds Point", "Whlis Bay", "Maude Island", "Cecil Island",
+    "Cypress Harbour", "Sir Edmund Bay", "NA_7", "Cliff Bay", "Glacier Falls",
+    "Burdwood", "NA_11", "NA_12", "Wicklow Point", "NA_14", "NA_15",
+    "Upper Retreat", "Arrow Pass", "Midsummer", "Potts Bay", "Port Elizabeth",
+    "Humphrey Rock", "Sargeaunt Pass", "Doctors Islets", "Swanson", 
+    "Larson Island", "Noo-la"
+    )
+
+    # vector of the numbers assigned by Gary Mary (2010)
+    farm_num = seq(1, 26, 1)
+
+    # make dataframe of the two name types 
+    names_df = data.frame(
+        text = text_names,
+        nums = farm_num
+    )
+
+    # bind the df so both name types are present 
+    df_both_names = dplyr::left_join(
+        df,
+        names_df,
+        by = "farm_num"
+    )
+
+    # return joined
+    return(df_both_names)
+
 }
