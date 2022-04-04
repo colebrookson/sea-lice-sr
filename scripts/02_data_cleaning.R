@@ -57,13 +57,32 @@ raw_marty_data = readxl::read_excel(
 # match up farm name to number 
 farm_nums = sort(unique(raw_marty_data$`Farm # on  Map`))
 farm_names = c(
-    NA,
-    NA,
-    "Cecil Island",
-    "Cypress Harbour",
-    "Sir Edmund Bay",
-    "Cliff Bay",
-    
+    1, "Simmonds Point",
+    2, "Whlis Bay",
+    3, "Maude Island",
+    4, "Cecil Island",
+    5, "Cypress Harbour",
+    6, "Sir Edmund Bay",
+    7, NA,
+    8, "Cliff Bay",
+    9, "Glacier Falls",
+    10, "Burdwood",
+    11, NA,
+    12, NA,
+    13, "Wicklow Point",
+    14, NA,
+    15, NA,
+    16, "Upper Retreat",
+    17, "Arrow Pass",
+    18, "Midsummer",
+    19, "Potts Bay",
+    20, "Port Elizabeth",
+    21, "Humphrey Rock",
+    22, "Sargeaunt Pass",
+    23, "Doctors Islets",
+    24, "Swanson",
+    25, "Larson Island",
+    26, "Noo-la"
 )
 
 # Updated data from public source ==============================================
