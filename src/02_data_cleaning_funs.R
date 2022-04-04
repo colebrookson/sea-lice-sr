@@ -64,7 +64,7 @@ bind_map_data = function(raw_df, sampled) {
         # make new column 
         dplyr::mutate(
             sampled =
-            ifelse(farm_data_sum$farm %in% sampled,
+            ifelse(raw_df_cleaned$farm %in% sampled,
                     "sampled", 
                     "unsampled"
             )
@@ -75,6 +75,8 @@ bind_map_data = function(raw_df, sampled) {
         dplyr::filter(
             sampled == "sampled"
         )
+
+    return(raw_df_cleaned_sampled)
 }
 
 standardize_names = function(df) {
