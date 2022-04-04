@@ -46,7 +46,9 @@ names(scfs_data)[names(scfs_data) == "location"] = "farm"
 ##### BEGIN NOTE #######################
 # Note that the data in this section are downloaded directly from the related 
 # PNAS paper (https://doi.org/10.1073/pnas.1009573108) (we downloaded and store
-# the data instead of including a `wget` or the like for simplicity)
+# the data instead of including a `wget` or the like for simplicity).
+# 
+# 
 ##### END NOTE #######################
 
 # read in xlsx sheet of interest
@@ -84,6 +86,19 @@ farm_names = c(
     25, "Larson Island",
     26, "Noo-la"
 )
+
+# rename and only keep the columns I want (#, farm # on map, month, year, #fish,
+# chalimus/fish, motile l.s./fish, female l.s./fish, caligus/fish)
+
+# get rid of anything psat row 2509
+
+# rename months to number months 
+
+# strip comma from the number of fish 
+
+# filter out times when stocks were empty (i.e. # of fish is zero)
+
+
 
 # Updated data from public source ==============================================
 updated_farm_data = read_csv(here(
