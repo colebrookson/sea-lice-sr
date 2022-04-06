@@ -124,17 +124,20 @@ trim_marty_data = function(df) {
     # trim down data to only include names in the names vector & to get rid of 
     # unneeded calculations at the bottom of the sheet
     df_trimmed = df %>% 
-        dplyr::select(all_of(names)) %>% 
-        dplyr::slice(-(2507:nrow(df)))
+        dplyr::select(
+            all_of(names)
+        ) %>% 
+        dplyr::slice(-(2507:nrow(df))
+        )
 
     # rename variables 
     df_trimmed_renamed = df_trimmed %>% 
-        dplyr::rename_at(
-            vars(names) ~ new_names
+        dplyr::rename_with(
+            ~ new_names[which(names == .x)], .cols = names
         )
 
     # return 
-    return(df_trimmed)
+    return(df_trimmed_renamed)
 
 }
 
