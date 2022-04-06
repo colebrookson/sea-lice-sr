@@ -158,8 +158,8 @@ farm_names = function(df) {
 
     # make dataframe of the two name types 
     names_df = data.frame(
-        text = text_names,
-        nums = farm_num
+        farm_name = farm_name,
+        farm_num = farm_num
     )
 
     # bind the df so both name types are present 
@@ -172,4 +172,15 @@ farm_names = function(df) {
     # return joined
     return(df_both_names)
 
+}
+
+fix_months = function(df) {
+
+    # use a simple joined dataframe to match across 
+    month_names = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+                    "Sep", "Oct", "Nov", "Dec")
+    month_numbers = seq(1,12,1)
+
+    # ensure all the month names in the vector above and in the df are the same
+    df_names = sort(unique(df$month))
 }

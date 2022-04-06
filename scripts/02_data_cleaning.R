@@ -55,16 +55,15 @@ raw_marty_data = readxl::read_excel(
     sheet = 2
 )
 
-# step 1 -  select only columns of interest, and chop 
-marty_data_trimmed = raw_marty_data %>% 
-    trim_marty_data()
 
-# rename and only keep the columns I want (#, farm # on map, month, year, #fish,
-# chalimus/fish, motile l.s./fish, female l.s./fish, caligus/fish)
-
+marty_data_trimmed = df = raw_marty_data %>% 
+    # step 1 -  select only columns of interest, chop the bottom summary stuff 
+    # off, and rename the columns 
+    trim_marty_data() %>% 
+    # step 2 - add in farm names
+    farm_names() %>% 
+    # step 3 - rename the months to the number of the month 
 # rename the farms to the names 
-
-# get rid of anything psat row 2509
 
 # rename months to number months 
 
