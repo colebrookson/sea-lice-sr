@@ -179,8 +179,38 @@ fix_months = function(df) {
     # use a simple joined dataframe to match across 
     month_names = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
                     "Sep", "Oct", "Nov", "Dec")
-    month_numbers = seq(1,12,1)
+    month_numbers = seq(1, 12, 1)
+
+    month_df = data.frame(
+        month = month_names, 
+        num = month_numbers
+    )
 
     # ensure all the month names in the vector above and in the df are the same
     df_names = sort(unique(df$month))
+    month_sorted = sort(month_names)
+
+    if (df_names != month_sorted) {
+        stop("Months in function and months in dataframe do not match!")
+    }
+
+    # left join the data 
+    df_month_nums = dplyr::left_join(
+        df, 
+        month_df, 
+        by = "month"
+    )
+
+    # keep the number of the month and get rid of the text version 
+    df_months = df_month_nums %>% 
+        dplyr::select(
+            -month
+        ) %>% 
+        dplyr::rename(
+            month = num
+        )
+
+    # return
+    return(df_months)
+
 }
