@@ -117,8 +117,8 @@ trim_marty_data = function(df) {
 
     # vec of new names for these 
     new_names = c(
-        "obs_num", "farm_num", "month", "year", "inventory", "chal_fish", 
-        "mot_lep_fish", "fem_lep_fish", "cal_fish"
+        "obs_num", "farm_num", "month", "year", "inventory", "chal_av",
+        "lep_av_mot", "lep_av_fem", "cal_av"
     )
 
     # trim down data to only include names in the names vector & to get rid of 
@@ -133,7 +133,7 @@ trim_marty_data = function(df) {
     # rename variables 
     df_trimmed_renamed = df_trimmed %>% 
         dplyr::rename_with(
-            ~ new_names[which(names == .x)], .cols = names
+            ~ new_names[which(names == .x)], .cols = all_of(names)
         )
 
     # return 
@@ -190,7 +190,7 @@ fix_months = function(df) {
     df_names = sort(unique(df$month))
     month_sorted = sort(month_names)
 
-    if (df_names != month_sorted) {
+    if (!identical(df_names, month_sorted)) {
         stop("Months in function and months in dataframe do not match!")
     }
 
@@ -212,5 +212,81 @@ fix_months = function(df) {
 
     # return
     return(df_months)
+
+}
+
+trim_updated_data = function(df) {
+
+    # keep only the Broughton area observations
+    df_broughton = df %>% 
+        dplyr::filter(
+            `Finfish Aquaculture Reporting Zone` == "Broughton Archipelago"
+        )
+
+    df_trimmed = df_broughton %>% 
+        dplyr::select(
+            `_id`, Year, Month, `Site Common Name`, Latitude, Longitude,
+
+        )
+}
+
+join_marty_bati_data = function(marty_df, bati_df) {
+
+    # get rid of date column in bati_df 
+    bati_df = bati_df %>% 
+        select(-date)
+
+    # make "total" columns in the marty_df
+    marty_df_cleaned = marty_df %>%
+
+        # get rid of unnecessary columns
+        dplyr::select(
+            -obs_num, -farm_num, -chal_av, -lep_av_fem
+        ) %>%
+
+        # remove farms that aren't in the BATI version 
+        dplyr::filter(
+            farm_name %in% unique(bati_df$farm)
+        ) %>% 
+
+        # make the total values for the leps and the cals 
+        dplyr::rowwise() %>% 
+        dplyr::mutate(
+            lep_tot = inventory * lep_av_mot,
+            cal_tot = inventory * cal_av
+        ) %>% 
+
+        # rename appropriately
+        dplyr::rename(
+            farm = farm_name,
+            lep_av = lep_av_mot
+        ) %>%
+
+        # defer to BATI data, so only keep Marty data where BATI is not present
+        dplyr::filter(
+            year < min(bati_df$year)
+        )
+
+    # check the two df's are the name in terms of their column names 
+    if (!identical(sort(names(marty_df_cleaned)), sort(names(bati_df)))) {
+
+        stop("column names not the same!")
+    }
+
+    # order the two dataframes the same so they can be bound together 
+    col_order = c(
+        "farm", "year", "month", "inventory", "lep_av", 
+        "lep_tot", "cal_av", "cal_tot"
+    )
+    reorder_marty_df = marty_df_cleaned[, col_order]
+    reorder_bati_df = bati_df[, col_order]
+
+    # bind dataframes 
+    bound_df = data.frame(
+        rbind(reorder_marty_df, reorder_bati_df)
+    )
+
+    # return 
+    return(bound_df)
 
 }

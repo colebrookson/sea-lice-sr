@@ -55,21 +55,22 @@ raw_marty_data = readxl::read_excel(
     sheet = 2
 )
 
-
+# use previously written functions to clean up the data 
 marty_data_trimmed = df = raw_marty_data %>% 
+
     # step 1 -  select only columns of interest, chop the bottom summary stuff 
     # off, and rename the columns 
     trim_marty_data() %>% 
+
     # step 2 - add in farm names
     farm_names() %>% 
+
     # step 3 - rename the months to the number of the month 
-# rename the farms to the names 
+    fix_months()
 
-# rename months to number months 
-
-# strip comma from the number of fish 
 
 # filter out times when stocks were empty (i.e. # of fish is zero)
+
 
 
 
