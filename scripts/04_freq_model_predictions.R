@@ -22,8 +22,7 @@ library(patchwork)
 source(here("./src/01_plot_themes.R"))
 source(here("./src/02_data_cleaning_funs.R"))
 
-farm_regress = readr::read_csv(
-    here("./data/regression-data/farm-regression-data.csv"))
+farm_regress = read_csv(here("./data/clean-farm/marty-bati-joined.csv"))
 scfs_regress = readr::read_csv(
     here("./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
 
@@ -47,7 +46,7 @@ tmb_fit = readRDS(here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
 predict_data = data.frame(year = as.character(c(2001:2021)),
                         week = NA,
                         farm = NA)
-predict_data$all_lep = predict(tmb_fit, newdata = new_data,
+predict_data$all_lep = predict(tmb_fit, newdata = predict_data,
             type = "response",
             re.form = NA
             )
@@ -78,7 +77,7 @@ summary(farm_grouping_regress)
 
 # Compare farm and wild data with models =======================================
 
-predict_datalibrary(tidyverse)
+library(tidyverse)
 library(here)
 library(glmmTMB)
 library(lme4)
@@ -91,7 +90,8 @@ source(here("./src/01_plot_themes.R"))
 source(here("./src/02_data_cleaning_funs.R"))
 
 farm_regress = readr::read_csv(
-    here("./data/regression-data/farm-regression-data.csv"))$all_farms = c(NA, NA, all_farms$leps)
+    here("./data/regression-data/farm-regression-data.csv"))
+predict_data$all_farms = c(NA, NA, all_farms$leps)
 predict_data$focal_farms = c(NA, NA, focal_farms$leps)
 predict_data$log_all_farms = log10(predict_data$all_farms)
 predict_data$log_focal_farms = log10(predict_data$focal_farms)

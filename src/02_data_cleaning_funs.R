@@ -12,74 +12,6 @@
 
 `%notin%` = Negate(`%in%`)
 
-bind_map_data = function(raw_df, sampled) {
-
-    raw_df_cleaned = raw_df %>% 
-
-        # filter to only area of interest
-        dplyr::filter(
-            `Finfish Aquaculture Reporting Zone` == "Broughton Archipelago"
-        ) %>%
-
-        # keep names we want to group by
-        dplyr::select(
-            `Site Common Name`, Longitude, Latitude,
-            `Average L. salmonis motiles per fish`
-        ) %>%
-
-        # rename columns so they're consistent with how they're plotted
-        dplyr::rename(
-            farm = `Site Common Name`,
-            lat = Latitude,
-            long = Longitude,
-            avg_leps = `Average L. salmonis motiles per fish`
-        ) %>%
-
-        # need to make farm into a factor so we can group by it
-        dplyr::mutate(
-            farm = as.factor(farm)
-        ) %>%
-
-        # group by to get the mean at the level we want
-        dplyr::group_by(
-            farm, lat, long
-        ) %>%
-
-        # summarize to get the mean across the groups 
-        dplyr::summarize(
-            mean_leps = mean(avg_leps, na.rm = TRUE)
-        ) %>%
-
-        # filter to get rid of the confusing wrong latitude values 
-        dplyr::filter(
-            lat > 0
-        ) %>%
-
-        # ungroup because the ifelse needs a character not a factor
-        dplyr::ungroup()
-
-    ### add in a column denoting sampled versus unsampled farms 
-    raw_df_cleaned_sampled = raw_df_cleaned %>%
-
-        # make new column 
-        dplyr::mutate(
-            sampled =
-            ifelse(raw_df_cleaned$farm %in% sampled,
-                    "sampled", 
-                    "unsampled"
-            )
-        )
-
-    ### make separate object with only the sampled farms
-    sampled_farms_df = raw_df_cleaned_sampled %>% 
-        dplyr::filter(
-            sampled == "sampled"
-        )
-
-    return(raw_df_cleaned_sampled)
-
-}
-
 standardize_names = function(df) {
 
     # get current set of names
@@ -234,7 +166,23 @@ join_marty_bati_data = function(marty_df, bati_df) {
 
     # get rid of date column in bati_df 
     bati_df = bati_df %>% 
-        select(-date)
+        dplyr::select(-date)
+
+    # make sure all farm names match up - DEFAULT TO MARTY NAMES
+    bati_names = sort(unique(bati_df$farm))
+    marty_names = sort(unique(marty_df$farm_name))
+
+    bati_df_renamed = bati_df %>% 
+        dplyr::mutate(
+            farm = forcats::fct_recode(farm, 
+                "Arrow Pass" = "Arrow Passage",
+                "Humphrey Rock" = "Humphrey Rocks",
+                "Larson Island" = "Larsen Island",
+                "Midsummer" = "Midsummer Island",
+                "Sargeaunt Pass" = "Sargeaunt Passage",
+                "Swanson" = "Swanson Island"
+            )
+        )
 
     # make "total" columns in the marty_df
     marty_df_cleaned = marty_df %>%
@@ -243,11 +191,6 @@ join_marty_bati_data = function(marty_df, bati_df) {
         dplyr::select(
             -obs_num, -farm_num, -chal_av, -lep_av_fem
         ) %>%
-
-        # remove farms that aren't in the BATI version 
-        dplyr::filter(
-            farm_name %in% unique(bati_df$farm)
-        ) %>% 
 
         # make the total values for the leps and the cals 
         dplyr::rowwise() %>% 
@@ -268,7 +211,8 @@ join_marty_bati_data = function(marty_df, bati_df) {
         )
 
     # check the two df's are the name in terms of their column names 
-    if (!identical(sort(names(marty_df_cleaned)), sort(names(bati_df)))) {
+    if (!identical(sort(names(marty_df_cleaned)), 
+                   sort(names(bati_df_renamed)))) {
 
         stop("column names not the same!")
     }
@@ -279,7 +223,7 @@ join_marty_bati_data = function(marty_df, bati_df) {
         "lep_tot", "cal_av", "cal_tot"
     )
     reorder_marty_df = marty_df_cleaned[, col_order]
-    reorder_bati_df = bati_df[, col_order]
+    reorder_bati_df = bati_df_renamed[, col_order]
 
     # bind dataframes 
     bound_df = data.frame(
@@ -288,5 +232,73 @@ join_marty_bati_data = function(marty_df, bati_df) {
 
     # return 
     return(bound_df)
+
+}
+
+bind_map_data = function(marty_df, bati_df) {
+
+    raw_df_cleaned = raw_df %>% 
+
+        # filter to only area of interest
+        dplyr::filter(
+            `Finfish Aquaculture Reporting Zone` == "Broughton Archipelago"
+        ) %>%
+
+        # keep names we want to group by
+        dplyr::select(
+            `Site Common Name`, Longitude, Latitude,
+            `Average L. salmonis motiles per fish`
+        ) %>%
+
+        # rename columns so they're consistent with how they're plotted
+        dplyr::rename(
+            farm = `Site Common Name`,
+            lat = Latitude,
+            long = Longitude,
+            avg_leps = `Average L. salmonis motiles per fish`
+        ) %>%
+
+        # need to make farm into a factor so we can group by it
+        dplyr::mutate(
+            farm = as.factor(farm)
+        ) %>%
+
+        # group by to get the mean at the level we want
+        dplyr::group_by(
+            farm, lat, long
+        ) %>%
+
+        # summarize to get the mean across the groups 
+        dplyr::summarize(
+            mean_leps = mean(avg_leps, na.rm = TRUE)
+        ) %>%
+
+        # filter to get rid of the confusing wrong latitude values 
+        dplyr::filter(
+            lat > 0
+        ) %>%
+
+        # ungroup because the ifelse needs a character not a factor
+        dplyr::ungroup()
+
+    ### add in a column denoting sampled versus unsampled farms 
+    raw_df_cleaned_sampled = raw_df_cleaned %>%
+
+        # make new column 
+        dplyr::mutate(
+            sampled =
+            ifelse(raw_df_cleaned$farm %in% sampled,
+                    "sampled",
+                    "unsampled"
+            )
+        )
+
+    ### make separate object with only the sampled farms
+    sampled_farms_df = raw_df_cleaned_sampled %>% 
+        dplyr::filter(
+            sampled == "sampled"
+        )
+
+    return(raw_df_cleaned_sampled)
 
 }

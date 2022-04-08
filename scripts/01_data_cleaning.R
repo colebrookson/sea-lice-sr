@@ -86,7 +86,7 @@ readr::write_csv(
 
 # All Farms
 
-# Cumulative Lice on the Knight Tribune Corridor 
+# Cumulative Lice on the Knight Tribune Corridor
 
 # look at ways lice are measured
 scfs_lice_cols = c("lep_cope", "chala", "chalb", "lep_pamale", "lep_pafemale",
