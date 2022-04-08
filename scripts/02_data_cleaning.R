@@ -20,12 +20,16 @@ source(here("./src/02_data_cleaning_funs.R"))
 lice_file_location = "./data/louse-data/Sea-lice-database-master/Data/"
 
 # pull in data files 
-farm_data_raw = readr::read_csv(here("./data/raw/BATI_farm_louse_data_RAW.csv"))
-farm_locations_raw = readr::read_csv(here("./data/raw/farm-locations.csv"))
+farm_data_raw = readr::read_csv(here("./data/raw-farm/BATI_farm_louse_data_RAW.csv"))
+farm_locations_raw = readr::read_csv(here("./data/raw-farm/farm-locations.csv"))
 scfs_data_raw = readr::read_csv(here(paste0(lice_file_location,
                                 "BroughtonSeaLice_fishData.csv")))
 lice_site_data_raw = readr::read_csv(here(paste0(lice_file_location,
                                 "BroughtonSeaLice_siteData.csv")))
+raw_marty_data = readxl::read_excel(
+    path = here("./data/raw-farm/marty-2010-data/sd01.xlsx"),
+    sheet = 2
+)
 
 # naming standardization =======================================================
 
@@ -49,14 +53,8 @@ names(scfs_data)[names(scfs_data) == "location"] = "farm"
 # the data instead of including a `wget` or the like for simplicity).
 ##### END NOTE #######################
 
-# read in xlsx sheet of interest
-raw_marty_data = readxl::read_excel(
-    path = here("./data/raw/marty-2010-data/sd01.xlsx"),
-    sheet = 2
-)
-
 # use previously written functions to clean up the data 
-marty_data_trimmed = df = raw_marty_data %>% 
+marty_data_trimmed = raw_marty_data %>% 
 
     # step 1 -  select only columns of interest, chop the bottom summary stuff 
     # off, and rename the columns 
@@ -68,15 +66,34 @@ marty_data_trimmed = df = raw_marty_data %>%
     # step 3 - rename the months to the number of the month 
     fix_months()
 
-
 # filter out times when stocks were empty (i.e. # of fish is zero)
+marty_data_stocked = marty_data_trimmed %>% 
+    dplyr::filter(!is.na(inventory))
+
+# bind marty and bati data =====================================================
+
+all_farm_data = join_marty_bati_data(
+    marty_data_trimmed, farm_data
+)
+readr::write_csv(
+    all_farm_data, here("./data/clean-farm/marty-bati-joined.csv"))
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 # Updated data from public source ==============================================
 updated_farm_data = read_csv(here(
-    "./data/raw/canadian-gov-open-data/fish-farm-sea-louse-counts-data.csv"
+    "./data/raw-farm/canadian-gov-open-data/fish-farm-sea-louse-counts-data.csv"
 ))
 
 
