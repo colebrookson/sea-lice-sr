@@ -78,65 +78,15 @@ all_farm_data = join_marty_bati_data(
 readr::write_csv(
     all_farm_data, here("./data/clean-farm/marty-bati-joined.csv"))
 
+# prepare data sources for regression ==========================================
 
+# farm data can be grouped in three ways 
 
+# Humphrey, Sergeant, Doctors
 
+# All Farms
 
-
-
-
-
-
-
-
-
-
-# Updated data from public source ==============================================
-updated_farm_data = read_csv(here(
-    "./data/raw-farm/canadian-gov-open-data/fish-farm-sea-louse-counts-data.csv"
-))
-
-
-# take average of info across temporal sampling period =========================
-
-# make date at first of every month or at the day given 
-farm_data$date_first = with(farm_data, 
-                    lubridate::ymd(sprintf("%d-%02d-%02d", year, month, 1)))
-scfs_data$date = with(scfs_data,
-                    lubridate::ymd(sprintf("%d-%02d-%02d", year, month, day)))
-
-# group by columns we want and keep the unique ones 
-timeline_farm = farm_data %>% 
-    dplyr::select(farm, date_first) %>%
-    dplyr::filter(farm %in% c("Burdwood",
-                                "Glacier Falls",
-                                "Wicklow Point")) %>%
-    dplyr::group_by(date_first, farm) %>%
-    dplyr::mutate(data = "farm") %>%
-    dplyr::rename(date = date_first) %>% 
-    unique()
-# remove the extra words for easier comparison 
-timeline_farm[which(timeline_farm$farm == "Glacier Falls"),"farm"] = "Glacier"
-timeline_farm[which(timeline_farm$farm == "Wicklow Point"),"farm"] = "Wicklow"
-
-# group for the salmon coast data too
-timeline_scfs = scfs_data %>% 
-    dplyr::select(farm, date) %>%
-    dplyr::group_by(farm, date) %>%
-    dplyr::mutate(data = "scfs") %>%
-    unique()
-
-# bind these data together
-timeline_data = rbind(timeline_farm, timeline_scfs)
-
-
-# put two data sources together for regression =================================
-
-# farm data
-farm_regress = farm_data %>% 
-    select(lep_av, cal_av, farm, year, month)
-readr::write_csv(farm_regress,
-    here("./data/regression-data/farm-regression-data.csv"))
+# Cumulative Lice on the Knight Tribune Corridor 
 
 # look at ways lice are measured
 scfs_lice_cols = c("lep_cope", "chala", "chalb", "lep_pamale", "lep_pafemale",
@@ -188,6 +138,59 @@ scfs_regress_chal_inc = scfs_regress_chal_inc %>%
 # write data
 readr::write_csv(scfs_regress_chal_inc,
     here("./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
+##################### BELOW THIS POINT IS NOT CLEAN ###########################
+
+
+
+
+
+
+
+
+
+
+
+
+# Updated data from public source ==============================================
+updated_farm_data = read_csv(here(
+    "./data/raw-farm/canadian-gov-open-data/fish-farm-sea-louse-counts-data.csv"
+))
+
+
+# take average of info across temporal sampling period =========================
+
+# make date at first of every month or at the day given 
+farm_data$date_first = with(farm_data, 
+                    lubridate::ymd(sprintf("%d-%02d-%02d", year, month, 1)))
+scfs_data$date = with(scfs_data,
+                    lubridate::ymd(sprintf("%d-%02d-%02d", year, month, day)))
+
+# group by columns we want and keep the unique ones 
+timeline_farm = farm_data %>% 
+    dplyr::select(farm, date_first) %>%
+    dplyr::filter(farm %in% c("Burdwood",
+                                "Glacier Falls",
+                                "Wicklow Point")) %>%
+    dplyr::group_by(date_first, farm) %>%
+    dplyr::mutate(data = "farm") %>%
+    dplyr::rename(date = date_first) %>% 
+    unique()
+# remove the extra words for easier comparison 
+timeline_farm[which(timeline_farm$farm == "Glacier Falls"),"farm"] = "Glacier"
+timeline_farm[which(timeline_farm$farm == "Wicklow Point"),"farm"] = "Wicklow"
+
+# group for the salmon coast data too
+timeline_scfs = scfs_data %>% 
+    dplyr::select(farm, date) %>%
+    dplyr::group_by(farm, date) %>%
+    dplyr::mutate(data = "scfs") %>%
+    unique()
+
+# bind these data together
+timeline_data = rbind(timeline_farm, timeline_scfs)
+
+
+
 
 
 
