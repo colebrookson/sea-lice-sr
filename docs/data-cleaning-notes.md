@@ -5,6 +5,8 @@
 
 ## Farm Data 
 
+NOTE: Glacier has two sites (9 & 10) in Gary Marty map. 
+
 ### Current Questions:
 
 1) Gary Marty data has data in 2000-2002 that includes measurements of fish >600 days at sea with no counts and counts right after treatments. Should both of those be included? Keeping them in for now but want clarification. 
