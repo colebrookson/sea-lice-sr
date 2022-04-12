@@ -66,21 +66,25 @@ system_map = ggplot() +
     geom_point(data = farm_loc,
                 aes(x = long, y = lat,
                     fill = ktc,
-                    shape = sampled),
-                    size = 3.5) +
+                    shape = sampled,
+                    size = sampled)) +
     geom_text_repel(data = farm_loc,
                     aes(x = long, y = lat, 
                         label = farm_num#, colour = sampled
                         )) +
     scale_fill_manual("Knight Tribune Corridor Classification", 
                         values = c("#963CBDFF", "#FF6F61FF")) +
-    scale_shape_manual("Sampling Site Near Farm", values = c(21, 24)) +
+    scale_shape_manual("Sampling Site Near Farm", 
+                        values = c(23, 21),
+                        labels = c("Sampling Site", "No Sampling Site")) +
+    scale_size_manual(values = c(5,3)) +
     guides(fill = guide_legend(
         override.aes = list(size = 4, shape = 21)
         ),
     shape = guide_legend(
         override.aes = list(size = 4)
-        )) +
+        ),
+    size = "none") +
     #scale_colour_manual(values = c("red", "black")) +
     theme_small_map() +
     labs(x = "Longitude", y = "Latitude")
