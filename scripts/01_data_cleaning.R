@@ -176,6 +176,11 @@ scfs_regress_chal_inc = scfs_regress_chal_inc %>%
 # write data
 readr::write_csv(scfs_regress_chal_inc,
     here("./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
+
+
+
+
+    
 ##################### BELOW THIS POINT IS NOT CLEAN ###########################
 
 

@@ -15,7 +15,8 @@ library(here)
 library(glmmTMB)
 library(DHARMa)
 
-farm_regress = read_csv(here("./data/clean-farm/marty-bati-joined.csv"))
+farm_regress = read_csv(
+    here("./data/clean-farm/marty-bati-data-joined-stocked-only.csv"))
 scfs_regress = read_csv(
     here("./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
 
