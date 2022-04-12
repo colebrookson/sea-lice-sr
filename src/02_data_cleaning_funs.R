@@ -76,22 +76,22 @@ trim_marty_data = function(df) {
 farm_names = function(df) {
 
     # vector of common names of the farm 
-    farm_name = c(
+    farm_name_vec = c(
     "Simmonds Point", "Whlis Bay", "Maude Island", "Cecil Island",
-    "Cypress Harbour", "Sir Edmund Bay", "NA_7", "Cliff Bay", "Glacier Falls",
-    "Burdwood", "NA_11", "NA_12", "Wicklow Point", "NA_14", "NA_15",
+    "Cypress Harbour", "Sir Edmund Bay", "NA_7", "Cliff Bay", "Glacier Falls", 
+    "Burdwood", "NA_12", "Wicklow Point", "NA_14", "NA_15",
     "Upper Retreat", "Arrow Pass", "Midsummer", "Potts Bay", "Port Elizabeth",
     "Humphrey Rock", "Sargeaunt Pass", "Doctors Islets", "Swanson", 
     "Larson Island", "Noo-la"
     )
 
     # vector of the numbers assigned by Gary Mary (2010)
-    farm_num = seq(1, 26, 1)
+    farm_num_vec = c(seq(1, 9, 1), seq(11, 26, 1))
 
     # make dataframe of the two name types 
     names_df = data.frame(
-        farm_name = farm_name,
-        farm_num = farm_num
+        farm_name = farm_name_vec,
+        farm_num = farm_num_vec
     )
 
     # bind the df so both name types are present 
@@ -235,8 +235,54 @@ join_marty_bati_data = function(marty_df, bati_df) {
 
 }
 
-bind_map_data = function(marty_df, bati_df) {
+bind_map_data = function(
+    all_farm_data, 
+    raw_marty_data, 
+    farm_locations_df,
+    dfo_open_data) {
 
+    # clean/standardize marty data
+    marty_df_trimmed = raw_marty_data %>% 
+
+        # get only the columns I want 
+        dplyr::select(
+            Year, `Farm # on  Map`, Month, `# Motiles (L.salmonis)`, `# fish`
+        ) %>% 
+
+        # rename 
+        dplyr::rename(
+            year = Year,
+            farm_num = `Farm # on  Map`,
+            month = Month,
+            avg_leps = `# Motiles (L.salmonis)`,
+            inventory = `# fish`
+        ) %>% 
+
+        # get the farm names 
+        farm_names()
+
+    # clean/standardize dfo open data
+    dfo_open_data_trimmed = dfo_open_data %>% 
+
+        # keep only the Broughton area observations
+        dplyr::filter(
+            `Finfish Aquaculture Reporting Zone` == "Broughton Archipelago"
+        ) %>% 
+
+        # keep only specific columns
+        dplyr::select(
+            Year, Month, `Site Common Name`, Latitude, Longitude,
+        ) %>% 
+
+        # rename to standard 
+        dplyr::rename(
+            year = Year, 
+            month = Month, 
+            farm_name = `Site Common Name`,
+            lat = Latitude,
+            long = Longitude
+        )
+    
     raw_df_cleaned = raw_df %>% 
 
         # filter to only area of interest

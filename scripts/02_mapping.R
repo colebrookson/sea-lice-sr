@@ -25,7 +25,7 @@ source(here("./src/02_data_cleaning_funs.R"))
 # set file locations
 lice_file_location = "./data/louse-data/Sea-lice-database-master/Data/"
 farm_file_location = "./data/raw-farm/canadian-gov-open-data/"
-farm_data = read_csv(here(paste0(farm_file_location, 
+dfo_open_data = read_csv(here(paste0(farm_file_location, 
                                 "fish-farm-sea-louse-counts-data.csv")))
 lice_site_data = read_csv(here(paste0(lice_file_location,
                                 "BroughtonSeaLice_siteData.csv")))

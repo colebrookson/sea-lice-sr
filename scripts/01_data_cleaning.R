@@ -20,7 +20,8 @@ source(here("./src/02_data_cleaning_funs.R"))
 lice_file_location = "./data/louse-data/Sea-lice-database-master/Data/"
 
 # pull in data files 
-farm_data_raw = readr::read_csv(here("./data/raw-farm/BATI_farm_louse_data_RAW.csv"))
+farm_data_raw = readr::read_csv(here(
+    "./data/raw-farm/BATI_farm_louse_data_RAW.csv"))
 farm_locations_raw = readr::read_csv(here("./data/raw-farm/farm-locations.csv"))
 scfs_data_raw = readr::read_csv(here(paste0(lice_file_location,
                                 "BroughtonSeaLice_fishData.csv")))
@@ -76,7 +77,8 @@ all_farm_data = join_marty_bati_data(
     marty_data_trimmed, farm_data
 )
 readr::write_csv(
-    all_farm_data, here("./data/clean-farm/marty-bati-joined.csv"))
+    all_farm_data, here("./data/clean-farm/marty-bati-joined.csv")
+)
 
 # prepare data sources for regression ==========================================
 
@@ -141,7 +143,9 @@ readr::write_csv(scfs_regress_chal_inc,
 ##################### BELOW THIS POINT IS NOT CLEAN ###########################
 
 
-
+# open government data processing ==============================================
+farm_data = farm_data %>% 
+    dplyr::filter(Finfish Aquaculture Reporting Zone)
 
 
 
