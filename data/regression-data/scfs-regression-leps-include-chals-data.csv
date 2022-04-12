@@ -1,4 +1,4 @@
-all_lice,all_lep,all_cal,month,year,day,date,farm,week
+all_lice,all_lep,all_cal,month,year,day,date,farm_name,week
 2,0,0,6,2001,12,2001-06-12,Burdwood,24
 3,0,0,6,2001,12,2001-06-12,Burdwood,24
 4,0,0,6,2001,12,2001-06-12,Burdwood,24

@@ -100,19 +100,17 @@ readr::write_csv(farm_map_nums,
 # bind marty and bati data =====================================================
 
 all_farm_data = join_marty_bati_data(
-    marty_data_trimmed, farm_data, farm_map_nums
+    marty_df, bati_df, farm_map_nums
 )
 readr::write_csv(
     all_farm_data, here("./data/clean-farm/marty-bati-joined.csv")
 )
-
 
 # check that there are no lep_tot measures when there is not a stock measurement
 check_lep_total_calculations(all_farm_data)
 
 # add option that excludes non-stocked obs/no lep count obs 
 all_farm_data_stocked = all_farm_data %>% 
-
     # exclude where lep_tot is NA
     dplyr::filter(!is.na(lep_tot))
 readr::write_csv(
@@ -161,7 +159,12 @@ scfs_data_chal_exc = scfs_data %>%
 
 # scfs data
 scfs_regress_chal_inc = data.frame(scfs_data_chal_inc %>% 
-    dplyr::select(all_lice, all_lep, all_cal, month, year, day, date, farm))
+    dplyr::select(all_lice, all_lep, all_cal, 
+                    month, year, day, date, farm)) %>% 
+    # rename farm to farm_name to stay consistent
+    dplyr::rename(
+        farm_name = farm
+    )
 
 # need to make a column for week 
 scfs_regress_chal_inc$week = 
@@ -180,7 +183,7 @@ readr::write_csv(scfs_regress_chal_inc,
 
 
 
-    
+
 ##################### BELOW THIS POINT IS NOT CLEAN ###########################
 
 
