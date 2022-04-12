@@ -106,48 +106,21 @@ readr::write_csv(
     all_farm_data, here("./data/clean-farm/marty-bati-joined.csv")
 )
 
+
 # check that there are no lep_tot measures when there is not a stock measurement
-for (row in seq_len(nrow(all_farm_data))) { 
-
-    temp_row = all_farm_data[row, c("inventory", "lep_av", "lep_tot")]
-
-    # make sure at least one of lep_av or inventory is NA if lep_tot is NA
-    if (
-        is.na(temp_row$lep_tot) &
-            (!is.na(temp_row$inventory) & !is.na(temp_row$lep_av))
-    ) {
-        stop(paste0("ERROR - PROBLEM AT ROW NUMBER ", row, 
-            "lep_tot cannot be NA if there are inventory and average values!"))
-    }
-
-    # if there is a lep_tot value, make sure neither lep_av or inventory is NA
-    if (
-        !is.na(temp_row$lep_tot) & 
-            (is.na(temp_row$inventory) | is.na(temp_row$lep_av))
-    ) {
-        stop(paste0("ERROR - PROBLEM AT ROW NUMBER ", row, 
-            " --lep_tot cannot have value if inventory or avg are NA!"))
-    }
-
-
-}
-if (!identical(sort(names(marty_df_deferred)), 
-            sort(names(bati_df_renamed)))) {
-
-    stop("column names not the same!")
-}
+check_lep_total_calculations(all_farm_data)
 
 # add option that excludes non-stocked obs/no lep count obs 
+all_farm_data_stocked = all_farm_data %>% 
 
-
-all_farm_stocked = all_farm_data %>% 
-
-    # filter inventoryt and lep_tot 
+    # exclude where lep_tot is NA
     dplyr::filter(!is.na(lep_tot))
+readr::write_csv(
+    all_farm_data_stocked, 
+        here("./data/clean-farm/marty-bati-data-joined-stocked-only.csv")
+)
 
 # prepare data sources for regression ==========================================
-
-
 
 # look at ways lice are measured
 scfs_lice_cols = c("lep_cope", "chala", "chalb", "lep_pamale", "lep_pafemale",
@@ -169,7 +142,8 @@ scfs_data_chal_inc = scfs_data %>%
                                 lep_pafemale, lep_male, lep_nongravid, 
                                 lep_gravid, cal_cope, cal_mot, cal_gravid, 
                                 unid_cope, chal_unid, unid_pa, unid_adult,
-                                na.rm = TRUE))
+                                na.rm = TRUE),
+                    date = lubridate::make_date(year, month, day))
 # sum across the lice spp cols -- DO NOT INCLUDE CHALIMUS
 scfs_data_chal_exc = scfs_data %>% 
     dplyr::rowwise() %>%
@@ -181,7 +155,8 @@ scfs_data_chal_exc = scfs_data %>%
                                 lep_pafemale, lep_male, lep_nongravid, 
                                 lep_gravid, cal_cope, cal_mot, cal_gravid, 
                                 unid_cope, chal_unid, unid_pa, unid_adult,
-                                na.rm = TRUE))
+                                na.rm = TRUE),
+                    date = lubridate::make_date(year, month, day))
 # set up both data with only the information we want & write it out ============
 
 # scfs data
@@ -191,6 +166,8 @@ scfs_regress_chal_inc = data.frame(scfs_data_chal_inc %>%
 # need to make a column for week 
 scfs_regress_chal_inc$week = 
     lubridate::week(lubridate::ymd(scfs_regress_chal_inc$date))
+
+table(scfs_regress_chal_inc$week)
 
 # exclude data from weeks 28, 33, 9 
 scfs_regress_chal_inc = scfs_regress_chal_inc %>% 

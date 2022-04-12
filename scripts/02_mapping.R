@@ -36,8 +36,26 @@ dfo_open_data = read_csv(here(paste0(farm_file_location,
 farm_locations_df = read_csv(here(here("./data/raw-farm/farm-locations.csv")))
 
 # pull together data for mapping ===============================================
+
+# put together relevant data
 farm_loc = bind_map_data(raw_marty_data, farm_locations_df, dfo_open_data,
                             c("Wicklow Point", "Burdwood", "Glacier Falls (1)"))
+
+# write out combos of farm names and farm numbers 
+farm_map_nums = farm_loc %>% 
+    # keep relevant columns
+    dplyr::select(farm_name, farm_num) %>% 
+    # ensure both galcier falls are categorized together 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+        farm_name = ifelse(farm_name %in% 
+                c("Glacier Falls (1)", "Glacier Falls (2)"),
+            "Glacier Falls", farm_name),
+        farm_num = ifelse(farm_name == "Glacier Falls", 6, farm_num)
+    ) %>% 
+    unique()
+write_csv(farm_map_nums, 
+        here("./data/clean-farm/farm-numbers-names-according-to-map.csv"))
 
 # make factors
 farm_loc$ktc = as.factor(farm_loc$ktc)
