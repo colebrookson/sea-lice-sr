@@ -94,17 +94,56 @@ farm_map_nums = farm_loc %>%
         farm_num = ifelse(farm_name == "Glacier Falls", 6, farm_num)
     ) %>% 
     unique()
-write_csv(farm_map_nums, 
+readr::write_csv(farm_map_nums, 
         here("./data/clean-farm/farm-numbers-names-according-to-map.csv"))
 
 # bind marty and bati data =====================================================
 
 all_farm_data = join_marty_bati_data(
-    marty_data_trimmed, farm_data
+    marty_data_trimmed, farm_data, farm_map_nums
 )
 readr::write_csv(
     all_farm_data, here("./data/clean-farm/marty-bati-joined.csv")
 )
+
+# check that there are no lep_tot measures when there is not a stock measurement
+for (row in seq_len(nrow(all_farm_data))) { 
+
+    temp_row = all_farm_data[row, c("inventory", "lep_av", "lep_tot")]
+
+    # make sure at least one of lep_av or inventory is NA if lep_tot is NA
+    if (
+        is.na(temp_row$lep_tot) &
+            (!is.na(temp_row$inventory) & !is.na(temp_row$lep_av))
+    ) {
+        stop(paste0("ERROR - PROBLEM AT ROW NUMBER ", row, 
+            "lep_tot cannot be NA if there are inventory and average values!"))
+    }
+
+    # if there is a lep_tot value, make sure neither lep_av or inventory is NA
+    if (
+        !is.na(temp_row$lep_tot) & 
+            (is.na(temp_row$inventory) | is.na(temp_row$lep_av))
+    ) {
+        stop(paste0("ERROR - PROBLEM AT ROW NUMBER ", row, 
+            " --lep_tot cannot have value if inventory or avg are NA!"))
+    }
+
+
+}
+if (!identical(sort(names(marty_df_deferred)), 
+            sort(names(bati_df_renamed)))) {
+
+    stop("column names not the same!")
+}
+
+# add option that excludes non-stocked obs/no lep count obs 
+
+
+all_farm_stocked = all_farm_data %>% 
+
+    # filter inventoryt and lep_tot 
+    dplyr::filter(!is.na(lep_tot))
 
 # prepare data sources for regression ==========================================
 

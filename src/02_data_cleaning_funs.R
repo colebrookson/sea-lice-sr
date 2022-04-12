@@ -288,11 +288,18 @@ join_marty_bati_data = function(marty_df, bati_df, farm_map_nums) {
             hump_sarg_doc = ifelse(farm_name %in% 
                 c("Sargeaunt Pass", "Doctors Islets", "Humphrey Rock"), 
                 "Humphrey-Sargeaunt-Doctors Triangle", "Other")
+        ) %>%
+
+        # mutate new row to calculate the lep_tot row
+        dplyr::rowwise() %>%
+        dplyr::mutate(
+            lep_tot = lep_av * inventory,
+            cal_tot = cal_av * inventory
         )
 
 
     # return 
-    return(bound_df)
+    return(bound_df_groups)
 
 }
 
@@ -473,4 +480,30 @@ bind_map_data = function(
     # return 
     return(map_df_groupings)
 
+}
+
+check_lep_total_calculations = function(all_farm_data) {
+
+    for (row in seq_len(nrow(all_farm_data))) {
+
+    temp_row = all_farm_data[row, c("inventory", "lep_av", "lep_tot")]
+
+    # make sure at least one of lep_av or inventory is NA if lep_tot is NA
+    if (
+            is.na(temp_row$lep_tot) &
+                (!is.na(temp_row$inventory) & !is.na(temp_row$lep_av))
+        ) {
+            stop(paste0("ERROR - PROBLEM AT ROW NUMBER ", row, 
+            " -- lep_tot cannot be NA if inventory and avg_lep have values!"))
+        }
+
+        # if there is lep_tot value, make sure neither lep_av or inventory is NA
+        if (
+            !is.na(temp_row$lep_tot) & 
+                (is.na(temp_row$inventory) | is.na(temp_row$lep_av))
+        ) {
+            stop(paste0("ERROR - PROBLEM AT ROW NUMBER ", row, 
+                " --lep_tot cannot have value if inventory or avg are NA!"))
+        }
+    }
 }
