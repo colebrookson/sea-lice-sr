@@ -133,7 +133,7 @@ scfs_cals = c("cal_cope", "cal_mot", "cal_gravid")
 scfs_data_chal_inc = scfs_data %>% 
     dplyr::rowwise() %>%
     dplyr::mutate(all_lep = sum(lep_cope, lep_pamale, lep_pafemale, lep_male, 
-                            lep_nongravid, lep_gravid, na.rm = TRUE),
+                            lep_nongravid, lep_gravid, chala, chalb, na.rm = TRUE),
                     all_cal = sum(cal_cope, cal_mot, cal_gravid,
                                     na.rm = TRUE), 
                     all_lice = sum(lep_cope, chala, chalb, lep_pamale, 

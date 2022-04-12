@@ -22,7 +22,8 @@ library(patchwork)
 source(here("./src/01_plot_themes.R"))
 source(here("./src/02_data_cleaning_funs.R"))
 
-farm_regress = read_csv(here("./data/clean-farm/marty-bati-joined.csv"))
+farm_regress = read_csv(
+    here("./data/clean-farm/marty-bati-data-joined-stocked-only.csv"))
 scfs_regress = readr::read_csv(
     here("./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
 
@@ -31,11 +32,11 @@ scfs_regress$all_lep = as.integer(scfs_regress$all_lep)
 scfs_regress$all_cal = as.integer(scfs_regress$all_cal)
 scfs_regress$all_lice = as.integer(scfs_regress$all_lice)
 scfs_regress$year = as.factor(as.character(scfs_regress$year))
-scfs_regress$farm = as.factor(as.character(scfs_regress$farm))
+scfs_regress$farm_name = as.factor(as.character(scfs_regress$farm_name))
 scfs_regress$week = as.factor(as.character(scfs_regress$week))
 
 # clean farm data 
-farm_regress$farm = as.factor(as.character(farm_regress$farm))
+farm_regress$farm_name = as.factor(as.character(farm_regress$farm_name)) 
 farm_regress$year = as.factor(as.character(farm_regress$year))
 
 # read in model object
@@ -48,27 +49,105 @@ predict_data = data.frame(year = as.character(c(2001:2021)),
                         farm = NA)
 predict_data$all_lep = predict(tmb_fit, newdata = predict_data,
             type = "response",
-            re.form = NA
+            re.form = NA,
             )
 
 # add in log data 
 predict_data$log_all_lep = log10(predict_data$all_lep)
 
+# plot of model predictions
+just_wild_timeline = ggplot(data = predict_data) +
+    geom_point(aes(x = year, y = all_lep, fill = all_lep), 
+                shape = 21, 
+                colour = "black",
+                size = 3.5) + 
+    stat_smooth(aes(x = year, y = all_lep),
+                    colour = "black") +
+    labs(x = "Year", y = "Number of Lice per Fish", title = "Wild Leps") +
+    scale_fill_gradientn(
+        colours = rev(PNWColors::pnw_palette("Sunset2",
+                                        type = "continuous"))) +
+    scale_x_discrete(breaks = c(2005, 2010, 2015, 2020)) +
+    theme_raw_comp()
+ggsave(filename = here("./figs/just-wild-raw-comparison.png"),
+        plot = just_wild_timeline,
+        width = 8,
+        height = 6,
+        dpi = 600)
+
+
 # add in farm data for comparison ==============================================
 
 all_farms = farm_regress %>% 
+    dplyr::filter(month %in% c(3, 4)) %>% 
     dplyr::group_by(year) %>% 
-    dplyr::summarize(leps = mean(lep_av))
-focal_farms = farm_regress %>% 
-    dplyr::filter(farm %in% c("Wicklow Point", "Burdwood", "Glacier Falls")) %>%
+    dplyr::summarize(all_leps = mean(lep_tot))
+
+ktc_farms = farm_regress %>% 
+    dplyr::filter(month %in% c(3, 4)) %>% 
+    dplyr::filter(ktc == "Knight Tribune Corridor") %>%
     dplyr::group_by(year) %>%
-    dplyr::summarize(leps = mean(lep_av))
+    dplyr::summarize(ktc_leps = mean(lep_tot))
+
+h_s_d_farms_df = farm_regress %>% 
+    dplyr::filter(month %in% c(3, 4)) %>% 
+    dplyr::filter(hump_sarg_doc == "Humphrey-Sargeaunt-Doctors Triangle") %>%
+    dplyr::group_by(year) %>%
+    dplyr::summarize(hsd_leps = mean(lep_tot))
 
 # compare between two farm groupings 
-comp_data = data.frame(
-    all_farms_measure = all_farms$leps,
-    focal_farms_measure = focal_farms$leps
+comp_data = data.frame(year = as.factor(c(2000:2021)))
+comp_data_all = left_join(
+    x = comp_data,
+    y = all_farms,
+    by = "year"
 )
+comp_data_all_ktc = left_join(
+    x = comp_data_all,
+    y = ktc_farms,
+    by = "year"
+)
+comp_data_all_ktc_hsd = left_join(
+    x = comp_data_all_ktc,
+    y = h_s_d_farms_df,
+    by = "year"
+)
+all_comp = left_join(
+    x = comp_data_all_ktc_hsd,
+    y = (predict_data %>% select(year, all_lep)),
+    by = "year"
+)
+
+wild_to_all_farms =  mgcv::gam(all_lep ~ s(all_leps),
+                        data = all_comp)
+summary(wild_to_all_farms)
+saveRDS(wild_to_all_farms, 
+    here("./data/model-outputs/wild-lice-to-all-farms-gam.RDS"))
+wild_to_ktc_farms = mgcv::gam(all_lep ~ s(ktc_leps),
+                        data = all_comp)
+summary(wild_to_ktc_farms)
+saveRDS(wild_to_ktc_farms, 
+    here("./data/model-outputs/wild-lice-to-ktc-farms-gam.RDS"))
+wild_to_hsd_farms = mgcv::gam(all_lep ~ s(hsd_leps),
+                        data = all_comp)
+summary(wild_to_hsd_farms)
+saveRDS(wild_to_hsd_farms, 
+    here("./data/model-outputs/wild-lice-to-hsd-farms-gam.RDS"))
+
+
+all_comp$log_ktc = log10(all_comp$ktc_leps)
+all_comp$log_all_lep = log10(all_comp$all_lep)
+plot(x = all_comp$log_ktc, y = all_comp$log_all_lep)
+
+
+
+
+
+
+
+
+
+
 farm_grouping_regress = stats::lm(all_farms_measure ~ focal_farms_measure,
                             data = comp_data)
 saveRDS(farm_grouping_regress, 
@@ -155,8 +234,12 @@ predict_data_long_wild = predict_data_long %>%
     filter(measure == "Wild Leps")
 
 # plots ========================================================================
-p1 = ggplot(data = predict_data, 
-        aes(x = all_farms, y = all_lep, fill = all_lep)) +
+summary(wild_to_ktc_farms)
+summary(wild_to_hsd_farms)
+summary(wild_to_all_farms)
+
+p1 = ggplot(data = all_comp, 
+        aes(x = all_leps, y = all_lep, fill = all_lep)) +
     geom_point(
         shape = 21,
         colour = "black",
@@ -172,12 +255,12 @@ p1 = ggplot(data = predict_data,
     annotate(geom = "text", 
                 x = 3.5, 
                 y = 1.0, 
-                label = paste("R^2 ==", 0.367), 
+                label = paste("R^2 ==", 0.753), 
                 size = 7,
                 parse = TRUE)
 
-p2 = ggplot(data = predict_data, 
-        aes(x = focal_farms, y = all_lep, fill = all_lep)) +
+p2 = ggplot(data = all_comp, 
+        aes(x = ktc_leps, y = all_lep, fill = all_lep)) +
     geom_point(
         shape = 21,
         colour = "black",
@@ -186,14 +269,14 @@ p2 = ggplot(data = predict_data,
     scale_fill_gradientn(
         colours = rev(PNWColors::pnw_palette("Sunset2",
                                         type = "continuous"))) + 
-    labs(x = "Lice on Focal Farms", 
+    labs(x = "Lice on KTC Farms", 
             y = "Lice on Wild Fish", 
             title = "Focal Farms") + 
     theme_mod_comp() + 
     annotate(geom = "text", 
                 x = 2.75, 
                 y = 1.0, 
-                label = paste("R^2 ==", -0.0409), 
+                label = paste("R^2 ==", 0.872), 
                 size = 7,
                 parse = TRUE)
 p3 = ggplot(data = predict_data, 
@@ -263,23 +346,6 @@ ggsave(filename = here("./figs/wild-to-farm-raw-data-comparison.png"),
         height = 8,
         dpi = 600)
 
-just_wild_timeline = ggplot(data = predict_data_long_wild) +
-    geom_point(aes(x = year, y = value, fill = value), 
-                shape = 21, 
-                colour = "black",
-                size = 3.5) + 
-    stat_smooth(aes(x = year, y = value),
-                    colour = "black") +
-    labs(x = "Year", y = "Number of Lice per Fish", title = "Wild Leps") +
-    scale_fill_gradientn(
-        colours = rev(PNWColors::pnw_palette("Sunset2",
-                                        type = "continuous"))) +
-    theme_raw_comp()
-ggsave(filename = here("./figs/just-wild-raw-comparison.png"),
-        plot = just_wild_timeline,
-        width = 10,
-        height = 8,
-        dpi = 600)
 
 
 

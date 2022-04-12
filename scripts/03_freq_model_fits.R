@@ -25,7 +25,7 @@ scfs_regress$all_lep = as.integer(scfs_regress$all_lep)
 scfs_regress$all_cal = as.integer(scfs_regress$all_cal)
 scfs_regress$all_lice = as.integer(scfs_regress$all_lice)
 scfs_regress$year = as.factor(as.character(scfs_regress$year))
-scfs_regress$farm = as.factor(as.character(scfs_regress$farm))
+scfs_regress$farm_name = as.factor(as.character(scfs_regress$farm_name))
 scfs_regress$week = as.factor(as.character(scfs_regress$week))
 
 # use glmmTMB ==================================================================
@@ -36,7 +36,7 @@ n_cores = min(parallel::detectCores(), 8)
 # fit models using the different approaches 
 
 # approach 1 - location as random effect
-tmb_glmm_1_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
+tmb_glmm_1_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_name),
                     data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~0,
@@ -45,7 +45,7 @@ tmb_glmm_1_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                                              parallel = n_cores)
 )
 saveRDS(tmb_glmm_1_nb, here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
-tmb_glmm_1_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
+tmb_glmm_1_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_name),
                     data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~1,
