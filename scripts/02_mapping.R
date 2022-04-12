@@ -29,6 +29,7 @@ dfo_open_data = read_csv(here(paste0(farm_file_location,
                                 "fish-farm-sea-louse-counts-data.csv")))
 lice_site_data = read_csv(here(paste0(lice_file_location,
                                 "BroughtonSeaLice_siteData.csv")))
+farm_locations_df = read_csv(here(here("./data/raw-farm/farm-locations.csv")))
 
 # pull together data for mapping ===============================================
 farm_loc = bind_map_data(farm_data, 

@@ -180,7 +180,9 @@ join_marty_bati_data = function(marty_df, bati_df) {
                 "Larson Island" = "Larsen Island",
                 "Midsummer" = "Midsummer Island",
                 "Sargeaunt Pass" = "Sargeaunt Passage",
-                "Swanson" = "Swanson Island"
+                "Swanson" = "Swanson Island",
+                "Doctors Islets" = "Doctor Islets",
+                "Wehlis Bay" = "Whlis Bay"
             )
         )
 
@@ -239,14 +241,15 @@ bind_map_data = function(
     all_farm_data, 
     raw_marty_data, 
     farm_locations_df,
-    dfo_open_data) {
+    dfo_open_data,
+    sampled_farms) {
 
     # clean/standardize marty data
     marty_df_trimmed = raw_marty_data %>% 
 
         # get only the columns I want 
         dplyr::select(
-            Year, `Farm # on  Map`, Month, `# Motiles (L.salmonis)`, `# fish`
+            Year, `Farm # on  Map`, Month, `Motile L.s./ fish`, `# fish`
         ) %>% 
 
         # rename 
@@ -254,12 +257,40 @@ bind_map_data = function(
             year = Year,
             farm_num = `Farm # on  Map`,
             month = Month,
-            avg_leps = `# Motiles (L.salmonis)`,
+            avg_leps = `Motile L.s./ fish`,
             inventory = `# fish`
         ) %>% 
 
-        # get the farm names 
-        farm_names()
+        # trim down data to exclude unneeded calculations at the bottom
+        dplyr::slice(
+            -(2507:nrow(raw_marty_data))
+        )
+
+    # join farm locations df with marty data to get locations 
+    marty_locs = dplyr::left_join(
+        marty_df_trimmed,
+        farm_locations_df,
+        by = "farm_num"
+    )
+
+    # put mean leps in dataframe 
+    marty_summarized = marty_locs %>% 
+
+        # factor the columns that need it for the group_by()
+        #factor()
+
+        # group by to get the mean at the level we want
+        dplyr::group_by(
+            farm_name, lat, long
+        ) %>%
+
+        # summarize to get the mean across the groups 
+        dplyr::summarize(
+            mean_leps = mean(avg_leps, na.rm = TRUE)
+        ) %>%
+
+        # ungroup because the ifelse needs a character not a factor
+        dplyr::ungroup()
 
     # clean/standardize dfo open data
     dfo_open_data_trimmed = dfo_open_data %>% 
@@ -271,7 +302,8 @@ bind_map_data = function(
 
         # keep only specific columns
         dplyr::select(
-            Year, Month, `Site Common Name`, Latitude, Longitude,
+            Year, Month, `Site Common Name`, Latitude, 
+            Longitude, `Average L. salmonis motiles per fish`
         ) %>% 
 
         # rename to standard 
@@ -280,71 +312,88 @@ bind_map_data = function(
             month = Month, 
             farm_name = `Site Common Name`,
             lat = Latitude,
-            long = Longitude
-        )
-    
-    raw_df_cleaned = raw_df %>% 
-
-        # filter to only area of interest
-        dplyr::filter(
-            `Finfish Aquaculture Reporting Zone` == "Broughton Archipelago"
-        ) %>%
-
-        # keep names we want to group by
-        dplyr::select(
-            `Site Common Name`, Longitude, Latitude,
-            `Average L. salmonis motiles per fish`
-        ) %>%
-
-        # rename columns so they're consistent with how they're plotted
-        dplyr::rename(
-            farm = `Site Common Name`,
-            lat = Latitude,
             long = Longitude,
             avg_leps = `Average L. salmonis motiles per fish`
-        ) %>%
+        ) %>% 
 
-        # need to make farm into a factor so we can group by it
+        # get rid of the two separate locations for Tsa-ya
         dplyr::mutate(
-            farm = as.factor(farm)
+            lat = ifelse(farm_name == "Tsa-ya" & lat != 50.61330, 
+                            50.61330, lat),
+            long = ifelse(farm_name == "Tsa-ya" & long != -126.33073, 
+                            -126.33073, long)
+        ) %>% 
+
+        # flip the wrong lat long values
+        dplyr::rowwise() %>% 
+        dplyr::mutate(
+            fixed_lat = ifelse(lat > 0, lat, long),
+            fixed_long = ifelse(long < 0, long, lat)
         ) %>%
+        dplyr::select(
+            -lat, -long
+        ) %>% 
+        dplyr::rename(
+            lat = fixed_lat,
+            long = fixed_long
+        ) %>% 
 
         # group by to get the mean at the level we want
         dplyr::group_by(
-            farm, lat, long
-        ) %>%
+            farm_name, lat, long
+        ) %>% 
 
         # summarize to get the mean across the groups 
         dplyr::summarize(
             mean_leps = mean(avg_leps, na.rm = TRUE)
         ) %>%
 
-        # filter to get rid of the confusing wrong latitude values 
-        dplyr::filter(
-            lat > 0
-        ) %>%
+        # recode the levels of the names 
+        dplyr::mutate(farm_name = factor(farm_name)) %>% 
+        dplyr::mutate(
+            farm_name = forcats::fct_recode(farm_name, 
+                "Doctors Islets" = "Doctor Islets",
+                "Larson Island" = "Larsen Island",
+                "Whlis Bay" = "Wehlis Bay"
+            )
+        ) %>% 
 
         # ungroup because the ifelse needs a character not a factor
         dplyr::ungroup()
 
-    ### add in a column denoting sampled versus unsampled farms 
-    raw_df_cleaned_sampled = raw_df_cleaned %>%
+    # pull in the other glacier location and add in the more recent farms 
+    map_df = rbind(
+
+        # marty data pulled in as is
+        marty_summarized,
+
+        # filter dfo data to only the ones not in marty_summarized
+        dfo_open_data_trimmed %>% 
+            # only keep the rows not in the marty data
+            dplyr::filter(farm_name %notin% marty_summarized$farm_name &
+                            farm_name != "Glacier Falls"),
+
+        # filter the farm location one to just the glacier falls 
+        farm_locations_df %>% 
+                dplyr::select(-farm_num) %>% 
+                dplyr::filter(farm_name == "Glacier Falls (2)") %>% 
+                dplyr::mutate(mean_leps = (marty_summarized %>% 
+                    dplyr::filter(farm_name == "Glacier Falls (1)"))$mean_leps)
+    )
+
+    # add in a column denoting sampled versus unsampled farms 
+    map_df_sampled = map_df %>%
 
         # make new column 
         dplyr::mutate(
             sampled =
-            ifelse(raw_df_cleaned$farm %in% sampled,
+            ifelse(map_df$farm_name %in% sampled_farms,
                     "sampled",
                     "unsampled"
             )
         )
 
-    ### make separate object with only the sampled farms
-    sampled_farms_df = raw_df_cleaned_sampled %>% 
-        dplyr::filter(
-            sampled == "sampled"
-        )
-
+    # return 
     return(raw_df_cleaned_sampled)
 
 }
