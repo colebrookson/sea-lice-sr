@@ -238,7 +238,6 @@ join_marty_bati_data = function(marty_df, bati_df) {
 }
 
 bind_map_data = function(
-    all_farm_data, 
     raw_marty_data, 
     farm_locations_df,
     dfo_open_data,
@@ -275,9 +274,6 @@ bind_map_data = function(
 
     # put mean leps in dataframe 
     marty_summarized = marty_locs %>% 
-
-        # factor the columns that need it for the group_by()
-        #factor()
 
         # group by to get the mean at the level we want
         dplyr::group_by(
@@ -394,6 +390,6 @@ bind_map_data = function(
         )
 
     # return 
-    return(raw_df_cleaned_sampled)
+    return(map_df_sampled)
 
 }
