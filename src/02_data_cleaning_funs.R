@@ -377,7 +377,7 @@ bind_map_data = function(
                     dplyr::filter(farm_name == "Glacier Falls (1)"))$mean_leps)
     )
 
-    # add in a column denoting sampled versus unsampled farms 
+    # add in columns for numbers and sampled columns
     map_df_sampled = map_df %>%
 
         # make new column 
@@ -387,6 +387,12 @@ bind_map_data = function(
                     "sampled",
                     "unsampled"
             )
+        ) %>% 
+
+        # add the numbers of the farms according to latitude
+        dplyr::arrange(desc(lat)) %>% 
+        dplyr::mutate(
+            farm_num = seq(1,28,1)
         )
 
     # return 

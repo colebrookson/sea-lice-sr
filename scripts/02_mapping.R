@@ -36,7 +36,7 @@ dfo_open_data = read_csv(here(paste0(farm_file_location,
 farm_locations_df = read_csv(here(here("./data/raw-farm/farm-locations.csv")))
 
 # pull together data for mapping ===============================================
-farm_loc = bind_map_data(raw_marty_data, farm_locations_df, dfo_open_data
+farm_loc = bind_map_data(raw_marty_data, farm_locations_df, dfo_open_data,
                             c("Wicklow Point", "Burdwood", "Glacier Falls"))
 
 # get map data
@@ -64,7 +64,8 @@ system_map = ggplot() +
                     fill = mean_leps),
                     shape = 21) +
     geom_text_repel(data = farm_loc,
-                    aes(x = long, y = lat, label = farm, colour = sampled)) +
+                    aes(x = long, y = lat, 
+                        label = farm_name, colour = sampled)) +
     scale_fill_gradientn("Mean # of Lice per Fish",
                             colors = size_pal, guide = "legend",
                                 limits = c(0, 5),
