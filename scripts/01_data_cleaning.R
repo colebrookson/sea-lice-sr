@@ -18,19 +18,23 @@ source(here("./src/02_data_cleaning_funs.R"))
 
 # set location of other data
 lice_file_location = "./data/louse-data/Sea-lice-database-master/Data/"
+farm_file_location = "./data/raw-farm/canadian-gov-open-data/"
 
 # pull in data files 
 farm_data_raw = readr::read_csv(here(
     "./data/raw-farm/BATI_farm_louse_data_RAW.csv"))
-farm_locations_raw = readr::read_csv(here("./data/raw-farm/farm-locations.csv"))
-scfs_data_raw = readr::read_csv(here(paste0(lice_file_location,
-                                "BroughtonSeaLice_fishData.csv")))
-lice_site_data_raw = readr::read_csv(here(paste0(lice_file_location,
-                                "BroughtonSeaLice_siteData.csv")))
+farm_locations_df = readr::read_csv(here("./data/raw-farm/farm-locations.csv"))
 raw_marty_data = readxl::read_excel(
     path = here("./data/raw-farm/marty-2010-data/sd01.xlsx"),
     sheet = 2
 )
+dfo_open_data = read_csv(here(paste0(farm_file_location, 
+                                "fish-farm-sea-louse-counts-data.csv")))
+scfs_data_raw = readr::read_csv(here(paste0(lice_file_location,
+                                "BroughtonSeaLice_fishData.csv")))
+lice_site_data_raw = readr::read_csv(here(paste0(lice_file_location,
+                                "BroughtonSeaLice_siteData.csv")))
+
 
 # naming standardization =======================================================
 
@@ -38,7 +42,7 @@ names(farm_data_raw)
 names(scfs_data_raw)
 names(lice_site_data_raw)
 
-farm_data = standardize_names(farm_data_raw)
+bati_df = standardize_names(farm_data_raw)
 scfs_data = standardize_names(scfs_data_raw)
 lice_site_data = standardize_names(lice_site_data_raw)
 
@@ -55,7 +59,7 @@ names(scfs_data)[names(scfs_data) == "location"] = "farm"
 ##### END NOTE #######################
 
 # use previously written functions to clean up the data 
-marty_data_trimmed = raw_marty_data %>% 
+marty_df = raw_marty_data %>% 
 
     # step 1 -  select only columns of interest, chop the bottom summary stuff 
     # off, and rename the columns 
@@ -68,8 +72,30 @@ marty_data_trimmed = raw_marty_data %>%
     fix_months()
 
 # filter out times when stocks were empty (i.e. # of fish is zero)
-marty_data_stocked = marty_data_trimmed %>% 
+marty_df_stocked = marty_df %>% 
     dplyr::filter(!is.na(inventory))
+
+# ensure that farm names/numbers are matching to map ===========================
+
+# put together relevant data
+farm_loc = bind_map_data(raw_marty_data, farm_locations_df, dfo_open_data,
+                            c("Wicklow Point", "Burdwood", "Glacier Falls (1)"))
+
+# write out combos of farm names and farm numbers 
+farm_map_nums = farm_loc %>% 
+    # keep relevant columns
+    dplyr::select(farm_name, farm_num) %>% 
+    # ensure both galcier falls are categorized together 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+        farm_name = ifelse(farm_name %in% 
+                c("Glacier Falls (1)", "Glacier Falls (2)"),
+            "Glacier Falls", farm_name),
+        farm_num = ifelse(farm_name == "Glacier Falls", 6, farm_num)
+    ) %>% 
+    unique()
+write_csv(farm_map_nums, 
+        here("./data/clean-farm/farm-numbers-names-according-to-map.csv"))
 
 # bind marty and bati data =====================================================
 
@@ -82,13 +108,7 @@ readr::write_csv(
 
 # prepare data sources for regression ==========================================
 
-# farm data can be grouped in three ways 
 
-# Humphrey, Sergeant, Doctors
-
-# All Farms
-
-# Cumulative Lice on the Knight Tribune Corridor
 
 # look at ways lice are measured
 scfs_lice_cols = c("lep_cope", "chala", "chalb", "lep_pamale", "lep_pafemale",

@@ -162,7 +162,7 @@ trim_updated_data = function(df) {
         )
 }
 
-join_marty_bati_data = function(marty_df, bati_df) {
+join_marty_bati_data = function(marty_df, bati_df, farm_map_nums) {
 
     # get rid of date column in bati_df 
     bati_df = bati_df %>% 
@@ -173,8 +173,10 @@ join_marty_bati_data = function(marty_df, bati_df) {
     marty_names = sort(unique(marty_df$farm_name))
 
     bati_df_renamed = bati_df %>% 
+
+        # make sure the levels of the bati data farm names match 
         dplyr::mutate(
-            farm = forcats::fct_recode(farm, 
+            farm_name = forcats::fct_recode(farm, 
                 "Arrow Pass" = "Arrow Passage",
                 "Humphrey Rock" = "Humphrey Rocks",
                 "Larson Island" = "Larsen Island",
@@ -182,9 +184,11 @@ join_marty_bati_data = function(marty_df, bati_df) {
                 "Sargeaunt Pass" = "Sargeaunt Passage",
                 "Swanson" = "Swanson Island",
                 "Doctors Islets" = "Doctor Islets",
-                "Wehlis Bay" = "Whlis Bay"
             )
-        )
+        ) %>% 
+
+        # get rid of old farm names 
+        dplyr::select(-farm)
 
     # make "total" columns in the marty_df
     marty_df_cleaned = marty_df %>%
@@ -203,17 +207,34 @@ join_marty_bati_data = function(marty_df, bati_df) {
 
         # rename appropriately
         dplyr::rename(
-            farm = farm_name,
             lep_av = lep_av_mot
-        ) %>%
-
-        # defer to BATI data, so only keep Marty data where BATI is not present
-        dplyr::filter(
-            year < min(bati_df$year)
         )
 
+    # defer to BATI data, so only keep Marty data where BATI is not present
+    marty_df_deferred = marty_df_cleaned %>% 
+
+        # create new column to denote if year/farm observation is in BATI df
+        dplyr::rowwise() %>% 
+        dplyr::mutate(
+            keep = dplyr::case_when(
+                (farm_name %in% # check for farm name
+                    unique(bati_df_renamed$farm_name)) &
+                (year %in% # chcke also for year
+                    unique(bati_df_renamed$year))         ~ "bati",
+                TRUE                                      ~ "marty"
+            )
+        ) %>% 
+
+        # now filter out the "bati" obs as those will be provided by that df
+        dplyr::filter(
+            keep == "marty"
+        ) %>% 
+
+        # get rid of the keep column since we've used it 
+        dplyr::select(-keep)
+
     # check the two df's are the name in terms of their column names 
-    if (!identical(sort(names(marty_df_cleaned)), 
+    if (!identical(sort(names(marty_df_deferred)), 
                    sort(names(bati_df_renamed)))) {
 
         stop("column names not the same!")
@@ -221,16 +242,31 @@ join_marty_bati_data = function(marty_df, bati_df) {
 
     # order the two dataframes the same so they can be bound together 
     col_order = c(
-        "farm", "year", "month", "inventory", "lep_av", 
+        "farm_name", "year", "month", "inventory", "lep_av", 
         "lep_tot", "cal_av", "cal_tot"
     )
-    reorder_marty_df = marty_df_cleaned[, col_order]
+    reorder_marty_df = marty_df_deferred[, col_order]
     reorder_bati_df = bati_df_renamed[, col_order]
 
     # bind dataframes 
     bound_df = data.frame(
         rbind(reorder_marty_df, reorder_bati_df)
     )
+
+    # take the extra new farms out of farm map names df 
+    farm_map_names_timmed = farm_map_nums %>% 
+
+        # filter 
+        dplyr::filter(
+            farm_name %notin% c("Wa-kwa", "Tsa-ya")
+        )
+
+    # make sure farm names match between the bound_df and the farm map names 
+    if (!identical(sort(unique(bound_df$farm_name)), 
+                   sort(unique(farm_map_names_timmed$farm_name)))) {
+        stop("column names not the same!")
+    }
+
 
     # return 
     return(bound_df)
