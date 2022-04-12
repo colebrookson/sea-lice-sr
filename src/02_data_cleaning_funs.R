@@ -395,7 +395,23 @@ bind_map_data = function(
             farm_num = seq(1,28,1)
         )
 
+    # add in the different groupings 
+    map_df_groupings = map_df_sampled %>% 
+
+        # add value for Knight Tribune Corridor
+        dplyr::rowwise() %>% 
+        dplyr::mutate(
+            ktc = ifelse(farm_name %in% 
+                c("Wicklow Point", "NA_14", "NA_12", "Sir Edmund Bay",
+                "Burdwood", "NA_7", "Cliff Bay", "Glacier Falls (2)",
+                "Glacier Falls (1)", "Humphrey Rock", "Doctors Islets", 
+                "Sargeaunt Pass"), "Knight Tribune Corridor", "Broughton"), 
+            hump_sarg_doc = ifelse(farm_name %in% 
+                c("Sargeaunt Pass", "Doctors Islets", "Humphrey Rock"), 
+                "Humphrey-Sargeaunt-Doctors Triangle", "Other")
+        )
+
     # return 
-    return(map_df_sampled)
+    return(map_df_groupings)
 
 }
