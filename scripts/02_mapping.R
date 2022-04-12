@@ -77,7 +77,7 @@ system_map = ggplot() +
     scale_shape_manual("Sampling Site Near Farm", 
                         values = c(23, 21),
                         labels = c("Sampling Site", "No Sampling Site")) +
-    scale_size_manual(values = c(5,3)) +
+    scale_size_manual(values = c(5.5, 3)) +
     guides(fill = guide_legend(
         override.aes = list(size = 4, shape = 21)
         ),
