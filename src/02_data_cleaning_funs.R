@@ -267,6 +267,29 @@ join_marty_bati_data = function(marty_df, bati_df, farm_map_nums) {
         stop("column names not the same!")
     }
 
+    # add in the farm_nums 
+    bound_df_nums = dplyr::left_join(
+        x = bound_df,
+        y = farm_map_names_timmed,
+        by = "farm_name"
+    ) 
+
+    # add in groups 
+    bound_df_groups = bound_df_nums %>% 
+
+        # add value for Knight Tribune Corridor
+        dplyr::rowwise() %>% 
+        dplyr::mutate(
+            ktc = ifelse(farm_name %in% 
+                c("Wicklow Point", "NA_14", "NA_12", "Sir Edmund Bay",
+                "Burdwood", "NA_7", "Cliff Bay", "Glacier Falls (2)",
+                "Glacier Falls (1)", "Humphrey Rock", "Doctors Islets", 
+                "Sargeaunt Pass"), "Knight Tribune Corridor", "Broughton"), 
+            hump_sarg_doc = ifelse(farm_name %in% 
+                c("Sargeaunt Pass", "Doctors Islets", "Humphrey Rock"), 
+                "Humphrey-Sargeaunt-Doctors Triangle", "Other")
+        )
+
 
     # return 
     return(bound_df)
