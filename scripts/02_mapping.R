@@ -65,7 +65,7 @@ system_map = ggplot() +
                     shape = 21) +
     geom_text_repel(data = farm_loc,
                     aes(x = long, y = lat, 
-                        label = farm_name, colour = sampled)) +
+                        label = farm_num, colour = sampled)) +
     scale_fill_gradientn("Mean # of Lice per Fish",
                             colors = size_pal, guide = "legend",
                                 limits = c(0, 5),
