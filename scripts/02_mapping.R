@@ -37,7 +37,12 @@ farm_locations_df = read_csv(here(here("./data/raw-farm/farm-locations.csv")))
 
 # pull together data for mapping ===============================================
 farm_loc = bind_map_data(raw_marty_data, farm_locations_df, dfo_open_data,
-                            c("Wicklow Point", "Burdwood", "Glacier Falls"))
+                            c("Wicklow Point", "Burdwood", "Glacier Falls (1)"))
+
+# make factors
+farm_loc$ktc = as.factor(farm_loc$ktc)
+farm_loc$hump_sarg_doc = as.factor(farm_loc$hump_sarg_doc)
+farm_loc$sampled = as.factor(farm_loc$sampled)
 
 # get map data
 province = "British Columbia"
@@ -60,24 +65,27 @@ system_map = ggplot() +
     coord_cartesian(xlim = c(-127, -126.1), ylim = c(50.5, 50.9)) +
     geom_point(data = farm_loc,
                 aes(x = long, y = lat,
-                    size = mean_leps,
-                    fill = mean_leps),
-                    shape = 21) +
+                    fill = ktc,
+                    shape = sampled),
+                    size = 3.5) +
     geom_text_repel(data = farm_loc,
                     aes(x = long, y = lat, 
-                        label = farm_num, colour = sampled)) +
-    scale_fill_gradientn("Mean # of Lice per Fish",
-                            colors = size_pal, guide = "legend",
-                                limits = c(0, 5),
-                                breaks = c(0, 1, 2, 3, 4, 5)) +
-    guides(fill = guide_legend(), size = guide_legend(), color = "none") +
-    scale_size_continuous("Mean # of Lice per Fish",
-                limits = c(0, 5), breaks = c(0, 1, 2, 3, 4, 5)) +
-    scale_colour_manual(values = c("red", "black")) +
+                        label = farm_num#, colour = sampled
+                        )) +
+    scale_fill_manual("Knight Tribune Corridor Classification", 
+                        values = c("#963CBDFF", "#FF6F61FF")) +
+    scale_shape_manual("Sampling Site Near Farm", values = c(21, 24)) +
+    guides(fill = guide_legend(
+        override.aes = list(size = 4, shape = 21)
+        ),
+    shape = guide_legend(
+        override.aes = list(size = 4)
+        )) +
+    #scale_colour_manual(values = c("red", "black")) +
     theme_small_map() +
     labs(x = "Longitude", y = "Latitude")
 
-ggsave(filename = here("./figs/farm-map.png"),
+ggsave(filename = here("./figs/numbered-farm-map.png"),
         plot = system_map,
         width = 10,
         height = 8,
