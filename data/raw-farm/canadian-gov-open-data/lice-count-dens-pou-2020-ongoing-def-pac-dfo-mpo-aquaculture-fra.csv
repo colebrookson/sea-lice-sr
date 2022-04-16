@@ -1,0 +1,121 @@
+,
+Année,L'année au cours de laquelle les dénombrements ont eu lieu  Définitions 
+Mois,Le mois au cours duquel les dénombrements ont eu lieu  
+Numéro de référence de l’installation,Le numéro d’identification unique de l’installation.
+Titulaire de permis ,Le nom de l’entreprise ou de la personne qui détient le permis d’aquaculture de l’installation.
+Nom courant de l'installation,Le nom le plus couramment utilisé pour faire référence à l’installation d’aquaculture.
+Latitude,La latitude de l’emplacement du site en degrés décimaux.
+Longitude,La longitude de l’emplacement du site en degrés décimaux.
+Zone visée sur l'aquaculture des poissons,La zone géographique dans laquelle l’installation est située.
+Type d’échantillon,"Raison pour laquelle l’échantillonnage est effectué, incluant la surveillance de routine, la surveillance avant la migration, les notifications de dépassement de seuil, l'échantillonnage de suivi des dépassements de seuil ou l'échantillonnage avant et après le traitement."
+Date de l’incident,Jour où l’échantillonnage a commencé. Voir ci-dessous pour les exigences relatives à chaque type d’échantillon. 
+Nombre d’enclos échantillonnés,Nombre d’enclos d’une installation ayant été échantillonnés pendant cet échantillonnage. 
+Nombre moyen de L. salmonis vagiles par poisson ,"Lepeophtheirus salmonis est le nom scientifique du pou du saumon. Le terme « vagile » s’applique aux poux du saumon mâles et femelles aux stades préadulte et adulte. Cette colonne indique le nombre moyen de L. salmonis aux stades vagiles par saumon d’élevage examiné. Du 1er mars au 30 juin, le seuil réglementaire est de trois poux aux stades vagiles par poisson.  "
+Nombre moyen de femelles L. salmonis par poisson,"Par femelles L. salmonis, on entend les poux du saumon femelles au stade adulte.  Cette colonne fournit de l’information sur le nombre moyen de poux adultes femelles par saumon d’élevage examiné."
+Nombre moyen de chalimus par poisson ,Le terme « chalimus » renvoie aux stades juvéniles des poux présents sur le saumon.  Cette colonne indique le nombre moyen de poux chalimus par poisson d’élevage examiné.  L’espèce de pou n’est pas déterminée.
+Nombre moyen de Caligus par poisson ,Caligus clemensi est le nom scientifique du pou du hareng.  Cette colonne indique le nombre moyen d’individus de cette espèce de pou aux stades vagiles par saumon d’élevage.
+Commentaires,Les commentaires peuvent comprendre les raisons pour lesquelles les données ne sont pas disponibles ou des indications sur les mesures de gestion de la santé qu’un titulaire de permis doit prendre lorsque le seuil réglementaire de trois poux du saumon aux stades vagiles par poisson est dépassé.
+Classe d’âge ,"Désigne la période passée par la population de poissons d’élevage dans l’eau de mer. « Un » équivaut à moins d’un an, et « deux » équivaut à plus d’un an.  "
+,
+Baie Clayoquot,"Zone sur la côte ouest de l’île de Vancouver, près de Tofino, y compris les installations situées dans le bras Tofino, le chenal Fortune, la baie Bedwell, le bras Herbert, le bras Shelter et chenal Millar."
+Baie Nootka,"Zone située sur la côte ouest de l’île de Vancouver, près de la rivière Gold, y compris les installations situées dans le bras Muchalat."
+Bras Esperanza,"Bras sur la côte ouest de l’île de Vancouver, près de Tahsis, y compris les fermes du chenal Hecate."
+Baie Kyuquot,"Zone sur la côte nord-ouest de l’île de Vancouver, qui comprend des fermes près des îles Hohoae et Union."
+Baie Quatsino,Groupe de bras le plus au nord de la côte nord-ouest de l’île de Vancouver.
+Sunshine Coast,"Zone au nord de Vancouver allant de la baie Howe à la baie Desolation, qui comprend les fermes du bras Jervis, du bras Sechelt et du bras Salmon."
+Passage Discovery,"Zone englobant les îles Discovery du côté nord-centre-est de l’île de Vancouver, entre la rivière Campbell et la partie continentale de la Colombie-Britannique, du détroit de Johnstone au nord à l’île Cortez au sud."
+Archipel Broughton,Zone à l’extrémité est du détroit de la Reine-Charlotte allant du passage Wells au nord jusqu’au chenal Havannah au sud.
+Port Hardy,"Zone à l’extrémité ouest du détroit de la Reine-Charlotte, au nord de Port Hardy et au sud du cap Caution."
+Côte centrale,"Zone au nord de l’île de Vancouver, sur la côte centrale de la Colombie-Britannique, près de la ville de Klemtu et de l’île Princess Royal, y compris les fermes du passage Sheep et du chenal Tolmie."
+Bassin de Barkley,"Zone sur la côte sud-ouest de l’île de Vancouver, près du groupe des îles Broken, qui comprend des fermes près du bras Effingham et du bras Alberni."
+,
+Surveillance de routine,"Les titulaires de permis sont tenus de dénombrer les poux du poisson sur au moins trois structures de confinement empoissonnées une fois par mois de juillet à janvier. Pendant les périodes de dévalaison des saumons juvéniles (de mars à juin), cette exigence passe à une fois toutes les deux semaines."
+Dépassement de seuil,"Lorsque le seuil d’abondance de trois poux par poisson est dépassé, les détenteurs de permis doivent en informer le Ministère dans les 48 heures, et une surveillance et une atténuation supplémentaires sont nécessaires."
+Suivi au-delà du seuil,"Lorsque le seuil d’abondance de trois poux par poisson est dépassé, les détenteurs de permis doivent effectuer une surveillance supplémentaire au cours de la première semaine du dépassement et toutes les deux semaines par la suite, jusqu’à ce que l’abondance du pou du poisson soit réduite. "
+Prétraitement,"Lorsque des mesures d’atténuation du pou du poisson sont mises en œuvre, les titulaires de permis doivent procéder à un échantillonnage supplémentaire sur toutes les structures de confinement de l’installation dans les sept jours précédant le traitement des structures."
+Traitement postérieur à l’alimentation,"Lorsque les traitements du pou du poisson sont administrés par voie alimentaire, les détenteurs de permis ne sont pas tenus de prélever des échantillons pendant 21 jours après la fin du traitement afin de laisser le temps au médicament d’agir. Il faut alors procéder à un échantillonnage supplémentaire toutes les deux semaines, jusqu’à ce que l’abondance des poux soit inférieure au seuil. "
+Élimination mécanique effectuée postérieurement ou traitement du bain,"En cas de traitements par retrait mécanique ou bain, il faut effectuer un prélèvement supplémentaire dans chaque parc traité dans la semaine suivant le traitement."
+Première pré-migration; Deuxième pré-migration,"En février, une surveillance supplémentaire doit être effectuée pour vérifier que l’abondance du pou du poisson est gérée de manière appropriée jusqu’à la période de dévalaison des saumons juvéniles (de mars à juin). Il faut échantillonner la moitié des structures de confinement au cours des deux premières semaines de février et l’autre moitié au cours des deux dernières."
+,
+Mesure de gestion planifiée (Traitement médicamenteux dans un bain),"Le détenteur du permis prévoit un traitement par bain thérapeutique, comme le peroxyde d’hydrogène, à titre de mesure de gestion pour éviter de dépasser le seuil d’abondance du pou du poisson ou pour ramener l’abondance du pou du poisson en dessous du seuil."
+Mesure de gestion planifiée (Traitement non médicinal au bain),"Le détenteur du permis prévoit un traitement par bain non thérapeutique, par exemple un bain d’eau douce, comme mesure de gestion pour éviter de dépasser le seuil d’abondance du pou du poisson ou pour ramener l’abondance du pou du poisson en dessous du seuil."
+Mesure de gestion planifiée (Traitement administré dans l’alimentation),"Le titulaire du permis prévoit un traitement de lutte contre le pou du poisson administré par voie alimentaire, tel que SLICE©, comme mesure de gestion pour éviter de dépasser le seuil d’abondance du pou du poisson ou pour ramener l’abondance du pou du poisson en dessous du seuil."
+Mesure de gestion planifiée (Traitement par retrait mécanique),"Le détenteur du permis prévoit un traitement par retrait mécanique, comme Hydrolicer©, comme mesure de gestion pour éviter de dépasser le seuil d’abondance du pou du poisson ou pour ramener l’abondance du pou du poisson en dessous du seuil."
+Mise en jachère,"Les poissons de l’installation ont été récemment récoltés ou transférés. Par souci de simplicité, les installations ne sont déclarées en jachère qu’une fois après la récolte ou le transfert. Après qu’une installation a été indiquée comme étant en jachère, l’échantillonnage de dépistage du pou du poisson n’est plus déclaré jusqu’à ce que l’installation soit réempoissonnée."
+Récolte en attente,"Le détenteur du permis prévoit de récolter l’installation afin de réduire l’abondance absolue du pou du poisson. Pendant la période de dévalaison, le titulaire du permis doit encore ramener les niveaux de concentration de poux du poisson en dessous du seuil dans un délai de 42 jours."
+Récolte,"La récolte est une approche approuvée pour réduire le nombre absolu de poux du poisson dans une installation. Pendant la période de dévalaison des saumons juvéniles, le titulaire du permis doit encore ramener les niveaux de concentration de poux du poisson en dessous du seuil dans les 42 jours."
+Traitement administré dans l’alimentation,"Un traitement de lutte contre le pou du poisson administré par voie alimentaire, tel que SLICE©, a été utilisé comme mesure de gestion pour éviter de dépasser le seuil d’abondance du pou du poisson ou pour ramener l’abondance du pou du poisson en dessous du seuil. Pendant la période de dévalaison des saumons juvéniles, le titulaire du permis doit ramener les niveaux de concentration de poux du poisson en dessous du seuil dans les 42 jours."
+Traitement médicamenteux dans un bain,"Un traitement par bain thérapeutique, tel que le peroxyde d’hydrogène, a été utilisé comme mesure de gestion pour éviter de dépasser le seuil d’abondance du pou du poisson ou pour ramener l’abondance du pou du poisson en dessous du seuil. Pendant la période de dévalaison, le titulaire du permis doit ramener les niveaux de concentration de poux du poisson en dessous du seuil dans un délai de 42 jours."
+Traitement non médicinal au bain,"Un traitement par bain non thérapeutique, comme un bain d’eau douce, a été utilisé à titre de mesure de gestion pour éviter de dépasser le seuil d’abondance du pou du poisson ou pour ramener l’abondance du pou du poisson en dessous du seuil. Pendant la période de dévalaison des saumons juvéniles, le titulaire du permis doit ramener les niveaux de concentration de poux du poisson en dessous du seuil dans les 42 jours."
+Traitement par retrait mécanique,"Un traitement par retrait mécanique, tel que Hydrolicer©, a été utilisé comme mesure de gestion pour éviter de dépasser le seuil d’abondance du pou du poisson ou pour ramener l’abondance du pou du poisson en dessous du seuil. Pendant la période de dévalaison des saumons juvéniles, le titulaire du permis doit ramener les niveaux de concentration de poux du poisson en dessous du seuil dans les 42 jours."
+,
+Dénombrement(s) non requis (Géniteurs à l'année du frai),"Pour éviter de stresser inutilement les poissons, les titulaires de permis ne sont pas tenus de surveiller le pou du poisson sur les stocks de géniteurs sensibles pendant leur année de frai."
+,
+"La méthodologie d’échantillonnage diffère des exigences mentionnées dans les conditions de permis, mais répond aux exigences, les dépasse même","Les conditions de permis exigent qu’un dénombrement du pou du poisson soit effectué tous les mois, de juillet à janvier, et toutes les deux semaines avant et pendant la période de dévalaison des saumons juvéniles (de mars à juin). Chaque dénombrement nécessite l’échantillonnage de 20 poissons dans trois parcs distincts pendant une période de cinq jours. Dans les cas où des dénombrements supplémentaires sont effectués ou si des dénombrements sont menés dans des parcs supplémentaires, ils doivent être inclus dans le rapport, même s’ils dépassent les exigences minimales."
+Dénombrement(s) non effectué(s); Mesures de suivi prises,"Si un titulaire de permis ne procède pas à l’échantillonnage conformément aux conditions de son permis, le Ministère prend des mesures de suivi. Il peut s’agir d’une communication informelle, comme l’éducation, ou de mesures plus formelles, comme des lettres de non-conformité ou une action en justice."
+La méthodologie d’échantillonnage ne répond pas aux exigences mentionnées dans les conditions de permis; Mesures de suivi prises,"Si un titulaire de permis ne procède pas à l’échantillonnage conformément aux conditions de son permis, le Ministère prend des mesures de suivi. Il peut s’agir d’une communication informelle, comme l’éducation, ou de mesures plus formelles, comme des lettres de non-conformité."
+,
+Dénombrement(s) non effectué(s) (mesure de gestion de la santé),Le détenteur du permis n’est pas tenu de dénombrer les poux du poisson si les poissons reçoivent un traitement médicamenteux ou sont gérés par d’autres moyens lors d’un événement sanitaire.
+Dénombrement(s) non requis (<21 jours après le traitement dans l’alimentation),"Le titulaire du permis n’est pas tenu de dénombrer les poux du poisson pendant 21 jours après la fin d’un traitement administré par voie alimentaire, afin de laisser suffisamment de temps à l’aliment médicamenteux d’agir."
+La méthodologie d’échantillonnage ne répond pas aux exigences mentionnées dans les conditions de permis (mesure de gestion de la santé),"Si les poissons reçoivent un traitement médicamenteux ou sont gérés par d’autres moyens lors d’un événement sanitaire, il n’est peut-être pas possible d’effectuer un dénombrement complet (c’est-à-dire au moins trois parcs sur une période de cinq jours) comme l’exigent les conditions de permis. Dans ce cas, si une justification raisonnable est fournie, le Ministère peut accepter un échantillonnage incomplet."
+,
+Dénombrement(s) non effectué(s) (mauvaises conditions environnementales),"Le titulaire du permis n’est pas tenu de dénombrer les poux du poisson si un problème environnemental en cours, comme un faible niveau d’oxygène ou une prolifération de plancton, risque de causer un stress supplémentaire ou des blessures si le poisson était manipulé."
+La méthodologie d’échantillonnage ne répond pas aux exigences mentionnées dans les conditions de permis (mauvaises conditions environnementales),"Si un problème environnemental en cours, comme un faible niveau d’oxygène ou une prolifération de plancton, risque de causer un stress supplémentaire ou des blessures si les poissons sont manipulés, il n’est peut-être pas possible d’effectuer un dénombrement complet (c’est-à-dire au moins trois parcs sur une période de cinq jours) comme l’exigent les conditions de permis. Dans ces cas, si une justification raisonnable est fournie, le Ministère peut accepter un échantillonnage incomplet."
+Dénombrement(s) non effectué(s) (mauvaises conditions météorologiques),"Dans des situations extrêmes, de mauvaises conditions météorologiques, comme des tempêtes ou des marées, peuvent empêcher le détenteur du permis de procéder à l’échantillonnage requis du pou du poisson. Dans ces cas, si une justification raisonnable est fournie, le Ministère peut accepter un échantillonnage incomplet."
+,
+Dénombrement(s) non requis (récolte),"Le titulaire du permis n’est pas tenu de dénombrer les poux du poisson si les structures de confinement sont récoltées pour la consommation humaine dans les 10 jours suivants, car l’échantillonnage nécessite l’utilisation d’anesthésiques qui ne doivent pas être administrés aux poissons dans les 10 jours précédant la récolte pour la consommation humaine. "
+Dénombrement(s) non requis (< 4 bassins),"Les titulaires de permis sont tenus de procéder à des dénombrements des poux du poisson dès qu’une installation compte au moins quatre parcs de poissons sur le site pendant au moins 30 jours. Si une installation ne répond pas encore à ces exigences, l’échantillonnage n’est pas nécessaire."
+La méthodologie d’échantillonnage ne répond pas aux exigences mentionnées dans les conditions de permis (< 4 bassins),"Les titulaires de permis sont tenus de procéder à des dénombrements des poux du poisson dès qu’une installation compte au moins quatre parcs de poissons sur le site pendant au moins 30 jours. Si une installation ne répond pas encore à ces exigences, un dénombrement complet (au moins trois parcs sur une période de cinq jours) ne peut pas être effectué. Dans ce cas, le Ministère peut accepter un échantillonnage incomplet."
+La méthodologie d’échantillonnage ne répond pas aux exigences mentionnées dans les conditions de permis (récolte),"Le titulaire du permis n’est pas tenu de dénombrer les poux du poisson si les structures de confinement sont récoltées pour la consommation humaine dans les 10 jours suivants, car l’échantillonnage nécessite l’utilisation d’anesthésiques qui ne doivent pas être administrés aux poissons dans les 10 jours précédant la récolte pour la consommation humaine. Dans certains cas, un dénombrement complet (au moins trois parcs sur une période de cinq jours) ne peut pas être effectué. Dans ce cas, le Ministère peut accepter un échantillonnage incomplet."
+,
+Dénombrement(s) non effectué(s) (circonstances atténuantes),"En cas de circonstances atténuantes, telles qu’un risque pour la santé ou la sécurité humaine, le dénombrement des poux du poisson peut être reporté. Ces situations doivent être clairement communiquées au Ministère, qui doit les approuver."
+La méthodologie d’échantillonnage ne répond pas aux exigences mentionnées dans les conditions de permis (circonstances atténuantes),"Des circonstances atténuantes, telles qu’un risque pour la santé ou la sécurité humaine, peuvent empêcher le titulaire du permis d’effectuer un dénombrement complet (au moins trois parcs sur une période de cinq jours). Ces situations doivent être clairement communiquées au Ministère, qui doit les approuver."
+Examen des résultats de l'échantillonnage et de la méthodologie ; mesures de suivi prises ,"Le personnel du MPO chargé de la santé des poissons  a examiné les résultats de l'échantillonnage et la méthode de comptage afin de les évaluer par rapport aux exigences énoncées dans les conditions de permis. Les mesures de suivi peuvent comprendre une analyse de données plus poussée, des discussions avec les employés de l'industrie, notamment un examen des conditions relatives à l'application de mesure d'atténuation ou de traitement, ou une série de mesures liées à la non-conformité prises par le MPO."
+, 
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
