@@ -42,11 +42,15 @@ farm_regress$year = as.factor(as.character(farm_regress$year))
 # read in model object
 tmb_fit = readRDS(here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
 
+
+scfs_regress %>% 
+    dplyr::group_by(year) %>% 
+    summarize(mean_leps = mean(all_lep))
 # model predictions ============================================================
 
 predict_data = data.frame(year = as.character(c(2001:2021)),
                         week = NA,
-                        farm = NA)
+                        farm_name = NA)
 predict_data$all_lep = predict(tmb_fit, newdata = predict_data,
             type = "response",
             re.form = NA,
