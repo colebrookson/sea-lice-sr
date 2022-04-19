@@ -1,0 +1,1 @@
+pandoc docs/sr-methods-notes.md -V geometry:"top=2cm, bottom=1.5cm, left=2cm, right=2cm" -o docs/sr-methods-notes.pdf
