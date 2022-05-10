@@ -61,7 +61,9 @@ temp_pink = pink_sites %>%
     ) %>% 
     dplyr::select(
         day, mo, location, length_mm
-    )
+    ) %>% 
+    dplyr::rename(month = mo)
+
 temp_pink_glacier = pink_sites %>% 
     dplyr::filter(location == "Glacier Falls")
 temp_pink_burd = pink_sites %>% 
@@ -73,11 +75,23 @@ temp_scfs = scfs_data
 
 temp_scfs = temp_scfs %>% 
     dplyr::filter(year == 2001) %>% 
-    dplyr::filter(species == "pink")
+    dplyr::filter(species == "pink") %>% 
+    dplyr::select(day, month, length, location)
 
-# loop through the rows and see if a matching one exists
-for(i in seq_len(nrow(temp_pink))) {
+temp_scfs_glacier = temp_scfs %>% 
+    dplyr::filter(location == "Glacier")
+temp_scfs_burd = temp_scfs %>% 
+    dplyr::filter(location == "Burdwood")
+temp_scfs_wick = temp_scfs %>% 
+    dplyr::filter(location == "Wicklow")
 
-    pink_row = temp_pink[i,c("day", "mo", "length_mm")] # get just the row
-    
+# do the number of observations match up ?
+if(nrow(temp_pink_glacier) == nrow(temp_scfs_glacier)){
+    print("matching by rows (glacier) - YES")
 }
+if(nrow(temp_pink_burd) == nrow(temp_scfs_burd)){
+    print("matching by rows (burdwood) - YES")
+}
+
+
+
