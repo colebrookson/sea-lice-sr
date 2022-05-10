@@ -28,3 +28,17 @@ That gave a model of: $$R_{i,t} = N_{i,t-2} \text{exp}\left[r - b_iN_{i,t-2} - c
   * $\epsilon_{i,t}$ random annual variation that is independent among populations
 
 The linear version of the Ricker model is then fit: $$ \text{ln}\frac{R_{i,t}}{N_{i,t-2}} = r - b_iN_{i,t-2} - cW_{a,t-1} + \theta_t + \theta_{a,t} + \epsilon_{i,t} $$
+
+The Fleischman et al. (2012) version is as follows: 
+
+$$\text{ln}(R_y) = \ln(S_y) + \ln(\alpha) - \beta S_y + \phi \omega_{y-1} + \epsilon_y$$
+
+where the variables are:
+
+* $S$ is spawaning escapement in year $y$ 
+* $R$ is the returns (treated as unobserved states)
+* $\alpha$ is the productivity parameter
+* $\beta$ is the inverse capacity parameter of the Ricker stock-recruit relationship 
+* $\phi$ is te autoregressive lag-1 coefficient
+* $\omega_y$ is the model residual 
+* $\epsilon__y$ are independent normally distributed process errors. 
