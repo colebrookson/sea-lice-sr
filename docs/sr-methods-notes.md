@@ -41,4 +41,14 @@ where the variables are:
 * $\beta$ is the inverse capacity parameter of the Ricker stock-recruit relationship 
 * $\phi$ is te autoregressive lag-1 coefficient
 * $\omega_y$ is the model residual 
-* $\epsilon__y$ are independent normally distributed process errors. 
+* $\epsilon_y$ are independent normally distributed process errors. 
+
+We are interested in making estimates of the following parameters: 
+
+  * $r$ is the growth rate 
+  * $b_i$ is the density-dependence parameter for each population 
+  * $W_{a,t-1}$ is the average lice per wild juvenile salmon the previous year 
+  * $c$ is the strength of the relationship between salmon survival and lice on wild juvenile salmon 
+  * $\theta_t$ environmental stochasticity, spatially coherent among all populations for year
+  * $\theta_{a,t}$ spatially coherent variation for population within a management area  
+  * $\epsilon_{i,t}$ random annual variation that is independent among populations

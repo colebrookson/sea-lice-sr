@@ -64,11 +64,11 @@ temp_pink = pink_sites %>%
     ) %>% 
     dplyr::rename(month = mo)
 
-temp_pink_glacier = pink_sites %>% 
+temp_pink_glacier = temp_pink %>% 
     dplyr::filter(location == "Glacier Falls")
-temp_pink_burd = pink_sites %>% 
+c = temp_pink %>% 
     dplyr::filter(location == "Burdwood Islands") 
-temp_pink_wick = pink_sites %>% 
+temp_pink_wick = temp_pink %>% 
     dplyr::filter(location == "Wicklow Point")
 
 temp_scfs = scfs_data
@@ -85,13 +85,43 @@ temp_scfs_burd = temp_scfs %>%
 temp_scfs_wick = temp_scfs %>% 
     dplyr::filter(location == "Wicklow")
 
-# do the number of observations match up ?
-if(nrow(temp_pink_glacier) == nrow(temp_scfs_glacier)){
-    print("matching by rows (glacier) - YES")
-}
-if(nrow(temp_pink_burd) == nrow(temp_scfs_burd)){
-    print("matching by rows (burdwood) - YES")
-}
-
+# write out sorted pink study data
+sorted_temp_pink_glacier = arrange(temp_pink_glacier,
+    desc(day), desc(month), desc(length_mm))
+write_csv(sorted_temp_pink_glacier,
+    here("./data/louse-data/matching-scfs-pink-study-data/
+    sorted_temp_pink_glacier.csv")
+)
+sorted_temp_pink_burd= arrange(temp_pink_burd,
+    desc(day), desc(month), desc(length_mm))
+write_csv(sorted_temp_pink_burd,
+    here("./data/louse-data/matching-scfs-pink-study-data/
+    sorted_temp_pink_burd.csv")
+)
+sorted_temp_pink_wick= arrange(temp_pink_wick,
+    desc(day), desc(month), desc(length_mm))
+write_csv(sorted_temp_pink_wick,
+    here("./data/louse-data/matching-scfs-pink-study-data/
+    sorted_temp_pink_wick.csv")
+)
+# write out sorted other data
+sorted_temp_scfs_glacier = arrange(temp_scfs_glacier,
+    desc(day), desc(month), desc(length))
+write_csv(sorted_temp_scfs_glacier,
+    here("./data/louse-data/matching-scfs-pink-study-data/
+    sorted_temp_scfs_glacier.csv")
+)
+sorted_temp_scfs_burd = arrange(temp_scfs_burd,
+    desc(day), desc(month), desc(length))
+write_csv(sorted_temp_scfs_burd,
+    here("./data/louse-data/matching-scfs-pink-study-data/
+    sorted_temp_scfs_burd.csv")
+)
+sorted_temp_scfs_wick= arrange(temp_scfs_wick,
+    desc(day), desc(month), desc(length))
+write_csv(sorted_temp_scfs_wick,
+    here("./data/louse-data/matching-scfs-pink-study-data/
+    sorted_temp_scfs_wick.csv")
+)
 
 
