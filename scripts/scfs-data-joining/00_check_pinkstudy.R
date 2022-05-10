@@ -54,5 +54,30 @@ pink_sites = pink_study %>%
 match_vec = c()
 
 # attempt to do jenky check one by one by a search 
-temp_pink = pink_sites 
-temp_scfs = 
+temp_pink = pink_sites %>%
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+        length_mm = `length cm` * 10
+    ) %>% 
+    dplyr::select(
+        day, mo, location, length_mm
+    )
+temp_pink_glacier = pink_sites %>% 
+    dplyr::filter(location == "Glacier Falls")
+temp_pink_burd = pink_sites %>% 
+    dplyr::filter(location == "Burdwood Islands") 
+temp_pink_wick = pink_sites %>% 
+    dplyr::filter(location == "Wicklow Point")
+
+temp_scfs = scfs_data
+
+temp_scfs = temp_scfs %>% 
+    dplyr::filter(year == 2001) %>% 
+    dplyr::filter(species == "pink")
+
+# loop through the rows and see if a matching one exists
+for(i in seq_len(nrow(temp_pink))) {
+
+    pink_row = temp_pink[i,c("day", "mo", "length_mm")] # get just the row
+    
+}
