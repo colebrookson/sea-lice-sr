@@ -23,6 +23,7 @@ lice_file_location = "./data/louse-data/Sea-lice-database-master/Data/"
 
 scfs_data_raw = readr::read_csv(here(paste0(lice_file_location,
                                 "BroughtonSeaLice_fishData.csv")))
+scfs_data = standardize_names(scfs_data_raw)
 
 # filter data ==================================================================
 
@@ -52,4 +53,6 @@ pink_sites = pink_study %>%
 
 match_vec = c()
 
-# attempt to do jenky check 
+# attempt to do jenky check one by one by a search 
+temp_pink = pink_sites 
+temp_scfs = 
