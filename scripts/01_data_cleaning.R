@@ -273,22 +273,28 @@ for (row in seq_len(nrow(scfs_data))) { # go through each row
     }
 }
 
+# check what the maximum value should be 
+unid_check = scfs_data %>% 
+    dplyr::rowwise() %>% 
+    dplyr::summarize(check = 
+        sum(chala, chalb, unid_cope, chal_unid, unid_adult, na.rm = TRUE))
+hist(unid_check$check)
+### BEGIN NOTE ########
+# This shows there are a couple observations where the sum is huge so then the 
+# max of the new_lep column can be quite large  
+### END NOTE ########
+
 scfs_data_chal_inc = scfs_data %>% 
     dplyr::rowwise() %>%
     dplyr::mutate(all_lep = sum(lep_cope, lep_pamale, lep_pafemale, lep_male, 
-                            lep_nongravid, lep_gravid, 
-                            # vars below here all need the correction factor
-                            (chala * prop_lep), (chalb * prop_lep), 
-                            (unid_cope * prop_lep), (chal_unid * prop_lep),
-                            (unid_adult * prop_lep),
+                            lep_nongravid, lep_gravid,
+                            # vars that got the correction factor included here
+                            new_lep,
                             na.rm = TRUE),
                     all_cal = sum(cal_cope, cal_mot, cal_gravid,
                             # vars below here all need the correction factor
-                            (chala * (1-prop_lep)), (chalb * (1-prop_lep)), 
-                            (unid_cope * (1-prop_lep)), 
-                            (chal_unid * (1-prop_lep)), 
-                            (unid_adult * (1-prop_lep)),
-                                    na.rm = TRUE), 
+                            new_cal,
+                            na.rm = TRUE), 
                     all_lice = sum(lep_cope, chala, chalb, lep_pamale, 
                                 lep_pafemale, lep_male, lep_nongravid, 
                                 lep_gravid, cal_cope, cal_mot, cal_gravid, 
