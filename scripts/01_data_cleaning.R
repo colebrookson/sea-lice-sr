@@ -225,13 +225,38 @@ ggsave(filename = here::here("./figs/predicted-lep-proportions.png"),
         height = 5,
         dpi = 600)
 
+### BEGIN NOTE ########
+# So now that we know the proportion of all the years that we should expect to 
+# be leps vs. caligus, we can multiply that correction factor by the number of 
+# unidentified lice and the chalimus stage lice 
+### END NOTE ########
+
+prop_leps = pred_data_all_points %>% 
+    dplyr::select(year, prop_lep)
+
+# join the prop leps to the scfs_data so the proportion is in each row 
+scfs_data = dplyr::left_join(
+    scfs_data, 
+    prop_leps, 
+    by = "year"
+)
+
 # sum across the lice spp cols -- INCLUDING CHALIMUS
 scfs_data_chal_inc = scfs_data %>% 
     dplyr::rowwise() %>%
     dplyr::mutate(all_lep = sum(lep_cope, lep_pamale, lep_pafemale, lep_male, 
-                            lep_nongravid, lep_gravid, chala, chalb, 
+                            lep_nongravid, lep_gravid, 
+                            # vars below here all need the correction factor
+                            (chala * prop_lep), (chalb * prop_lep), 
+                            (unid_cope * prop_lep), (chal_unid * prop_lep),
+                            (unid_adult * prop_lep),
                             na.rm = TRUE),
                     all_cal = sum(cal_cope, cal_mot, cal_gravid,
+                            # vars below here all need the correction factor
+                            (chala * (1-prop_lep)), (chalb * (1-prop_lep)), 
+                            (unid_cope * (1-prop_lep)), 
+                            (chal_unid * (1-prop_lep)), 
+                            (unid_adult * (1-prop_lep)),
                                     na.rm = TRUE), 
                     all_lice = sum(lep_cope, chala, chalb, lep_pamale, 
                                 lep_pafemale, lep_male, lep_nongravid, 
