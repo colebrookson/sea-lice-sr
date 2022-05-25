@@ -21,3 +21,5 @@ pink_study = readr::read_csv(
 )
 scfs_regress = readr::read_csv(
     here("./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
+
+# make other version of the scfs_regress data with the pink_study info 

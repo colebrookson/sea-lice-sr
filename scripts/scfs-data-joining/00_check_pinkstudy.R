@@ -33,7 +33,7 @@ pink_sites = pink_study %>%
     dplyr::filter(`Relation to Farm` == "near farm") %>% 
     # note that the Date column has a bunch of formats and I'm not totally 
     # sure if I can trust it so I'll use the day and month options instead
-    dplyr::select(`Fish #`, day, mo, location, `length cm`, `Ch/ I-II-Lep`,
+    dplyr::select(`Fish #`, Date, location, `length cm`, `Ch/ I-II-Lep`,
             `Ch/III-IV-Lep`, `unid subadult`, `CI-IV Caligus`, 
             `preadult 1 Lep-male`, `preadult 1 Lep-female`, 
             `preadult 1 Lep-female`, `preadult 2 Lep-male`, 
@@ -49,9 +49,20 @@ pink_sites = pink_study %>%
          #   `virgin-Lep`, `adult female non-gravid-Lep`, `gravid female-Lep`,
           #  `adult male-Caligus`, `adult female-Caligus`,`gravid Caligus`)
 
-# attempt to see if data match up  =============================================
+### BEGIN NOTE #####
+# unfortunately the dates are really hard to parse automatically, so I will 
+# just manually go in and fix them in a version of this file 
+### END NOTE #####
 
-match_vec = c()
+readr::write_csv(pink_sites,
+    here(paste0("./data/louse-data/matching-scfs-pink-study-data/",
+    "pink-study-to-be-manually-fixed.csv"))
+)
+pink_sites = readr::read_csv(
+    here(paste0("./data/louse-data/matching-scfs-pink-study-data/",
+    "pink-study-FIXED-manually.csv"))
+)
+# attempt to see if data match up  =============================================
 
 # attempt to do jenky check one by one by a search 
 temp_pink = pink_sites %>%
@@ -60,13 +71,13 @@ temp_pink = pink_sites %>%
         length_mm = `length cm` * 10
     ) %>% 
     dplyr::select(
-        day, mo, location, length_mm
+        day, month, location, length_mm, `Fish #`
     ) %>% 
-    dplyr::rename(month = mo)
+    dplyr::rename(fish_id = `Fish #`)
 
 temp_pink_glacier = temp_pink %>% 
     dplyr::filter(location == "Glacier Falls")
-c = temp_pink %>% 
+temp_pink_burd = temp_pink %>% 
     dplyr::filter(location == "Burdwood Islands") 
 temp_pink_wick = temp_pink %>% 
     dplyr::filter(location == "Wicklow Point")
@@ -76,7 +87,7 @@ temp_scfs = scfs_data
 temp_scfs = temp_scfs %>% 
     dplyr::filter(year == 2001) %>% 
     dplyr::filter(species == "pink") %>% 
-    dplyr::select(day, month, length, location)
+    dplyr::select(day, month, length, location, fish_id)
 
 temp_scfs_glacier = temp_scfs %>% 
     dplyr::filter(location == "Glacier")
@@ -89,39 +100,37 @@ temp_scfs_wick = temp_scfs %>%
 sorted_temp_pink_glacier = arrange(temp_pink_glacier,
     desc(day), desc(month), desc(length_mm))
 write_csv(sorted_temp_pink_glacier,
-    here("./data/louse-data/matching-scfs-pink-study-data/
-    sorted_temp_pink_glacier.csv")
+    here(paste("./data/louse-data/matching-scfs-pink-study-data/",
+    "sorted_temp_pink_glacier.csv"))
 )
 sorted_temp_pink_burd= arrange(temp_pink_burd,
     desc(day), desc(month), desc(length_mm))
 write_csv(sorted_temp_pink_burd,
-    here("./data/louse-data/matching-scfs-pink-study-data/
-    sorted_temp_pink_burd.csv")
+    here(paste("./data/louse-data/matching-scfs-pink-study-data/",
+    "sorted_temp_pink_burd.csv"))
 )
 sorted_temp_pink_wick= arrange(temp_pink_wick,
     desc(day), desc(month), desc(length_mm))
 write_csv(sorted_temp_pink_wick,
-    here("./data/louse-data/matching-scfs-pink-study-data/
-    sorted_temp_pink_wick.csv")
+    here(paste0("./data/louse-data/matching-scfs-pink-study-data/",
+    "sorted_temp_pink_wick.csv"))
 )
 # write out sorted other data
 sorted_temp_scfs_glacier = arrange(temp_scfs_glacier,
     desc(day), desc(month), desc(length))
 write_csv(sorted_temp_scfs_glacier,
-    here("./data/louse-data/matching-scfs-pink-study-data/
-    sorted_temp_scfs_glacier.csv")
+    here(paste0("./data/louse-data/matching-scfs-pink-study-data/",
+    "sorted_temp_scfs_glacier.csv"))
 )
 sorted_temp_scfs_burd = arrange(temp_scfs_burd,
     desc(day), desc(month), desc(length))
 write_csv(sorted_temp_scfs_burd,
-    here("./data/louse-data/matching-scfs-pink-study-data/
-    sorted_temp_scfs_burd.csv")
+    here(paste0("./data/louse-data/matching-scfs-pink-study-data/",
+    "sorted_temp_scfs_burd.csv"))
 )
 sorted_temp_scfs_wick= arrange(temp_scfs_wick,
     desc(day), desc(month), desc(length))
 write_csv(sorted_temp_scfs_wick,
-    here("./data/louse-data/matching-scfs-pink-study-data/
-    sorted_temp_scfs_wick.csv")
+    here(paste0("./data/louse-data/matching-scfs-pink-study-data/",
+    "sorted_temp_scfs_wick.csv"))
 )
-
-

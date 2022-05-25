@@ -12,9 +12,14 @@
 
 library(tidyverse)
 library(here)
+library(mgcv)
+library(drc)
+library(nlme)
+library(aomisc)
 
 # pull in file with all functions to clean data 
-source(here("./src/02_data_cleaning_funs.R"))
+source(here::here("./src/02_data_cleaning_funs.R"))
+source(here::here("./src/01_plot_themes.R"))
 
 # set location of other data
 lice_file_location = "./data/louse-data/Sea-lice-database-master/Data/"
@@ -95,7 +100,8 @@ farm_map_nums = farm_loc %>%
     ) %>% 
     unique()
 readr::write_csv(farm_map_nums, 
-        here("./data/clean-farm/farm-numbers-names-according-to-map.csv"))
+        here("./data/clean-farm/farm-numbers-names-according-to-map.csv")
+)
 
 # bind marty and bati data =====================================================
 
@@ -129,11 +135,105 @@ scfs_leps_cols = c("lep_cope", "chala", "chalb", "lep_pamale", "lep_pafemale",
                     "lep_male", "lep_nongravid", "lep_gravid")
 scfs_cals = c("cal_cope", "cal_mot", "cal_gravid")
 
+# do regression like in Bateman et al. (2016)
+mot_data = scfs_data %>% 
+    dplyr::rowwise() %>%
+    dplyr::mutate( # make columns that divide the lice into species 
+        all_lep = sum(lep_pamale, lep_pafemale, lep_male, 
+                            lep_nongravid, lep_gravid, unid_pa, 
+                            na.rm = TRUE),
+        all_cal = sum(cal_mot, cal_gravid,
+                                    na.rm = TRUE), 
+        all_lice = sum(lep_pamale, 
+                                lep_pafemale, lep_male, lep_nongravid, 
+                                lep_gravid, cal_mot, cal_gravid,
+                                unid_adult, unid_pa, 
+                                na.rm = TRUE),
+        date = lubridate::make_date(year, month, day)) %>% 
+    dplyr::select( # keep only the columns we want
+        year, all_lep, all_lice
+    ) %>%
+    dplyr::group_by(
+        year
+    ) %>% 
+    dplyr::summarize( # find yearly means for the two we want
+        mean_lep = mean(all_lep, na.rm = TRUE),
+        mean_all = mean(all_lice, na.rm = TRUE)
+    ) %>% 
+    dplyr::filter( # keep this out since it's getting predicted
+        year != 2001
+    ) %>% 
+    dplyr::mutate( # find the proportion of all the lice that are leps
+        prop_lep = mean_lep / mean_all
+    )
+
+# non-linear regression (asymptotic) to get the shape of the curve
+# fit with Y = a - (a - b) * exp(-c * X) 
+# note that the value for a is fixed at 1.0 since it's an actual hard 
+# asymptote
+model = stats::nls(
+    formula = prop_lep ~ 1.0 - (1.0 - 0.0) * exp(- c * mean_all), 
+    start = list(c = 2), 
+    data = mot_data)
+
+# predict the data back from the model 
+pred_data_points = data.frame(
+    mean_all = seq(0,4,0.01)
+)
+pred_prop = stats::predict(model, 
+    pred_data_points,
+    type = "response")
+predicted_line = data.frame(cbind(pred_data_points, pred_prop)) %>% 
+    dplyr::rename(prop_lep = pred_prop)
+
+# make data for a plot 
+pred_data_all_points = rbind( # do this for the points 
+        data.frame(year = 2001,
+            mean_all = 3.44, 
+            # get the predicted value for the missing
+            prop_lep = 
+                predicted_line[which(
+                    predicted_line$mean_all == 3.44), "prop_lep"]
+        ),
+        data.frame(mot_data %>% 
+            dplyr::select(-c(mean_lep)) 
+        )
+    ) %>% 
+    mutate(
+        predicted = c("Predicted", rep("True", 20))
+    ) 
+pred_data_all_points$predicted = as.factor(pred_data_all_points$predicted)
+
+ggplot() +
+    geom_point(data = pred_data_all_points, 
+        aes(x = mean_all, y = prop_lep, fill = predicted),
+        shape = 21, size = 2.0) + 
+    geom_text(data = pred_data_all_points, 
+        aes(x = mean_all, y = prop_lep, label = year),
+        hjust = 0, nudge_x = 0.05) +
+    geom_line(data = predicted_line,
+        aes(x = mean_all, y = prop_lep),
+        linetype = "dashed", colour = "grey50") + 
+    scale_fill_manual(" ", values = c("purple1", "goldenrod2")) + 
+    theme_bw() + 
+    theme_mod_comp()
+
+ggplot() + 
+    geom_point(pred_data_all_points,
+        aes(x = mean_all, y = prop_lep)) +
+    geom_text(pred_data_all_points,
+        aes(x = mean_all, y = prop_lep, label = year), 
+        hjust = 0, nudge_x = 0.05) +
+    xlim(0, 3.5)
+
+
+
 # sum across the lice spp cols -- INCLUDING CHALIMUS
 scfs_data_chal_inc = scfs_data %>% 
     dplyr::rowwise() %>%
     dplyr::mutate(all_lep = sum(lep_cope, lep_pamale, lep_pafemale, lep_male, 
-                            lep_nongravid, lep_gravid, chala, chalb, na.rm = TRUE),
+                            lep_nongravid, lep_gravid, chala, chalb, 
+                            na.rm = TRUE),
                     all_cal = sum(cal_cope, cal_mot, cal_gravid,
                                     na.rm = TRUE), 
                     all_lice = sum(lep_cope, chala, chalb, lep_pamale, 
