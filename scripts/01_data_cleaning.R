@@ -223,8 +223,9 @@ ggsave(filename = here::here("./figs/predicted-lep-proportions.png"),
 
 ### BEGIN NOTE ########
 # So now that we know the proportion of all the years that we should expect to 
-# be leps vs. caligus, we can multiply that correction factor by the number of 
-# unidentified lice and the chalimus stage lice 
+# be leps vs. caligus, we can go through each row and draw (using our known) 
+# proportions of leps whether or not some unidentified stage should be a lep or 
+# not. Those are all summed and then added later on.  
 ### END NOTE ########
 
 prop_leps = pred_data_all_points %>% 
@@ -239,7 +240,8 @@ scfs_data = dplyr::left_join(
 
 set.seed(1234) 
 # make a new column with new leps vs new cals 
-scfs_data$new_lep = 0; scfs_data$new_cal = 0
+scfs_data$new_lep = 0
+scfs_data$new_cal = 0
 
 # get a vector of the columns we want to address 
 unid_lice = c("chala", "chalb", "unid_cope", "chal_unid", "unid_adult")
@@ -266,10 +268,10 @@ for (row in seq_len(nrow(scfs_data))) { # go through each row
                 )
             }
         } 
+    if(row %% 1000 == 0) {
+        print(paste0("iteration: ", row, " -- "))
     }
-
-df = data.frame(x = seq(1,5), y = c(1,6,7,3,5))
-for(i in 1:df[])
+}
 
 scfs_data_chal_inc = scfs_data %>% 
     dplyr::rowwise() %>%
