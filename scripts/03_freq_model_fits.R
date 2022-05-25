@@ -57,7 +57,7 @@ tmb_glmm_1_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_name),
 saveRDS(tmb_glmm_1_zinb, here::here("./data/model-outputs/tmb-glmm-ap1-zinb.RDS"))
 
 # aproach 2 - location as fixed effect
-tmb_glmm_2_nb = glmmTMB(all_lep ~ year + farm + (1 | week),
+tmb_glmm_2_nb = glmmTMB(all_lep ~ year + farm_name + (1 | week),
                     data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~0,
@@ -66,7 +66,7 @@ tmb_glmm_2_nb = glmmTMB(all_lep ~ year + farm + (1 | week),
                                              parallel = n_cores)
 )
 saveRDS(tmb_glmm_2_nb, here::here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))
-tmb_glmm_2_zinb = glmmTMB(all_lep ~ year + farm + (1 | week),
+tmb_glmm_2_zinb = glmmTMB(all_lep ~ year + farm_name + (1 | week),
                     data = scfs_regress,
                     family = nbinom2,
                     ziformula =  ~1,
