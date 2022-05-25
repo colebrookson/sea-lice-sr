@@ -204,29 +204,26 @@ pred_data_all_points = rbind( # do this for the points
     ) 
 pred_data_all_points$predicted = as.factor(pred_data_all_points$predicted)
 
-ggplot() +
+predicted_proportions = ggplot() +
     geom_point(data = pred_data_all_points, 
         aes(x = mean_all, y = prop_lep, fill = predicted),
-        shape = 21, size = 2.0) + 
+        shape = 21, size = 2.8) + 
     geom_text(data = pred_data_all_points, 
         aes(x = mean_all, y = prop_lep, label = year),
-        hjust = 0, nudge_x = 0.05) +
+        hjust = 0, nudge_x = 0.05, size = 3.0) +
     geom_line(data = predicted_line,
         aes(x = mean_all, y = prop_lep),
         linetype = "dashed", colour = "grey50") + 
     scale_fill_manual(" ", values = c("purple1", "goldenrod2")) + 
     theme_bw() + 
-    theme_mod_comp()
-
-ggplot() + 
-    geom_point(pred_data_all_points,
-        aes(x = mean_all, y = prop_lep)) +
-    geom_text(pred_data_all_points,
-        aes(x = mean_all, y = prop_lep, label = year), 
-        hjust = 0, nudge_x = 0.05) +
-    xlim(0, 3.5)
-
-
+    theme_mod_comp() +
+    labs(x = "Mean number of lice per fish (all louse species)", 
+        y = "Proportion of L. salmonis")
+ggsave(filename = here::here("./figs/predicted-lep-proportions.png"),
+        plot = predicted_proportions,
+        width = 6,
+        height = 5,
+        dpi = 600)
 
 # sum across the lice spp cols -- INCLUDING CHALIMUS
 scfs_data_chal_inc = scfs_data %>% 
