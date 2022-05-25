@@ -16,9 +16,10 @@ library(glmmTMB)
 library(DHARMa)
 
 farm_regress = read_csv(
-    here("./data/clean-farm/marty-bati-data-joined-stocked-only.csv"))
+    here::here("./data/clean-farm/marty-bati-data-joined-stocked-only.csv"))
 scfs_regress = read_csv(
-    here("./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
+    here::here(
+        "./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
 
 # ensure all counts are integer valued
 scfs_regress$all_lep = as.integer(scfs_regress$all_lep)
@@ -44,7 +45,7 @@ tmb_glmm_1_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_name),
                                              optArgs = list(method = "BFGS"),
                                              parallel = n_cores)
 )
-saveRDS(tmb_glmm_1_nb, here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
+saveRDS(tmb_glmm_1_nb, here::here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
 tmb_glmm_1_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_name),
                     data = scfs_regress,
                     family = nbinom2,
@@ -53,7 +54,7 @@ tmb_glmm_1_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_name),
                                              optArgs = list(method = "BFGS"),
                                              parallel = n_cores)
 )
-saveRDS(tmb_glmm_1_zinb, here("./data/model-outputs/tmb-glmm-ap1-zinb.RDS"))
+saveRDS(tmb_glmm_1_zinb, here::here("./data/model-outputs/tmb-glmm-ap1-zinb.RDS"))
 
 # aproach 2 - location as fixed effect
 tmb_glmm_2_nb = glmmTMB(all_lep ~ year + farm + (1 | week),
@@ -64,7 +65,7 @@ tmb_glmm_2_nb = glmmTMB(all_lep ~ year + farm + (1 | week),
                                              optArgs = list(method = "BFGS"),
                                              parallel = n_cores)
 )
-saveRDS(tmb_glmm_2_nb, here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))
+saveRDS(tmb_glmm_2_nb, here::here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))
 tmb_glmm_2_zinb = glmmTMB(all_lep ~ year + farm + (1 | week),
                     data = scfs_regress,
                     family = nbinom2,
@@ -73,7 +74,7 @@ tmb_glmm_2_zinb = glmmTMB(all_lep ~ year + farm + (1 | week),
                                              optArgs = list(method = "BFGS"),
                                              parallel = n_cores)
 )
-saveRDS(tmb_glmm_2_zinb, here("./data/model-outputs/tmb-glmm-ap2-zinb.RDS"))
+saveRDS(tmb_glmm_2_zinb, here::here("./data/model-outputs/tmb-glmm-ap2-zinb.RDS"))
 
 # check AIC values
 AIC(tmb_glmm_1_nb, tmb_glmm_1_zinb, tmb_glmm_2_nb, tmb_glmm_2_zinb)
@@ -100,7 +101,7 @@ tmb_cg = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                                              optArgs = list(method = "CG"),
                                              parallel = n_cores)
 )
-saveRDS(tmb_cg, here("./data/model-outputs/tmb-cg.RDS"))
+saveRDS(tmb_cg, here::here("./data/model-outputs/tmb-cg.RDS"))
 
 # L-BFGS-B is a limited-memory modification of the BFGS quasi-Newtonian method
 tmb_lbfgsb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
@@ -112,7 +113,7 @@ tmb_lbfgsb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                                                  method = "L-BFGS-B"),
                                              parallel = n_cores)
 )
-saveRDS(tmb_lbfgsb, here("./data/model-outputs/tmb-lbfgsb.RDS"))
+saveRDS(tmb_lbfgsb, here::here("./data/model-outputs/tmb-lbfgsb.RDS"))
 
 # SANN is a version of simulated annealing 
 tmb_sann = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
@@ -124,20 +125,20 @@ tmb_sann = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm),
                                                  method = "SANN"),
                                              parallel = 10)
 )
-saveRDS(tmb_sann, here("./data/model-outputs/tmb-sann.RDS"))
+saveRDS(tmb_sann, here::here("./data/model-outputs/tmb-sann.RDS"))
 
-tmb_bfgs = readRDS(here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
-tmb_cg = readRDS(here("./data/model-outputs/tmb-cg.RDS"))
-tmb_lbfgsb = readRDS(here("./data/model-outputs/tmb-lbfgsb.RDS"))
-tmb_sann = readRDS(here("./data/model-outputs/tmb-sann.RDS"))
+tmb_bfgs = readRDS(here::here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
+tmb_cg = readRDS(here::here("./data/model-outputs/tmb-cg.RDS"))
+tmb_lbfgsb = readRDS(here::here("./data/model-outputs/tmb-lbfgsb.RDS"))
+tmb_sann = readRDS(here::here("./data/model-outputs/tmb-sann.RDS"))
 
 AIC(tmb_bfgs, tmb_cg, tmb_lbfgsb, tmb_sann)
 
 # read in and inspect model objects ============================================
 
 # read in model objects
-tmb_1 = readRDS(here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
-tmb_2 = readRDS(here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))
+tmb_1 = readRDS(here::here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
+tmb_2 = readRDS(here::here("./data/model-outputs/tmb-glmm-ap2-nb.RDS"))
 
 # simulate residuals
 tmb_1_simres = simulateResiduals(tmb_1)

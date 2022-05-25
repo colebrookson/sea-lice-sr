@@ -12,10 +12,6 @@
 
 library(tidyverse)
 library(here)
-library(mgcv)
-library(drc)
-library(nlme)
-library(aomisc)
 
 # pull in file with all functions to clean data 
 source(here::here("./src/02_data_cleaning_funs.R"))
@@ -241,7 +237,40 @@ scfs_data = dplyr::left_join(
     by = "year"
 )
 
-# sum across the lice spp cols -- INCLUDING CHALIMUS
+set.seed(1234) 
+# make a new column with new leps vs new cals 
+scfs_data$new_lep = 0; scfs_data$new_cal = 0
+
+# get a vector of the columns we want to address 
+unid_lice = c("chala", "chalb", "unid_cope", "chal_unid", "unid_adult")
+
+# crapy loop to draw the probability and fill in the value
+for (row in seq_len(nrow(scfs_data))) { # go through each row 
+    # go through the columns that aren't to species 
+    for (col in unid_lice) { # go through each column of interest
+        if (is.na(scfs_data[row, col]) | scfs_data[row, col] < 1)
+            next # cut out NA's and zeros 
+        # draw for each louse in that column
+        for (louse in 1:data.frame(scfs_data[row, col])[1,1]) {
+            draw = sample(c(1, 0), # sample between a one or a zero
+                        size = 1, 
+                        # the probability is the proportion of leps or 
+                        # 1 minus that proportion for the caligus
+                        prob = c(scfs_data[row, "prop_lep"], 
+                            (1 - scfs_data[row, "prop_lep"])))
+            ifelse (draw == 1, # condition
+                # if the draw is 1 that one goes to the leps
+                scfs_data[row, "new_lep"] <- scfs_data[row, "new_lep"] + 1,
+                # if the draw is 0 that one goes to cals 
+                scfs_data[row, "new_cal"] <- scfs_data[row, "new_cal"] + 1
+                )
+            }
+        } 
+    }
+
+df = data.frame(x = seq(1,5), y = c(1,6,7,3,5))
+for(i in 1:df[])
+
 scfs_data_chal_inc = scfs_data %>% 
     dplyr::rowwise() %>%
     dplyr::mutate(all_lep = sum(lep_cope, lep_pamale, lep_pafemale, lep_male, 
