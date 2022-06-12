@@ -339,12 +339,7 @@ scfs_regress_chal_inc = scfs_regress_chal_inc %>%
 readr::write_csv(scfs_regress_chal_inc,
     here("./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
 
-##################### BELOW THIS POINT IS NOT CLEAN ###########################
 
-
-# open government data processing ==============================================
-farm_data = farm_data %>% 
-    dplyr::filter(Finfish Aquaculture Reporting Zone)
 
 
 
