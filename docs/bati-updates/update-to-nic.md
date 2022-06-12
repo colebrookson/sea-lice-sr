@@ -32,6 +32,6 @@ We show that the number of lice on wild juveniles is best predicted by the numbe
 ![Farm Comparison](/figs/wild-to-farm-models-comparison.png)
 **Figure 1:** A comparison of the relationship between the number of lice on wild salmon (on a log10 scale), and the number of lice on the three sets of farm comparisons (also a log10 scale).
 
-Given these results, we are able to use our model to estimate the number of lice on the 
+Given these results, we will be able to use the number of lice on farmed fish as an estimate of the lice on wild fish in our main stock-recruit model. With the data for pink salmon now in hand, this is possible. 
 
 ## Next Steps
