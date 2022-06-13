@@ -1,2 +1,3 @@
 covariate
 stochasticity
+frequentist
