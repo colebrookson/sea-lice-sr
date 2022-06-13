@@ -25,3 +25,8 @@ nuseds = nuseds %>%
   filter(SPECIES == "Pink") %>% 
   filter(AREA %in% c("7", "8", "9", "10"))
 
+## get escapement by either taking the value from the year and river
+## or summing the values (ensure to remove NA)
+## also get the area from the river 
+
+
