@@ -59,54 +59,107 @@ riv_vec = numeric(nrow(esc_df))
 
 # loop through all the year-river combos and get escapement values 
 for(year in 1954:2017) {
-  for(river in unique(nuseds$WATERBODY)){
+  for(river in unique(nuseds$WATERBODY)) {
     
     # get the subset of the data we're interested in 
     temp = nuseds[which(nuseds$ANALYSIS_YR == year & 
                           nuseds$WATERBODY == river), ]
-    
     # find number of rows we need to deal with 
     n_obs = nrow(temp)
-  
-    ## CASE 1 --- NO VALUE ##
-    
-    if(n_obs == 0) {
-      esc = NA
+    if(n_obs <= 1) { # deal with cases of only one or less observations
+      esc = 
+        dplyr::case_when(
+          n_obs == 0 ~ NA,
+          n_obs == 1 ~ 
+            # sub-case 
+            dplyr::case_when(
+              is.na(temp$MAX_ESTIMATE) ~ 
+                # sub-case when is.na is true 
+                dplyr::case_when(
+                  # proper NA
+                  temp$ADULT_PRESENCE %in% c("NOT INSPECTED", 
+                                             "UNKOWN") ~ temp$MAX_ESTIMATE,
+                  # should be zero
+                  temp$ADULT_PRESENCE == "NONE OBSERVED" ~ 0), 
+              # sub case if is.na isn't true
+              !is.na(temp$MAX_ESTIMATE) ~ temp$MAX_ESTIMATE)
+        )
+    } else { # now deal with more than one observation 
+      vals = temp$MAX_ESTIMATE
+      for(obs in 1:nrow(temp)) {
+        if(is.na(vals[obs])) {
+          vals[obs] = 
+            dplyr::case_when(
+              temp$ADULT_PRESENCE %in% c("NOT INSPECTED", "UNKOWN") ~ vals[obs],
+              temp$ADULT_PRESENCE == "NONE OBSERVED" ~ 0
+            )
+        } else if(!is.na(vals[obs])) {
+          vals[obs] = vals[obs]
+        }
+      }
     }
-    
-    ## CASE 2 --- ONLY ONE VALUE ##
-    
-    if(n_obs == 1) {
-      
-      ## CASE 2.1 --- NA IS THE VALUE ##
-      
-      if(is.na(temp$MAX_ESTIMATE)) {
-        
-        ## CASE 2.1.1 --- NA IS THE REAL VALUE ##
+    esc = sum(vals, na.rm = TRUE)
+  }
+}
 
-        if(temp$ADULT_PRESENCE %in% c("NOT INSPECTED", "UNKOWN")) {
+
+
+
+
+      
+    )
+    esc = 
+      dplyr::case_when(
+        n_obs == 0 ~ NA,
+        n_obs == 1 ~ 
+          # sub-case 
+          dplyr::case_when(
+          is.na(temp$MAX_ESTIMATE) ~ 
+            # sub-case when is.na is true 
+            dplyr::case_when(
+              # proper NA
+              temp$ADULT_PRESENCE %in% c("NOT INSPECTED", 
+                                     "UNKOWN") ~ temp$MAX_ESTIMATE,
+              # should be zero
+              temp$ADULT_PRESENCE == "NONE OBSERVED" ~ 0), 
+          # sub case if is.na isn't true
+          !is.na(temp$MAX_ESTIMATE) ~ temp$MAX_ESTIMATE),  
+        n_obs > 1 ~ 
+          dplyr::case_when(
+            # if there is a real value then just take the sum 
+            if(
+              
+            )
+          )
+        (n_obs == 1 & 
+           is.na(temp$MAX_ESTIMATE) & 
+           temp$ADULT_PRESENCE == "NONE OBSERVED") ~ 0,
+        (n_obs == 1 )
+      )
+    
+    if (n_obs == 0) { ## CASE 1 --- NO VALUE ##
+      esc = NA
+    } else if(n_obs == 1) { ## CASE 2 --- ONLY ONE VALUE ##
+      if(is.na(temp$MAX_ESTIMATE)) { ## CASE 2.1 --- NA IS THE VALUE ##
+        if(temp$ADULT_PRESENCE %in% c("NOT INSPECTED", "UNKOWN")) {  ## CASE 2.1.1 --- NA IS THE REAL VALUE ##
           esc = temp$MAX_ESTIMATE
-        }
-        
-        ## CASE 2.1.2 --- SHOULD BE ZERO-VALUED ##
-        if(temp$ADULT_PRESENCE == "NONE OBSERVED") {
+        } else if(temp$ADULT_PRESENCE == "NONE OBSERVED") { ## CASE 2.1.2 --- SHOULD BE ZERO-VALUED ##
           esc = 0 
-        }
-      }
-      
-      ## CASE 2.2 --- REAL VALUE ##
-      
-      if(!is.na(temp$MAX_ESTIMATE)) {
+        } else { # stop case 
+          stop(paste0("ERROR - ", year, " ", river, " has issue"))
+        } 
+      } else if(!is.na(temp$MAX_ESTIMATE)) { ## CASE 2.2 --- REAL VALUE ##
         esc = temp$MAX_ESTIMATE
+      } else {
+        stop(paste0("ERROR - ", year, " ", river, " has issue"))
       }
-    }
     
     ## CASE 3 --- MULTIPLE VALUES ##
     
     # Since the sum of a real number and 0 or a real number and NA is the same
     # we don't need to the do the check from above
     
-    if(n_obs > 1) {
+    else if(n_obs > 1) {
       
       # check that at least one value is real 
       temp_vec = temp$MAX_ESTIMATE
@@ -123,17 +176,21 @@ for(year in 1954:2017) {
           }
           
           # if not a proper value make it zero
-          if(temp$ADULT_PRESENCE == "NONE OBSERVED") {
+          else if(temp$ADULT_PRESENCE[obs] == "NONE OBSERVED") {
             temp_vec[obs] = 0 
           }
         }
         
         # if the value is NOT NA
-        if(!is.na(temp_vec[obs])) {
+        else if(!is.na(temp_vec[obs])) {
           temp_vec[obs] = temp$MAX_ESTIMATE[obs] 
         }
       }
+      
+      # now sum across the vector 
+      esc = sum(na.rm = )
     }
+    
   }
 }
 
