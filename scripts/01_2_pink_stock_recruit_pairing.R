@@ -52,11 +52,58 @@ esc_df = data.frame(
   area = numeric(length(years))
 )
 
+# empty escapment vector to put values in 
+esc_vec = numeric(nrow(esc_df))
+
 # loop through all the year-river combos and get escapement values 
 for(year in 1954:2017) {
-  for(river in unique(esc_df$rivers)){
+  for(river in unique(nuseds$WATERBODY)){
     
+    # get the subset of the data we're interested in 
+    temp = nuseds[which(nuseds$ANALYSIS_YR == year & 
+                          nuseds$WATERBODY == river), ]
+    
+    # find number of rows we need to deal with 
+    n_obs = nrow(temp)
+  
     ## CASE 1 --- NO VALUE ##
+    
+    if(n_obs == 0) {
+      esc = NA
+    }
+    
+    ## CASE 2 --- ONLY ONE VALUE ##
+    
+    if(n_obs == 1) {
+      
+      ## CASE 2.1 --- NA IS THE VALUE ##
+      
+      if(is.na(temp$MAX_ESTIMATE)) {
+        
+        ## CASE 2.1.1 --- NA IS THE REAL VALUE ##
+
+        if(temp$ADULT_PRESENCE %in% c("NOT INSPECTED", "UNKOWN")) {
+          esc = temp$MAX_ESTIMATE
+        }
+        
+        ## CASE 2.1.2 --- SHOULD BE ZERO-VALUED ##
+        
+        
+      }
+      
+      ## CASE 2.1 --- NA IS THE VALUE ##
+      
+      if(temp$ADULT_PRESENCE %in% c("NOT INSPECTED", "UNKOWN")) {
+        esc = temp$MAX_ESTIMATE
+      }
+      
+      ## CASE 2.2 --- REAL VALUE ##
+      if(temp$ADULT_PRESENCE %in% c("NOT INSPECTED", "UNKOWN")) {
+        esc = temp$MAX_ESTIMATE
+      }
+      
+    }
+    
     
     # if no escapement value for that year/river combo, fill with NA
     if( # check for combos with no observations
@@ -104,14 +151,86 @@ for(year in 1954:2017) {
           }
         
         ## CASE 2.2 --- VALUE IS REAL ##
+        
+        if( # check if the value is non-NA
+          !is.na(nuseds[which(nuseds$ANALYSIS_YR == year & 
+                             nuseds$WATERBODY == river), "MAX_ESTIMATE"])
+        ) {
+          esc_df[which(esc_df$years == year &
+                         esc_df$rivers == river), "escape"] = 
+            nuseds[which(nuseds$ANALYSIS_YR == year & 
+                           nuseds$WATERBODY == river), "MAX_ESTIMATE"]
+        }
       }
+    } 
+    
+    ## CASE 3 --- MULTIPLE VALUES ##
+    
+    if(
+      nrow(nuseds[which(nuseds$ANALYSIS_YR == year & 
+                        nuseds$WATERBODY == river), ]) > 1
+    ) {
       
-      
-      esc_df[which(esc_df$years == year &
-                     esc_df$rivers == river), "escape"] = 
-        nuseds[which(nuseds$ANALYSIS_YR == year & 
-                       nuseds$WATERBODY == river), "MAX_ESTIMATE"]
-    } if( # if more than one row, use both
+      # Go through each of the cases and check for the way to interpret the max
+      # estimate 
+      for(
+        row in 1:nrow(nuseds[which(nuseds$ANALYSIS_YR == year & 
+                                        nuseds$WATERBODY == river), ])
+      ) {
+        
+        ## CASE 3.1 --- NA IS THE VALUE ##
+        
+        if( # if the value is NA, then do one of a few things
+          is.na(nuseds[which(nuseds$ANALYSIS_YR == year & 
+                             nuseds$WATERBODY == river), "MAX_ESTIMATE"][row, ])
+        ) {
+          # if the status of "ADULT_PRESENCE" is not inspected or unknown
+          # then just use the value (NA)
+          if( 
+            nuseds[which(nuseds$ANALYSIS_YR == year & 
+                nuseds$WATERBODY == river), "ADULT_PRESENCE"][row, ] %in%
+            c("NOT INSPECTED", "UNKOWN")
+          ) {
+            esc_df[which(esc_df$years == year &
+                           esc_df$rivers == river), "escape"] = 
+              nuseds[which(nuseds$ANALYSIS_YR == year & 
+                             nuseds$WATERBODY == river), "MAX_ESTIMATE"][row, ] 
+          }
+          # if the status of "ADULT_PRESENCE" is none observed, then instead sub
+          # in a zero 
+          if(
+            nuseds[which(nuseds$ANALYSIS_YR == year & 
+                         nuseds$WATERBODY == river), "ADULT_PRESENCE"][row, ] ==
+            "NONE OBSERVED"
+          ) {
+            esc_df[which(esc_df$years == year &
+                           esc_df$rivers == river), "escape"] = 0
+            }
+        }
+        
+        ## CASE 3.1 --- REAL VALUE ##
+        
+        if( # check if the value is non-NA
+          !is.na(nuseds[which(nuseds$ANALYSIS_YR == year & 
+                            nuseds$WATERBODY == river), "MAX_ESTIMATE"][row, ])
+        ) {
+          esc_df[which(esc_df$years == year &
+                         esc_df$rivers == river), "escape"] = 
+            nuseds[which(nuseds$ANALYSIS_YR == year & 
+                           nuseds$WATERBODY == river), "MAX_ESTIMATE"][row, ]
+        }
+        
+        
+        
+      ) {
+        
+      }
+    }
+    
+    
+    
+    
+    if( # if more than one row, use both
       nrow(nuseds[which(nuseds$ANALYSIS_YR == year & 
                         nuseds$WATERBODY == river), ]) > 1
       

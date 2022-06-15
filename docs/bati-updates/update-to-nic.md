@@ -5,9 +5,13 @@ output:
       keep_tex: yes
 ---
 
-# Update on BATI Contract
+# Correlative relationships between sea lice on Broughton area salmon farms and sea lice on wild juvenile salmon 
 ### **Cole Brookson**
 ### **09 June 2022**
+
+## Summary
+
+Initial analysis indicates there is a strong relationship between the number of lice present on salmon farms in the Broughton Archipelago and the number of lice present on juvenile   
 
 ## Data Acquisition
 
