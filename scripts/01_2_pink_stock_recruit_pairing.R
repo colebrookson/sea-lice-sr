@@ -55,12 +55,12 @@ esc_df = data.frame(
 # empty escapment vector to put values in 
 esc_vec = numeric(nrow(esc_df))
 yr_vec = numeric(nrow(esc_df))
-riv_vec = numeric(nrow(esc_df))
+riv_vec = character(nrow(esc_df))
 
 # loop through all the year-river combos and get escapement values 
+iter = 1
 for(year in 1954:2017) {
   for(river in unique(nuseds$WATERBODY)) {
-    
     # get the subset of the data we're interested in 
     temp = nuseds[which(nuseds$ANALYSIS_YR == year & 
                           nuseds$WATERBODY == river), ]
@@ -99,6 +99,12 @@ for(year in 1954:2017) {
       }
     }
     esc = sum(vals, na.rm = TRUE)
+    # now put each 
+    esc_vec[iter] = esc
+    yr_vec[iter] = year
+    riv_vec[iter] = river
+    # iterate
+    iter = iter + 1
   }
 }
 
