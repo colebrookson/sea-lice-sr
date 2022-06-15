@@ -87,9 +87,25 @@ for(year in 1954:2017) {
         }
         
         ## CASE 2.1.2 --- SHOULD BE ZERO-VALUED ##
-        
-        
+        if(temp$ADULT_PRESENCE == "NONE OBSERVED") {
+          esc = 0 
+        }
       }
+    }
+    
+    ## CASE 3 --- MULTIPLE VALUES ##
+    
+    # Since the sum of a real number and 0 or a real number and NA is the same
+    # we don't need to the do the check from above
+    
+    if(n_obs > 1) {
+      esc = sum(temp$MAX_ESTIMATE, na.rm = TRUE)
+    }
+      
+
+      
+      
+      
       
       ## CASE 2.1 --- NA IS THE VALUE ##
       
