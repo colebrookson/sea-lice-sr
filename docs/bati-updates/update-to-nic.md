@@ -11,7 +11,7 @@ output:
 
 ## Summary
 
-Initial analysis indicates there is a strong relationship between the number of lice present on salmon farms in the Broughton Archipelago and the number of lice present on juvenile   
+Initial analysis indicates there is a strong relationship between the number of lice present on salmon farms in the Broughton Archipelago and the number of lice present on juvenile salmon in the region. With the end goal of developing stock-recruit models to better understand the relationship between pressures from sea lice and returns of wild salmon stocks, we looked at the relationship of lice on wild juveniles to a) the number of lice on all farms, b) the number of lice on the farms in the Knight-Tribune corridor, and c) the number of lice on three focal farms - Humphrey, Sergeant, and Doctors. 
 
 ## Data Acquisition
 
@@ -24,6 +24,8 @@ The chum data we are still waiting on from Pieter, and hopefully that will come 
 We have already completed the analysis examining the correlation between lice on farmed fish and on wild fish. We were able to use the data from Salmon Coast Field Station on numbers of lice on wild fish, along with the data on the number of lice on farmed fish to see how those two patterns relate. 
 
 Given that some farms likely contribute far more lice to the number of lice on wild juvenile salmon, we compared three different groupings of the farms. We looked at the relationship of lice on wild juveniles to a) the number of lice on all farms, b) the number of lice on the farms in the Knight-Tribune corridor, and c) the number of lice on three focal farms - Humphrey, Sergeant, and Doctors. 
+
+![](wild-to-farm-models-comparison.png)
 
 We show that the number of lice on wild juveniles is best predicted by the number of lice on all farms. 
 
@@ -42,5 +44,7 @@ We are currently in the midst of developing a version of the stock-recruit model
 3. Fit the stock-recruit models to data using Bayesian methods to better quantify uncertainty. 
 
 These next steps mean that we are slightly behind (~2 weeks) the schedule outlined in the initial contract schedule, but progress will now be faster given that all pink salmon data are in hand. 
+
+**
 
 
