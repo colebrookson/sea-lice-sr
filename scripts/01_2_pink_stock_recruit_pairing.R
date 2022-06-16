@@ -53,7 +53,7 @@ esc_df = data.frame(
 )
 
 # empty escapment vector to put values in 
-esc_vec = numeric(nrow(esc_df))
+esc_vec = rep(NA, nrow(esc_df))
 yr_vec = numeric(nrow(esc_df))
 riv_vec = character(nrow(esc_df))
 
@@ -66,10 +66,12 @@ for(year in 1954:2017) {
                           nuseds$WATERBODY == river), ]
     # find number of rows we need to deal with 
     n_obs = nrow(temp)
-    if(n_obs <= 1) { # deal with cases of only one or less observations
+    if(n_obs == 0) { # do zero case here
+      # essentially just keep the current value of NA
+      esc = -9999999      
+    } else if(n_obs == 1) { # deal with cases of only one or less observations
       esc = 
         dplyr::case_when(
-          n_obs == 0 ~ as.numeric(NA),
           n_obs == 1 ~
             # sub-case
             dplyr::case_when(
@@ -107,6 +109,19 @@ for(year in 1954:2017) {
     iter = iter + 1
   }
 }
+
+# et rid of all -9999999 values
+esc_vec[which(esc_vec == -9999999)] = NA
+
+# current problem is that the vectors resulting are too big - not clear why the iterator is going to high 
+# but it's likely because of the fact it gets iterated in two places 
+
+
+## TESTING
+# year = 1954
+# river = "KENNETH RIVER"
+# iter = 18
+
 
 ## TEST
 # year = unique(esc_df$years)[1]
