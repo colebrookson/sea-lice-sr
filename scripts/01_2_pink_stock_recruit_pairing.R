@@ -122,8 +122,22 @@ esc_vec[which(esc_vec == -9999999)] = NA
 # set up catch data ============================================================
 
 # get catch rate for the pink data from Pieter
-pink_recon$exp_rate = 
-  pink_recon$reconstructed_escapement/pink_recon$total_stock
+pink_recon_rate = pink_recon %>% 
+  rowwise() %>% 
+  mutate(exp_rate = apportioned_catch/total_stock) %>% 
+  select(conservation_unit, year, exp_rate, total_stock, apportioned_catch)
+
+# pare down PSF data 
+psf_pink = psf_exp %>% 
+  filter(species %in% c("Pink (even)", "Pink (odd)"))
+
+## NOTE - need to figure out how these relate to the CU's - seem to remember 
+# this being on the PSF website somewhere in the PSE? 
+
+
+
+
+
 
 
 ## get exploitation rates from two sources of catch data 
