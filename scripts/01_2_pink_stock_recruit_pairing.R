@@ -119,6 +119,12 @@ for(year in 1954:2017) {
 # et rid of all -9999999 values
 esc_vec[which(esc_vec == -9999999)] = NA
 
+# set up catch data ============================================================
+
+# get catch rate for the pink data from Pieter
+pink_recon$exp_rate = 
+  pink_recon$reconstructed_escapement/pink_recon$total_stock
+
 
 ## get exploitation rates from two sources of catch data 
 ## the pink reconstructions and the PSF data 
