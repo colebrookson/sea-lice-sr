@@ -139,13 +139,6 @@ pink_exp$exp_rate = as.numeric(substr(pink_exp$exp_rate,
                            1,
                            nchar(pink_exp$exp_rate)-4))/100
 
-# now add in area 12 data to the pink_exp df
-area12_cus = c("Southern Fjords (even)", "Southern Fjords (odd)",
-               "Homathko-Klinaklini (odd)", "Nahwitti", 
-               "East Vancouver Island (odd)")
-pink_area12 = pink_recon_rate %>% 
-  dplyr::filter(conservation_unit %in% area12_cus)
-
 # to apply exploitation as accurately as possible, put in all rivers that
 # apply to each CU
 rivers_helper_df = rbind(
@@ -158,22 +151,25 @@ rivers_helper_df = rbind(
 # make all upper case so they match
 rivers_helper_df$rivers = stringr::str_to_upper(rivers_helper_df$rivers)
 
-south_fjords_even_one = c("Eva Creek, Driftwood Creek, Pack Lake Creek, Rainbow Creek, Seymour River, Waump Creek, Blind Creek, Boughey Creek, Fulmore River, Robbers Knob Creek, Ahnuhati River, Ahta River, Ahta Valley Creek, Call Creek, Gilford Creek, Glendale Creek, Hoeya Sound Creek, Kakweiken River, Kamano Bay Creek, Klinaklini River, Kwalate Creek, Lull Creek, Maple Creek, Matsui Creek, McAlister Creek, Port Harvey Lagoon Creeks, Potts Lagoon Creek, Protection Point Creek, Sallie Creek, Shoal Harbour Creek, Sim River, Viner Sound Creek, Adam River, Charles Creek, Eve River, Hyde Creek, Kokish River, Mills Creek, Naka Creek, Nimpkish River, Stranby River, Thiemer Creek, Tsitika River, Tuna River, Bughouse Creek, Carriden Creek, Charles Creek, Cohoe Creek, Embley Creek, Hauskin Creek, Health Lagoon Creek, Jennis Bay Creek, Kingcome River, Mackenzie River, Nimmo Creek, Scott Cove Creek, Simoom Sound Creek, Wakeman River, Waldon Creek, Cluxewe River, Keogh River, Nahwitti River, Quatse River, Shushartie River, Songhees Creek, Stranby River, Tsulquate River")
-south_fjords_even = stringr::str_split(south_fjords_even_one,
-                                       ", ")
-south_fjords_odd = c("Eva Creek, Driftwood Creek, Pack Lake Creek, Rainbow Creek, Seymour River, Waump Creek, Blind Creek, Boughey Creek, Fulmore River, Robbers Knob Creek,Ahnuhati River, Ahta River, Ahta Valley Creek, Call Creek, Gilford Creek, Glendale Creek, Hoeya Sound Creek, Kakweiken River, Kamano Bay Creek, Klinaklini River, Kwalate Creek, Lull Creek, Maple Creek, Matsui Creek, McAlister Creek, Port Harvey Lagoon Creeks, Potts Lagoon Creek, Protection Point Creek, Sallie Creek, Shoal Harbour Creek, Sim River, Viner Sound Creek")
-east_vi = c("Adam River, Charles Creek, Eve River, Hyde Creek, Kokish River, Mills Creek, Naka Creek, Nimpkish River, Stranby River, Thiemer Creek, Tsitika River, Tuna River")
-hk = c("Bughouse Creek, Carriden Creek, Charles Creek, Cohoe Creek, Embley Creek, Hauskin Creek, Health Lagoon Creek, Jennis Bay Creek, Kingcome River, Mackenzie River, Nimmo Creek, Scott Cove Creek,Simoom Sound Creek, Wakeman River, Waldon Creek")
-nahwitti = c("Cluxewe River, Keogh River, Nahwitti River, Quatse River, Shushartie River, Songhees Creek, Stranby River, Tsulquate River")
-
-## LEFT OFF FIGURING OUT THE BEST WAY TO SPLIT THESE STRINGS SO I CAN MATCH
-# THEM TO THE DATABASE AND FIGURE OUT WHAT THE SPECIFIC EXPLOITATION RATES ARE
-
 # get catch rate for the pink data from Pieter
 pink_recon_rate = pink_recon %>% 
   rowwise() %>% 
   mutate(exp_rate = apportioned_catch/total_stock) %>% 
   select(conservation_unit, year, exp_rate, total_stock, apportioned_catch)
+
+# now add in area 12 data to the pink_exp df
+area12_cus = c("Southern Fjords (even)", "Southern Fjords (odd)",
+               "Homathko-Klinaklini (odd)", "Nahwitti", 
+               "East Vancouver Island (odd)")
+pink_area12 = pink_recon_rate %>% 
+  dplyr::filter(conservation_unit %in% area12_cus)
+
+
+### LEFT OFF - there are too many observations in the esc_df ??? was working now isn't fml 
+
+
+
+
 
 
 
