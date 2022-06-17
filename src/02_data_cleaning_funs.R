@@ -507,3 +507,23 @@ check_lep_total_calculations = function(all_farm_data) {
         }
     }
 }
+
+extract_rivers = function(df, cu) {
+  
+  # isolate the values
+  temp = df[which(df$cu == cu ), "rivers"]
+  
+  # split them up 
+  temp_list = stringr::str_split(temp, ", ")
+  
+  # get vector from list 
+  temp_vec = temp_list[[1]]
+  
+  # get names vec 
+  names = rep(cu, length(temp_vec))
+  
+  # bind into dataframe
+  temp_df = data.frame(rivers = temp_vec, cu = names)
+  
+  return(temp_df)
+}

@@ -19,6 +19,9 @@ pink_exp =
   read_csv(here::here("./data/dfo-data/raw/pink/english-report-translated.csv"))
 pink_recon = 
   read_csv(here::here("./data/dfo-data/clean/pink-reconstructions.csv"))
+pink_helper = 
+  read_csv(here::here(
+    "./data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
 
 
 # trim nuseds data to useful size ==============================================
@@ -51,9 +54,9 @@ if(length(years) != length(rivers)) {
 }
 
 # empty escapment vector to put values in 
-esc_vec = rep(NA, nrow(esc_df))
-yr_vec = numeric(nrow(esc_df))
-riv_vec = character(nrow(esc_df))
+esc_vec = rep(NA, length(years))
+yr_vec = numeric(length(years))
+riv_vec = character(length(years))
 
 # loop through all the year-river combos and get escapement values 
 iter = 1
@@ -144,51 +147,24 @@ pink_area12 = pink_recon_rate %>%
   dplyr::filter(conservation_unit %in% area12_cus)
 
 # to apply exploitation as accurately as possible, put in all rivers that
-# apply to each CU 
-south_fjords_even_one = c("Eva Creek, Driftwood Creek, Pack Lake Creek, 
-                      Rainbow Creek, Seymour River, Waump Creek, Blind Creek, 
-                      Boughey Creek, Fulmore River, Robbers Knob Creek,
-                      Ahnuhati River, Ahta River, Ahta Valley Creek, 
-                      Call Creek, Gilford Creek, Glendale Creek, 
-                      Hoeya Sound Creek, Kakweiken River, Kamano Bay Creek, 
-                      Klinaklini River, Kwalate Creek, Lull Creek, Maple Creek, 
-                      Matsui Creek, McAlister Creek, Port Harvey Lagoon Creeks, 
-                      Potts Lagoon Creek, Protection Point Creek, Sallie Creek, 
-                      Shoal Harbour Creek, Sim River, Viner Sound Creek, 
-                      Adam River, Charles Creek, Eve River, Hyde Creek, 
-                      Kokish River, Mills Creek, Naka Creek, Nimpkish River, 
-                      Stranby River, Thiemer Creek, Tsitika River, Tuna River,
-                      Bughouse Creek, Carriden Creek, Charles Creek, 
-                      Cohoe Creek, Embley Creek, Hauskin Creek, 
-                      Health Lagoon Creek, Jennis Bay Creek, Kingcome River, 
-                      Mackenzie River, Nimmo Creek, Scott Cove Creek,
-                      Simoom Sound Creek, Wakeman River, Waldon Creek, 
-                      Cluxewe River, Keogh River, Nahwitti River, Quatse River, 
-                      Shushartie River, Songhees Creek, Stranby River, 
-                      Tsulquate River")
+# apply to each CU
+rivers_helper_df = rbind(
+  extract_rivers(pink_helper, "south_fjords_even"),
+  extract_rivers(pink_helper, "south_fjords_odd"),
+  extract_rivers(pink_helper, "east_vi"),
+  extract_rivers(pink_helper, "hk"),
+  extract_rivers(pink_helper, "nahwitti")
+)
+# make all upper case so they match
+rivers_helper_df$rivers = stringr::str_to_upper(rivers_helper_df$rivers)
+
+south_fjords_even_one = c("Eva Creek, Driftwood Creek, Pack Lake Creek, Rainbow Creek, Seymour River, Waump Creek, Blind Creek, Boughey Creek, Fulmore River, Robbers Knob Creek, Ahnuhati River, Ahta River, Ahta Valley Creek, Call Creek, Gilford Creek, Glendale Creek, Hoeya Sound Creek, Kakweiken River, Kamano Bay Creek, Klinaklini River, Kwalate Creek, Lull Creek, Maple Creek, Matsui Creek, McAlister Creek, Port Harvey Lagoon Creeks, Potts Lagoon Creek, Protection Point Creek, Sallie Creek, Shoal Harbour Creek, Sim River, Viner Sound Creek, Adam River, Charles Creek, Eve River, Hyde Creek, Kokish River, Mills Creek, Naka Creek, Nimpkish River, Stranby River, Thiemer Creek, Tsitika River, Tuna River, Bughouse Creek, Carriden Creek, Charles Creek, Cohoe Creek, Embley Creek, Hauskin Creek, Health Lagoon Creek, Jennis Bay Creek, Kingcome River, Mackenzie River, Nimmo Creek, Scott Cove Creek, Simoom Sound Creek, Wakeman River, Waldon Creek, Cluxewe River, Keogh River, Nahwitti River, Quatse River, Shushartie River, Songhees Creek, Stranby River, Tsulquate River")
 south_fjords_even = stringr::str_split(south_fjords_even_one,
-                                       ",")
-south_fjords_odd = c("Eva Creek, Driftwood Creek, Pack Lake Creek, 
-                      Rainbow Creek, Seymour River, Waump Creek, Blind Creek, 
-                      Boughey Creek, Fulmore River, Robbers Knob Creek,
-                      Ahnuhati River, Ahta River, Ahta Valley Creek, 
-                      Call Creek, Gilford Creek, Glendale Creek, 
-                      Hoeya Sound Creek, Kakweiken River, Kamano Bay Creek, 
-                      Klinaklini River, Kwalate Creek, Lull Creek, Maple Creek, 
-                      Matsui Creek, McAlister Creek, Port Harvey Lagoon Creeks, 
-                      Potts Lagoon Creek, Protection Point Creek, Sallie Creek, 
-                      Shoal Harbour Creek, Sim River, Viner Sound Creek")
-east_vi = c("Adam River, Charles Creek, Eve River, Hyde Creek, 
-                      Kokish River, Mills Creek, Naka Creek, Nimpkish River, 
-                      Stranby River, Thiemer Creek, Tsitika River, Tuna River")
-hk = c("Bughouse Creek, Carriden Creek, Charles Creek, 
-                      Cohoe Creek, Embley Creek, Hauskin Creek, 
-                      Health Lagoon Creek, Jennis Bay Creek, Kingcome River, 
-                      Mackenzie River, Nimmo Creek, Scott Cove Creek,
-                      Simoom Sound Creek, Wakeman River, Waldon Creek")
-nahwitti = c("Cluxewe River, Keogh River, Nahwitti River, Quatse River, 
-                      Shushartie River, Songhees Creek, Stranby River, 
-                      Tsulquate River")
+                                       ", ")
+south_fjords_odd = c("Eva Creek, Driftwood Creek, Pack Lake Creek, Rainbow Creek, Seymour River, Waump Creek, Blind Creek, Boughey Creek, Fulmore River, Robbers Knob Creek,Ahnuhati River, Ahta River, Ahta Valley Creek, Call Creek, Gilford Creek, Glendale Creek, Hoeya Sound Creek, Kakweiken River, Kamano Bay Creek, Klinaklini River, Kwalate Creek, Lull Creek, Maple Creek, Matsui Creek, McAlister Creek, Port Harvey Lagoon Creeks, Potts Lagoon Creek, Protection Point Creek, Sallie Creek, Shoal Harbour Creek, Sim River, Viner Sound Creek")
+east_vi = c("Adam River, Charles Creek, Eve River, Hyde Creek, Kokish River, Mills Creek, Naka Creek, Nimpkish River, Stranby River, Thiemer Creek, Tsitika River, Tuna River")
+hk = c("Bughouse Creek, Carriden Creek, Charles Creek, Cohoe Creek, Embley Creek, Hauskin Creek, Health Lagoon Creek, Jennis Bay Creek, Kingcome River, Mackenzie River, Nimmo Creek, Scott Cove Creek,Simoom Sound Creek, Wakeman River, Waldon Creek")
+nahwitti = c("Cluxewe River, Keogh River, Nahwitti River, Quatse River, Shushartie River, Songhees Creek, Stranby River, Tsulquate River")
 
 ## LEFT OFF FIGURING OUT THE BEST WAY TO SPLIT THESE STRINGS SO I CAN MATCH
 # THEM TO THE DATABASE AND FIGURE OUT WHAT THE SPECIFIC EXPLOITATION RATES ARE
