@@ -14,6 +14,11 @@ source(here::here("./src/02_data_cleaning_funs.R"))
 source(here::here("./src/01_plot_themes.R"))
 
 nuseds_raw = read_csv(here::here("./data/NuSEDS/NuSEDS_20220309.csv"))
+psf_exp = 
+  read_csv(here::here("./data/PSF-PSE/pacific-salmon-explorer-output.csv"))
+pink_recon = 
+  read_csv(here::here("./data/dfo-data/clean/pink-reconstructions.csv"))
+
 
 # trim nuseds data to useful size ==============================================
 names(nuseds_raw)
@@ -92,7 +97,8 @@ for(year in 1954:2017) {
         if(is.na(vals[obs])) {
           vals[obs] = 
             dplyr::case_when(
-              temp$ADULT_PRESENCE[obs] %in% c("NOT INSPECTED", "UNKOWN") ~ vals[obs],
+              temp$ADULT_PRESENCE[obs] %in% c("NOT INSPECTED", "UNKOWN") ~ 
+                vals[obs],
               temp$ADULT_PRESENCE[obs] == "NONE OBSERVED" ~ 0
             )
         } else if(!is.na(vals[obs])) {
@@ -113,34 +119,6 @@ for(year in 1954:2017) {
 # et rid of all -9999999 values
 esc_vec[which(esc_vec == -9999999)] = NA
 
-# current problem is that the vectors resulting are too big - not clear why the iterator is going to high 
-# but it's likely because of the fact it gets iterated in two places 
-
-
-## TESTING
-# year = 1954
-# river = "KENNETH RIVER"
-# iter = 18
-
-
-## TEST
-# year = unique(esc_df$years)[1]
-# river = unique(esc_df$rivers)[1]
-# 
-# year = 2001
-# river = "SHUSHARTIE RIVER"
-# for(year in unique(esc_df$years)) {
-#   for(river in unique(esc_df$rivers)){
-#     
-#     if(
-#       nrow(nuseds[which(nuseds$ANALYSIS_YR == year &
-#                         nuseds$WATERBODY == river),]) > 1
-#     ) {
-#       print(year); print(river)
-#    }
-#     
-#   }
-# }
 
 ## get exploitation rates from two sources of catch data 
 ## the pink reconstructions and the PSF data 
