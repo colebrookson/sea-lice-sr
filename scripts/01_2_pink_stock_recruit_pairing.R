@@ -117,20 +117,24 @@ esc_vec[which(esc_vec == -9999999)] = NA
 
 # now turn vectors into a dataframe
 esc_df = data.frame(
+  cbind(
   esc = esc_vec,
   river = riv_vec,
   year = yr_vec
+  )
 )
 
 # cut down nuseds data to just area and river to join
 nuseds_areariver = nuseds %>% 
   dplyr::select(AREA, WATERBODY) %>% 
-  dplyr::rename(river = WATERBODY)
+  dplyr::rename(river = WATERBODY) %>% 
+  unique()
 esc_df = dplyr::left_join(
   x = esc_df,
   y = nuseds_areariver,
   by = "river"
-)
+  ) %>% 
+  dplyr::rename(area = AREA)
 
 # set up catch data ============================================================
 
@@ -164,26 +168,31 @@ area12_cus = c("Southern Fjords (even)", "Southern Fjords (odd)",
 pink_area12 = pink_recon_rate %>% 
   dplyr::filter(conservation_unit %in% area12_cus)
 
+# add exploitation rates to data ===============================================
 
-### LEFT OFF - there are too many observations in the esc_df ??? was working now isn't fml 
-
-
-
-
-
-
-
-## NOTE - need to figure out how these relate to the CU's - seem to remember 
-# this being on the PSF website somewhere in the PSE? 
-unique(psf_pink$location)
-
-
-
-
-
+# do it in an ugly loop so it's readable
+esc_df$exp = NA
+for(row in seq_len(nrow(esc_df))){
+  
+  # find the area and year first
+  cur_area = esc_df[row, "area"]
+  cur_year = esc_df[row, "year"]
+  cur_river = esc_df[row, "river"]
+  
+  if(cur_area %in% c(7:10)) {
+    esc_df[row, "exp"] = 
+      pink_exp[which(pink_exp$year == cur_year & 
+                       pink_exp$area == cur_area), "exp_rate"]
+  } else if(cur_area == 12) {
+    esc_df[row, "exp"] = 
+      pink_exp[which(pink_exp$year == cur_year &
+                       pink_exp_area == cur_area & 
+                       )]
+  }
+}
 
 ## get exploitation rates from two sources of catch data 
-## the pink reconstructions and the PSF data 
+## the pink reconstructions and the english data 
 
 ## Set up overall S-R data base with all rivers 
 
