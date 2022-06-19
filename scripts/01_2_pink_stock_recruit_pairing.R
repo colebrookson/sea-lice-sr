@@ -174,20 +174,72 @@ pink_area12 = pink_recon_rate %>%
 esc_df$exp = NA
 for(row in seq_len(nrow(esc_df))){
   
-  # find the area and year first
+  # find the river, area, and year first
   cur_area = esc_df[row, "area"]
   cur_year = esc_df[row, "year"]
   cur_river = esc_df[row, "river"]
   
+  # if the area is 7-10 it's easy just take the one value
   if(cur_area %in% c(7:10)) {
     esc_df[row, "exp"] = 
       pink_exp[which(pink_exp$year == cur_year & 
                        pink_exp$area == cur_area), "exp_rate"]
-  } else if(cur_area == 12) {
-    esc_df[row, "exp"] = 
-      pink_exp[which(pink_exp$year == cur_year &
-                       pink_exp_area == cur_area & 
-                       )]
+  } else if(cur_area == 12) { # if it's area 12 then it's a bit harder
+    
+    # first check to see if the specific river is in the helper df
+    if(cur_river %in% rivers_helper_df$rivers) {
+      region = rivers_helper_df[which(rivers_helper_df$rivers == cur_river),
+                                "cu"]
+      
+      # if the river is in two regions - deal with that 
+      if(length(region > 1)) {
+        if((as.numeric(cur_year) %% 2) != 0) {# if odd year take out even region
+          region = region[which(region != "south_fjords_even")]
+        }
+      }
+      
+      # if the river is in the helper df, find the corresponding 
+      # area and put that value in 
+      if(region == "south_fjords_even") {
+        esc_df[row, "exp"] = 
+          pink_area12[which(pink_area12$year == cur_year &
+                              pink_area12$conservation_unit == 
+                              "Southern Fjords (even)"), 
+                      "exp_rate"]
+      } else if(region == "south_fjords_odd") {
+        esc_df[row, "exp"] = 
+          pink_area12[which(pink_area12$year == cur_year &
+                              pink_area12$conservation_unit == 
+                              "Southern Fjords (odd)"), 
+                      "exp_rate"]
+      } else if(region == "east_vi") {
+        esc_df[row, "exp"] = 
+          pink_area12[which(pink_area12$year == cur_year &
+                              pink_area12$conservation_unit == 
+                              "East Vancouver Island (odd)"), 
+                      "exp_rate"]
+      } else if(region == "hk") {
+        esc_df[row, "exp"] = 
+          pink_area12[which(pink_area12$year == cur_year &
+                              pink_area12$conservation_unit == 
+                              "Homathko-Klinaklini (odd)"), 
+                      "exp_rate"]
+      } else if(region == "nahwitti") {
+        esc_df[row, "exp"] = 
+          pink_area12[which(pink_area12$year == cur_year &
+                              pink_area12$conservation_unit == 
+                              "Nahwitti"), 
+                      "exp_rate"]
+      } else {
+        stop("ERROR - some non-matching on row ", row)
+      }
+    } else { # if the current river is NOT in the helper df
+      # take the mean of the values in that year (likely just one)
+      esc_df[row, "exp"] = 
+        mean(pink_area12[which(pink_area12$year == cur_year),
+                       "exp_rate"]$exp_rate, 
+           na.rm = TRUE)
+    }
   }
 }
 
