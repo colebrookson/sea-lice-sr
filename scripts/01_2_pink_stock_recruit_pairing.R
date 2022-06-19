@@ -171,17 +171,20 @@ pink_area12 = pink_recon_rate %>%
 # add exploitation rates to data ===============================================
 
 # do it in an ugly loop so it's readable
-esc_df$exp = NA
-for(row in seq_len(nrow(esc_df))){
+
+esc_df_short = esc_df %>% 
+  filter(year <= 2016)
+esc_df_short$exp = NA
+for(row in seq_len(nrow(esc_df_short))){
   
   # find the river, area, and year first
-  cur_area = esc_df[row, "area"]
-  cur_year = esc_df[row, "year"]
-  cur_river = esc_df[row, "river"]
+  cur_area = esc_df_short[row, "area"]
+  cur_year = esc_df_short[row, "year"]
+  cur_river = esc_df_short[row, "river"]
   
   # if the area is 7-10 it's easy just take the one value
   if(cur_area %in% c(7:10)) {
-    esc_df[row, "exp"] = 
+    esc_df_short[row, "exp"] = 
       pink_exp[which(pink_exp$year == cur_year & 
                        pink_exp$area == cur_area), "exp_rate"]
   } else if(cur_area == 12) { # if it's area 12 then it's a bit harder
@@ -201,31 +204,31 @@ for(row in seq_len(nrow(esc_df))){
       # if the river is in the helper df, find the corresponding 
       # area and put that value in 
       if(region == "south_fjords_even") {
-        esc_df[row, "exp"] = 
+        esc_df_short[row, "exp"] = 
           pink_area12[which(pink_area12$year == cur_year &
                               pink_area12$conservation_unit == 
                               "Southern Fjords (even)"), 
                       "exp_rate"]
       } else if(region == "south_fjords_odd") {
-        esc_df[row, "exp"] = 
+        esc_df_short[row, "exp"] = 
           pink_area12[which(pink_area12$year == cur_year &
                               pink_area12$conservation_unit == 
                               "Southern Fjords (odd)"), 
                       "exp_rate"]
       } else if(region == "east_vi") {
-        esc_df[row, "exp"] = 
+        esc_df_short[row, "exp"] = 
           pink_area12[which(pink_area12$year == cur_year &
                               pink_area12$conservation_unit == 
                               "East Vancouver Island (odd)"), 
                       "exp_rate"]
       } else if(region == "hk") {
-        esc_df[row, "exp"] = 
+        esc_df_short[row, "exp"] = 
           pink_area12[which(pink_area12$year == cur_year &
                               pink_area12$conservation_unit == 
                               "Homathko-Klinaklini (odd)"), 
                       "exp_rate"]
       } else if(region == "nahwitti") {
-        esc_df[row, "exp"] = 
+        esc_df_short[row, "exp"] = 
           pink_area12[which(pink_area12$year == cur_year &
                               pink_area12$conservation_unit == 
                               "Nahwitti"), 
@@ -235,7 +238,7 @@ for(row in seq_len(nrow(esc_df))){
       }
     } else { # if the current river is NOT in the helper df
       # take the mean of the values in that year (likely just one)
-      esc_df[row, "exp"] = 
+      esc_df_short[row, "exp"] = 
         mean(pink_area12[which(pink_area12$year == cur_year),
                        "exp_rate"]$exp_rate, 
            na.rm = TRUE)
@@ -243,10 +246,20 @@ for(row in seq_len(nrow(esc_df))){
   }
 }
 
-## get exploitation rates from two sources of catch data 
-## the pink reconstructions and the english data 
+## Set up overall S-R data base with all rivers ================================
 
-## Set up overall S-R data base with all rivers 
+# first check structure 
+esc_df_short$esc = as.numeric(esc_df_short$esc)
+
+# Recruitment estimates R = N/(1-u)
+esc_df_short = esc_df_short %>% 
+  rowwise() %>% 
+  mutate(R = esc/(1-exp))
+
+# Spawner estimates to pair with recruitment (S(t-2) corresponds to R(t))
+esc_df_short$S<-NA
+esc_df_short$S[3:length(esc_df_short$S)] = 
+  esc_df_short$esc[1:(length(esc_df_short$S)-2)]
 
 ## Remove ambigious farm exposure/enhancement/etc
 
