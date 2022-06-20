@@ -8,7 +8,6 @@
 
 library(tidyverse)
 library(here)
-library(stringr)
 
 # pull in file with all functions to clean data 
 source(here::here("./src/02_data_cleaning_funs.R"))
@@ -22,6 +21,7 @@ pink_recon =
 pink_helper = 
   read_csv(here::here(
     "./data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
+
 
 
 # trim nuseds data to useful size ==============================================
@@ -255,6 +255,7 @@ esc_df_short$esc = as.numeric(esc_df_short$esc)
 esc_df_short = esc_df_short %>% 
   rowwise() %>% 
   mutate(R = esc/(1-exp))
+#esc_df_short[which(is.nan(esc_df_short$R)),] = NA
 
 esc_df_short$S = NA
 esc_df_short$survival = NA
@@ -267,25 +268,93 @@ for(river in unique(esc_df_short$river)) {
     esc_df_short[which(esc_df_short$river == river & 
                          esc_df_short$year == year), "S"] =
       esc_df_short[which(esc_df_short$river == river &
-                           esc_df_short$year == (year - 2)),"esc"]
+                           esc_df_short$year == (year - 2)), "esc"]
     # now assign survival 
     esc_df_short[which(esc_df_short$river == river & 
                          esc_df_short$year == year), "survival"] =
       #log(R(t)/S(t-2))
-      log((esc_df_short[which(esc_df_short$river == river & 
-                           esc_df_short$year == year), "R"]) / 
+      (esc_df_short[which(esc_df_short$river == river & 
+                           esc_df_short$year == year),"R"]) / 
       (esc_df_short[which(esc_df_short$river == river &
-                            esc_df_short$year == (year - 2)),"esc"]))
+                            esc_df_short$year == (year - 2)),"esc"])
   }
 }
 
-## Remove ambigious farm exposure/enhancement/etc
+# add log survival 
+esc_df_short$log_survival = log(esc_df_short$survival)
 
-## make sure odd and even year populations are specified
+# deal with negative infinity meansurements
+esc_df_short[which(esc_df_short$log_survival == -Inf), "survival"] = NA
 
-## Only keep pop'ns with a minimum of 20 spawner-recruit pairs
+# Remove ambiguous farm exposure/enhancement/etc ===============================
 
-## Include lice co-variate
+# get the rivers to be included -- these come from Steph's work
+area12_rivers = c("AHNUHATI RIVER", "AHTA RIVER", "GLENDALE CREEK", 
+                  "KAKWEIKEN RIVER", "KINGCOME RIVER", "LULL CREEK", 
+                  "VINER SOUND CREEK", "WAKEMAN RIVER")
+area07_rivers = c("PINE RIVER", "NEEKAS CREEK", "TANKEEAH RIVER", 
+                  "KWAKUSDIS RIVER", "BULLOCK CHANNEL CREEKS", "QUARTCHA CREEK", 
+                  "LEE CREEK", "ROSCOE CREEK", "CLATSE CREEK", 
+                  "WALKER LAKE CREEK", "GOAT BUSHU CREEK", 
+                  "DEER PASS LAGOON CREEKS", "KUNSOOT RIVER", "KADJUSDIS RIVER", 
+                  "MCLOUGHLIN CREEK", "COOPER INLET CREEKS")
+
+# subset the dataframes 
+area_12_df = esc_df_short[which(esc_df_short$area == 12),]
+area_07_df = esc_df_short[which(esc_df_short$area == 7),]
+
+# all other areas 
+other_areas_df = esc_df_short[which(esc_df_short$area %notin% c(12, 7)),]
+
+# filter to only the desired areas 
+area_12_df = area_12_df %>% 
+  dplyr::filter(river %in% area12_rivers)
+area_07_df = area_07_df %>% 
+  dplyr::filter(river %in% area07_rivers)
+
+# bind all other areas and the filtered ones
+new_esc_df = rbind(area_07_df, area_12_df, other_areas_df)
+
+# specify even vs odd years ====================================================
+
+new_esc_df = new_esc_df %>% 
+  rowwise() %>% 
+  dplyr::mutate(even_odd = ifelse(
+    (year %% 2) == 0, "even",
+    "odd"
+  ))
+
+
+# Only keep pop'ns with a minimum of 20 spawner-recruit pairs ==================
+
+# first define populations as even/odd in the same river 
+new_esc_df$pop = NA
+num_rivers = unique(new_esc_df$river)
+
+# iterate through rivers 
+n_pops = 1
+for(river in num_rivers) {
+  
+  # assign population the value for odd years
+  new_esc_df$pop[which(new_esc_df$river == river 
+                       & new_esc_df$even_odd == "odd")] = n_pops
+  # iterate
+  n_pops = n_pops + 1
+  # now check even years 
+  new_esc_df$pop[which(new_esc_df$river == river 
+                       & new_esc_df$even_odd == "even")] = n_pops
+  # iterate
+  n_pops = n_pops + 1
+}
+
+# make this into a factor 
+new_esc_df$pop = as.factor(new_esc_df$pop)
+
+# bring in louse covariate =====================================================
+
+
+
+## Include lice co-var
 
 ## make final data base 
 
