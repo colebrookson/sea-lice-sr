@@ -78,6 +78,11 @@ ggsave(filename = here::here("./figs/just-wild-raw-comparison.png"),
         height = 6,
         dpi = 600)
 
+# write df 
+readr::write_csv(predict_data, 
+                 here::here(
+                   "./data/regression-data/predicted-lice-abundance.csv"))
+
 # add in farm data for comparison ==============================================
 
 all_farms = farm_regress %>% 

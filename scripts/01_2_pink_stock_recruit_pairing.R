@@ -13,16 +13,17 @@ library(here)
 source(here::here("./src/02_data_cleaning_funs.R"))
 source(here::here("./src/01_plot_themes.R"))
 
-nuseds_raw = read_csv(here::here("./data/NuSEDS/NuSEDS_20220309.csv"))
+nuseds_raw = readr::read_csv(here::here("./data/NuSEDS/NuSEDS_20220309.csv"))
 pink_exp = 
-  read_csv(here::here("./data/dfo-data/raw/pink/english-report-translated.csv"))
+  readr::read_csv(here::here(
+    "./data/dfo-data/raw/pink/english-report-translated.csv"))
 pink_recon = 
-  read_csv(here::here("./data/dfo-data/clean/pink-reconstructions.csv"))
+  readr::read_csv(here::here("./data/dfo-data/clean/pink-reconstructions.csv"))
 pink_helper = 
-  read_csv(here::here(
+  readr::read_csv(here::here(
     "./data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
-
-
+lice_pred = readr::read_csv(here::here(
+  "./data/regression-data/predicted-lice-abundance.csv"))
 
 # trim nuseds data to useful size ==============================================
 names(nuseds_raw)
@@ -263,20 +264,31 @@ esc_df_short$survival = NA
 # Spawner estimates to pair with recruitment (S(t-2) corresponds to R(t))
 esc_df_short$year = as.numeric(esc_df_short$year)
 for(river in unique(esc_df_short$river)) {
-  for(year in 1956:2016) {
-    # assign the spawners
-    esc_df_short[which(esc_df_short$river == river & 
-                         esc_df_short$year == year), "S"] =
-      esc_df_short[which(esc_df_short$river == river &
-                           esc_df_short$year == (year - 2)), "esc"]
-    # now assign survival 
-    esc_df_short[which(esc_df_short$river == river & 
-                         esc_df_short$year == year), "survival"] =
-      #log(R(t)/S(t-2))
-      (esc_df_short[which(esc_df_short$river == river & 
-                           esc_df_short$year == year),"R"]) / 
-      (esc_df_short[which(esc_df_short$river == river &
-                            esc_df_short$year == (year - 2)),"esc"])
+  for(year in 1954:2016) {
+    
+    # check if the previous year is even there 
+    if(nrow(esc_df_short[which(esc_df_short$river == river &
+                               esc_df_short$year == (year - 2)), "esc"]) == 0){
+      esc_df_short[which(esc_df_short$river == river & 
+                           esc_df_short$year == year), "S"] = NA
+      esc_df_short[which(esc_df_short$river == river & 
+                           esc_df_short$year == year), "survival"] = NA
+    } else {
+      # assign the spawners
+      
+      esc_df_short[which(esc_df_short$river == river & 
+                           esc_df_short$year == year), "S"] =
+        esc_df_short[which(esc_df_short$river == river &
+                             esc_df_short$year == (year - 2)), "esc"]
+      # now assign survival 
+      esc_df_short[which(esc_df_short$river == river & 
+                           esc_df_short$year == year), "survival"] =
+        #log(R(t)/S(t-2))
+        (esc_df_short[which(esc_df_short$river == river & 
+                              esc_df_short$year == year),"R"]) / 
+        (esc_df_short[which(esc_df_short$river == river &
+                              esc_df_short$year == (year - 2)),"esc"]) 
+    }
   }
 }
 
@@ -349,6 +361,41 @@ for(river in num_rivers) {
 
 # make this into a factor 
 new_esc_df$pop = as.factor(new_esc_df$pop)
+
+# loop through and figure out how many pairs there are in each populations 
+pops_to_keep = c()
+for(curr_pop in unique(new_esc_df$pop)) {
+  
+  # grab the current df of the population we want 
+  temp = new_esc_df[which(new_esc_df$pop == curr_pop),]
+  
+  # if there are enough mon-NA's then keep it 
+  if(nrow(temp[which(!is.na(temp$survival)),]) >= 20) {
+    
+    pops_to_keep = c(curr_pop, pops_to_keep)
+  }
+}
+
+final_rivers_df = new_esc_df[which(new_esc_df$pop %in% pops_to_keep),]
+
+# name the populations
+final_rivers_df$population_name = paste(
+  stringr::str_to_lower(gsub(" ", "_", final_rivers_df$river)),
+  final_rivers_df$even_odd,
+  sep = "_"
+)
+
+# remove NA observations of survival
+final_rivers_df = final_rivers_df %>% 
+  dplyr::filter(
+    !is.na(survival)
+  )
+
+cat("Final dataset: \n Total number of populations (even/odd): ", 
+    length(unique(final_rivers_df$pop)), "\n Total number of S-R pairs: ", 
+    dim(final_rivers_df)[1], "\n Total number of rivers: ", 
+    length(unique(final_rivers_df$river)))
+
 
 # bring in louse covariate =====================================================
 
