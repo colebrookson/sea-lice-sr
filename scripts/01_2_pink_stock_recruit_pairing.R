@@ -256,10 +256,28 @@ esc_df_short = esc_df_short %>%
   rowwise() %>% 
   mutate(R = esc/(1-exp))
 
+esc_df_short$S = NA
+esc_df_short$survival = NA
+
 # Spawner estimates to pair with recruitment (S(t-2) corresponds to R(t))
-esc_df_short$S<-NA
-esc_df_short$S[3:length(esc_df_short$S)] = 
-  esc_df_short$esc[1:(length(esc_df_short$S)-2)]
+esc_df_short$year = as.numeric(esc_df_short$year)
+for(river in unique(esc_df_short$river)) {
+  for(year in 1956:2016) {
+    # assign the spawners
+    esc_df_short[which(esc_df_short$river == river & 
+                         esc_df_short$year == year), "S"] =
+      esc_df_short[which(esc_df_short$river == river &
+                           esc_df_short$year == (year - 2)),"esc"]
+    # now assign survival 
+    esc_df_short[which(esc_df_short$river == river & 
+                         esc_df_short$year == year), "survival"] =
+      #log(R(t)/S(t-2))
+      log((esc_df_short[which(esc_df_short$river == river & 
+                           esc_df_short$year == year), "R"]) / 
+      (esc_df_short[which(esc_df_short$river == river &
+                            esc_df_short$year == (year - 2)),"esc"]))
+  }
+}
 
 ## Remove ambigious farm exposure/enhancement/etc
 
