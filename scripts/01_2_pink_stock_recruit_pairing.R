@@ -251,12 +251,12 @@ for(row in seq_len(nrow(esc_df_short))){
 
 # first check structure 
 esc_df_short$esc = as.numeric(esc_df_short$esc)
+esc_df_short[which(esc_df_short$esc == 0),"esc"] = NA
 
 # Recruitment estimates R = N/(1-u)
 esc_df_short = esc_df_short %>% 
   rowwise() %>% 
   mutate(R = esc/(1-exp))
-#esc_df_short[which(is.nan(esc_df_short$R)),] = NA
 
 esc_df_short$S = NA
 esc_df_short$survival = NA
@@ -268,14 +268,14 @@ for(river in unique(esc_df_short$river)) {
     
     # check if the previous year is even there 
     if(nrow(esc_df_short[which(esc_df_short$river == river &
-                               esc_df_short$year == (year - 2)), "esc"]) == 0){
+                               esc_df_short$year == (year - 2)),]) == 0){
       esc_df_short[which(esc_df_short$river == river & 
                            esc_df_short$year == year), "S"] = NA
       esc_df_short[which(esc_df_short$river == river & 
                            esc_df_short$year == year), "survival"] = NA
     } else {
-      # assign the spawners
       
+      # assign the spawners
       esc_df_short[which(esc_df_short$river == river & 
                            esc_df_short$year == year), "S"] =
         esc_df_short[which(esc_df_short$river == river &
@@ -287,16 +287,13 @@ for(river in unique(esc_df_short$river)) {
         (esc_df_short[which(esc_df_short$river == river & 
                               esc_df_short$year == year),"R"]) / 
         (esc_df_short[which(esc_df_short$river == river &
-                              esc_df_short$year == (year - 2)),"esc"]) 
+                              esc_df_short$year == year), "S"]) 
     }
   }
 }
 
 # add log survival 
 esc_df_short$log_survival = log(esc_df_short$survival)
-
-# deal with negative infinity meansurements
-esc_df_short[which(esc_df_short$log_survival == -Inf), "survival"] = NA
 
 # Remove ambiguous farm exposure/enhancement/etc ===============================
 
@@ -336,7 +333,6 @@ new_esc_df = new_esc_df %>%
     "odd"
   ))
 
-
 # Only keep pop'ns with a minimum of 20 spawner-recruit pairs ==================
 
 # first define populations as even/odd in the same river 
@@ -362,21 +358,32 @@ for(river in num_rivers) {
 # make this into a factor 
 new_esc_df$pop = as.factor(new_esc_df$pop)
 
-# loop through and figure out how many pairs there are in each populations 
-pops_to_keep = c()
-for(curr_pop in unique(new_esc_df$pop)) {
+# loop through and figure out how many pairs there are in each populations
+populations = sort(unique(new_esc_df$pop))
+counts = numeric(length(unique(new_esc_df$pop)))
+for(curr_pop in 1:length(unique(new_esc_df$pop))) {
   
   # grab the current df of the population we want 
   temp = new_esc_df[which(new_esc_df$pop == curr_pop),]
   
-  # if there are enough mon-NA's then keep it 
-  if(nrow(temp[which(!is.na(temp$survival)),]) >= 20) {
-    
-    pops_to_keep = c(curr_pop, pops_to_keep)
-  }
+  # if there are enough mon-NA's then keep it
+  # (I know this is ugly and slow i just wanted to make 100% sure i was doing
+  # it out properly)
+  n_rows = nrow(temp)
+  n_NAs = nrow(temp[which(is.na(temp$survival)),])
+  counts[curr_pop] = n_rows - n_NAs
+  
 }
 
-final_rivers_df = new_esc_df[which(new_esc_df$pop %in% pops_to_keep),]
+pop_count_df = data.frame(
+  population = populations,
+  count = counts
+)
+
+enough_obs_df = pop_count_df[which(pop_count_df$count >= 20),]
+
+final_rivers_df = new_esc_df[which(new_esc_df$pop %in% 
+                                     enough_obs_df$population),]
 
 # name the populations
 final_rivers_df$population_name = paste(
@@ -399,10 +406,26 @@ cat("Final dataset: \n Total number of populations (even/odd): ",
 
 # bring in louse covariate =====================================================
 
+final_rivers_df$lice = NA
 
+# deal with all zero values first - non-area 12, and pre-2001
+final_rivers_df[which(final_rivers_df$area != 12), "lice"] = 0
+final_rivers_df[which(final_rivers_df$area == 12 & 
+                        final_rivers_df$year < 2001), "lice"] = 0
 
-## Include lice co-var
+# now do the area 12 that we can
+for(yr in 2001:2016) {
+  
+  # get the subset 
+  final_rivers_df[which(final_rivers_df$area == 12 & 
+                          final_rivers_df$year == yr), "lice"] = 
+    # find the value from the other dataset
+    lice_pred[which(lice_pred$year == yr), "all_lep"]
+  
+}
 
-## make final data base 
+# make final data base =========================================================
+readr::write_csv(final_rivers_df, 
+                 here::here("./data/for-model-runs/stock-recruit-data.csv"))
 
 
