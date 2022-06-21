@@ -385,10 +385,19 @@ enough_obs_df = pop_count_df[which(pop_count_df$count >= 20),]
 final_rivers_df = new_esc_df[which(new_esc_df$pop %in% 
                                      enough_obs_df$population),]
 
+# keep a copy that doesn't filter out rivers with not enough observations
+all_rivers = new_esc_df 
+
 # name the populations
 final_rivers_df$population_name = paste(
   stringr::str_to_lower(gsub(" ", "_", final_rivers_df$river)),
   final_rivers_df$even_odd,
+  sep = "_"
+)
+
+all_rivers$population_name = paste(
+  stringr::str_to_lower(gsub(" ", "_", all_rivers$river)),
+  all_rivers$even_odd,
   sep = "_"
 )
 
@@ -398,10 +407,20 @@ final_rivers_df = final_rivers_df %>%
     !is.na(survival)
   )
 
+all_rivers = all_rivers %>% 
+  dplyr::filter(
+    !is.na(survival)
+  )
+
 cat("Final dataset: \n Total number of populations (even/odd): ", 
     length(unique(final_rivers_df$pop)), "\n Total number of S-R pairs: ", 
     dim(final_rivers_df)[1], "\n Total number of rivers: ", 
     length(unique(final_rivers_df$river)))
+
+cat("Final dataset: \n Total number of populations (even/odd): ", 
+    length(unique(all_rivers$pop)), "\n Total number of S-R pairs: ", 
+    dim(all_rivers)[1], "\n Total number of rivers: ", 
+    length(unique(all_rivers$river)))
 
 
 # bring in louse covariate =====================================================
@@ -424,8 +443,28 @@ for(yr in 2001:2016) {
   
 }
 
+# repeat for all versions one 
+all_rivers$lice = NA
+
+# deal with all zero values first - non-area 12, and pre-2001
+all_rivers[which(all_rivers$area != 12), "lice"] = 0
+all_rivers[which(all_rivers$area == 12 & 
+                        all_rivers$year < 2001), "lice"] = 0
+
+# now do the area 12 that we can
+for(yr in 2001:2016) {
+  
+  # get the subset 
+  all_rivers[which(all_rivers$area == 12 & 
+                          all_rivers$year == yr), "lice"] = 
+    # find the value from the other dataset
+    lice_pred[which(lice_pred$year == yr), "all_lep"]
+  
+}
+
 # make final data base =========================================================
 readr::write_csv(final_rivers_df, 
                  here::here("./data/for-model-runs/stock-recruit-data.csv"))
-
-
+readr::write_csv(all_rivers, 
+                 here::here(
+                   "./data/for-model-runs/non-filtered-stock-recruit-data.csv"))
