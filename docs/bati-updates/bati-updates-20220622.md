@@ -60,47 +60,71 @@ In the paper (and in the final dataset generated in the code), there are:
    * 179 populations
    * 2307 S-R pairs
    * 99 rivers
-   * 
+  
 But, I think this is actually too large of a dataset. There is code to exclude populations with <20 S-R pairs: 
+
 ![bg right:50% height:60%](./figs/less-than-20-pairs.png)
 
+It's just that there's nowhere where the `R.LongEnough` is actually used to subset the focal dataframe 
 
 ---
 
-# Why Git from the command line? 
+# Problem 1 - Do the results change? 
 
-* It's the only place you can run *all* Git commands 
-* If you know the command line version you can probably figure out a GUI version - the opposite is not necessarily true 
-* You might have a preference of GUI, but *all* users can use command line tools
-* Interacting with servers needs to be done via command line, so you might as well learn how to do it on your own machine 
-* Language-specific plug-ins (i.e. Git for RStudio) force you to open the IDE for that language every time you need to make a change to a file, even if it's not in that langauge 
+So I redid all the analysis with the code and data availabe. These are the results: 
+
+![bg right:50% height:60%](./figs/original-code-anova.png)
+![bg left:50% height:60%](./figs/original-code-output.png)
+
+**Side note:** $c$ is reported as a positive value in the MS.
+
+---
+
+# Problem 1 - Do the results change? 
+
+I then checked the results when the correct dataset (making sure the populations with <20 pairs were out). That gave: 
+   * 55 populations
+   * 1253 S-R pairs
+   * 32 rivers
+
+
+
+![bg right:50% height:60%](./figs/cor-inc-anova.png)
+![bg left:50% height:60%](./figs/cor-inc-output.png)
+
+So conclusions don't change (the alternative model still improves the fit), but the value of $c$ does change (was -0.19) before. 
 
 ---
 
-# Cloud-based Git repository hosting service (GitHub)
+# Problem 2 - Lice covariate match-up 
 
-* A for-profit company that hosts Git repositories
-* Free to use for public repositories (makes it *very* popular for open-source projects)
-* Provides a nice interface for viewing your repositories contents
-* Allows you to publish items with DOIs (links with Zenodo for this) 
+Unfortunately though after this I noticed another problem with how the data for the lice covariate was being matched up. Essentially, somehow this "+1" made it into the code: 
+![bg right:50% height:60%](./figs/W-creation.png)
+![bg left:50% height:60%](./figs/W-years.png)
 
----
-# Important Concept: Branches 
-
-* When you are making lots of changes, you don't necessarily want to work on the "stable" branch
-* This is especially important when collaborating with others who rely on having a working code base 
+So you'll notice this now goes from 2002 - 2011, but this should be 2001-2010. Particularly the highest year (2001) is what matters I suspect.
 
 ---
-# Important Concept: Merging 
+# Problem 2 - Re-doing Analysis with proper lice covariate
 
-* Merging is what allows us to make the changes that happened on the "feature branch" present on the main branch, once we're sure we like them 
-* This can get complicated with large numbers of files, but the great thing about Git is you can **always** go back if you mess up!
+So I re-did the analysis with both versions of the dataset (the longer and the shorter on). Here is with the longer:
+
+![bg right:50% height:60%](./figs/inc-cor-anova.png)
+![bg left:50% height:60%](./figs/inc-cor-output.png)
+
+Here we see that actually the null model actually has a slightly lower AIC. The estimate for $r$ stays relatively consistent, but for $c$ it goes to almost zero. 
 
 ---
-# Important Concept: Reverting 
+# Problem 2 - Re-doing Analysis with proper lice covariate
 
-* We might make mistakes, and it's important to know how to "undo" those mistakes 
-* There are often two scenarios: 
-  * You want to keep some of the work you did since the "bad" commit
-  * You don't want to keep any of it (usually one or two commits back)
-  * 
+I tried this also with the dataset of the correct size:
+
+![bg right:50% height:60%](./figs/cor-cor-anova.png)
+![bg left:50% height:60%](./figs/cor-cor-output.png)
+
+So this is similar - the null model is marginally better AIC-wise, and $c$ is close to zero. 
+
+---
+# Obviously I could be missing something...
+
+...but this is what I have been able to figure out so far. **Unsure where to go from here...**

@@ -1,0 +1,61 @@
+<h1 id="updates-on-initial-stock-recruit-model-results"><strong>Updates on Initial Stock-Recruit Model Results</strong></h1>
+<p><em>Presenter:</em> Cole Brookson <em>Date:</em> 2022-02-17</p>
+<hr />
+<h1 id="model">Model</h1>
+<p>Followed the form in Peacock (2013)</p>
+<p><br /><span class="math display">ln[<em>R</em><sub><em>i</em>, <em>t</em></sub>/<em>N</em><sub><em>i</em>, <em>t</em> − 2</sub>] = <em>r</em> − <em>b</em><sub><em>i</em></sub><em>N</em><sub><em>i</em>, <em>t</em> − 2</sub> − <em>c</em><em>W</em><sub><em>a</em>, <em>t</em> − 1</sub> + <em>θ</em><sub><em>t</em></sub> + <em>θ</em><sub><em>a</em>, <em>t</em></sub> + <em>ϵ</em><sub><em>i</em>, <em>t</em></sub></span><br /></p>
+<ul>
+<li>Fit in <code>glmmTMB</code>
+<ul>
+<li>Null model: <code>survival ~ scale(S):population_name +                              (1|year/area)</code></li>
+<li>Alternative model: <code>survival ~ scale(S):population_name +                             scale(lice) + (1|year/area)</code></li>
+</ul></li>
+<li>Reason for using <code>scale()</code> on the predictors is the models didn’t converge without it - non-positive-definite Hessian</li>
+<li>Final dataset (only kept populations with &gt; 20 stock-recruits per populations):
+<ul>
+<li>77 populations (even/odd)</li>
+<li>1752 S-R pairs</li>
+<li>45 rivers</li>
+</ul></li>
+</ul>
+<h1 id="why-is-this-different-than-stephs-results">Why is This Different Than Stephs Results</h1>
+<p>I think there are some actually very small errors in the code that introduced some problems (<strong>I have not fully tested this</strong>)</p>
+<hr />
+<h1 id="problem-1---sample-size">Problem 1 - Sample size</h1>
+<p>In the paper (and in the final dataset generated in the code), there are: * 179 populations * 2307 S-R pairs * 99 rivers * But, I think this is actually too large of a dataset. There is code to exclude populations with &lt;20 S-R pairs:</p>
+<figure>
+<img src="./figs/less-than-20-pairs.png" alt="bg right:50% height:60%" /><figcaption>bg right:50% height:60%</figcaption>
+</figure>
+<hr />
+<h1 id="why-git-from-the-command-line">Why Git from the command line?</h1>
+<ul>
+<li>It’s the only place you can run <em>all</em> Git commands</li>
+<li>If you know the command line version you can probably figure out a GUI version - the opposite is not necessarily true</li>
+<li>You might have a preference of GUI, but <em>all</em> users can use command line tools</li>
+<li>Interacting with servers needs to be done via command line, so you might as well learn how to do it on your own machine</li>
+<li>Language-specific plug-ins (i.e. Git for RStudio) force you to open the IDE for that language every time you need to make a change to a file, even if it’s not in that langauge</li>
+</ul>
+<hr />
+<h1 id="cloud-based-git-repository-hosting-service-github">Cloud-based Git repository hosting service (GitHub)</h1>
+<ul>
+<li>A for-profit company that hosts Git repositories</li>
+<li>Free to use for public repositories (makes it <em>very</em> popular for open-source projects)</li>
+<li>Provides a nice interface for viewing your repositories contents</li>
+<li>Allows you to publish items with DOIs (links with Zenodo for this)</li>
+</ul>
+<h1 id="important-concept-merging">Important Concept: Merging</h1>
+<ul>
+<li>Merging is what allows us to make the changes that happened on the “feature branch” present on the main branch, once we’re sure we like them</li>
+<li>This can get complicated with large numbers of files, but the great thing about Git is you can <strong>always</strong> go back if you mess up!</li>
+</ul>
+<hr />
+<h1 id="important-concept-reverting">Important Concept: Reverting</h1>
+<ul>
+<li>We might make mistakes, and it’s important to know how to “undo” those mistakes</li>
+<li>There are often two scenarios:
+<ul>
+<li>You want to keep some of the work you did since the “bad” commit</li>
+<li>You don’t want to keep any of it (usually one or two commits back)</li>
+<li></li>
+</ul></li>
+</ul>
