@@ -2,7 +2,7 @@
 theme: default
 _class: lead
 paginate: true
-marp: true
+marp: false
 backgroundColor: #fff
 style: |
   img {background-color: transparent!important;}
@@ -36,35 +36,34 @@ $$ \text{ln}[R_{i,t}/N_{i,t-2}] = r - b_iN_{i,t-2} - cW_{a,t-1} + \theta_t + \th
   * 45 rivers
 
 ---
-# Why Bother? 
+# Results
 
-Reproducibility for: 
+Comparison between null model and alternative model:
 
-![bg right:60% height:70%](./figs/nature-repro.jpg)
+![bg right:80% height:90%](./figs/sr-model-anova.png)
 
-1. You!!
-2. Your Collaborators
-3. Others
-
----
-
-# Well, how do we do it?
-
-![bg right width:50% height:10%](./figs/git.png)
-![bg width:100% height:30%](./figs/github.png)
+1. No clear difference between the null model and the alternative model
+   * Note - cannot test the model differences without using the `scale()` in `glmmTMB` but can force them to fit `lme4` - however there was still no difference
+2. **Model parameters** for the growth rate, $r$ (Intercept) = 0.19218, and the strength of the relationship betweenpink salmon survival and lice on wild juvenile salmon, $c$ = 0.09217
 
 ---
 
-# Version Control System (Git)
+# Why is This Different Than Stephs Results
 
-![bg right width:100% height:50%](./figs/git-workflow.png)
+I think there are some actually very small errors in the code that introduced some problems (**I have not fully tested this**)
 
+---
 
-* Git has three main states your files can reside in: 
-  * `modified`
-  * `staged`
-  * `committed`
-* Your files move through these stages as you make changes 
+# Problem 1 - Sample size 
+
+In the paper (and in the final dataset generated in the code), there are: 
+   * 179 populations
+   * 2307 S-R pairs
+   * 99 rivers
+   * 
+But, I think this is actually too large of a dataset. There is code to exclude populations with <20 S-R pairs: 
+![bg right:50% height:60%](./figs/less-than-20-pairs.png)
+
 
 ---
 
@@ -87,20 +86,18 @@ Reproducibility for:
 
 ---
 # Important Concept: Branches 
-![bg right width:100% height%](./figs/branch-1.png)
+
 * When you are making lots of changes, you don't necessarily want to work on the "stable" branch
 * This is especially important when collaborating with others who rely on having a working code base 
 
 ---
 # Important Concept: Merging 
-![bg right width:100% height%](./figs/branch-2.png)
+
 * Merging is what allows us to make the changes that happened on the "feature branch" present on the main branch, once we're sure we like them 
 * This can get complicated with large numbers of files, but the great thing about Git is you can **always** go back if you mess up!
 
 ---
 # Important Concept: Reverting 
-
-![bg right width:75% height%](./figs/revert.png)
 
 * We might make mistakes, and it's important to know how to "undo" those mistakes 
 * There are often two scenarios: 
