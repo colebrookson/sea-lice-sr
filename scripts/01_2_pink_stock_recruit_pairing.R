@@ -430,17 +430,20 @@ final_rivers_df$lice = NA
 # deal with all zero values first - non-area 12, and pre-2001
 final_rivers_df[which(final_rivers_df$area != 12), "lice"] = 0
 final_rivers_df[which(final_rivers_df$area == 12 & 
-                        final_rivers_df$year < 2001), "lice"] = 0
+                        final_rivers_df$year < 2002), "lice"] = 0
 
 # now do the area 12 that we can
-for(yr in 2001:2016) {
+for(yr in 2002:2017) {
   
   # get the subset 
   final_rivers_df[which(final_rivers_df$area == 12 & 
                           final_rivers_df$year == yr), "lice"] = 
     # find the value from the other dataset
-    lice_pred[which(lice_pred$year == yr), "all_lep"]
-  
+    lice_pred[which(lice_pred$year == yr-1), "all_lep"]
+    ## NOTE ###
+    # the -1 in line above is supposed to be there, to pair the year of the lice
+    # infection with the return year
+    ## END NOTE ##
 }
 
 # repeat for all versions one 
@@ -461,6 +464,9 @@ for(yr in 2001:2016) {
     lice_pred[which(lice_pred$year == yr), "all_lep"]
   
 }
+
+table(all_rivers$area)
+table(all_rivers$area[which(year == 2016)])
 
 # make final data base =========================================================
 readr::write_csv(final_rivers_df, 
