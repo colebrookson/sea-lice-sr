@@ -31,21 +31,25 @@ cat("Final dataset: \n Total number of populations (even/odd): ",
     length(unique(unfilter_sr_df$river)))
 # last touch-up's of the data ==================================================
 
-sr_df[which(sr_df$area == 12 & year %in% c(1990:2000)), "lice"] = NA
-sr_df = sr_df[which(sr_df$year > 1961),]
+#sr_df[which(sr_df$area == 12 & (sr_df$year %in% c(1990:2000)), "lice"] = NA
+#sr_df = sr_df[which(sr_df$year > 1961),]
 
 sr_df$area = as.factor(sr_df$area)
 sr_df$year_fac = as.factor(sr_df$year)
 sr_df$population_name = as.factor(sr_df$population_name)
 
 # do it again for unfiltered data 
-unfilter_sr_df[which(unfilter_sr_df$area == 12 & 
-                         year %in% c(1990:2000)), "lice"] = NA
-unfilter_sr_df = unfilter_sr_df[which(unfilter_sr_df$year > 1961),]
+#unfilter_sr_df[which(unfilter_sr_df$area == 12 & 
+#                       unfilter_sr_df$year %in% c(1990:2000)), "lice"] = NA
+#unfilter_sr_df = unfilter_sr_df[which(unfilter_sr_df$year > 1961),]
 
 unfilter_sr_df$area = as.factor(unfilter_sr_df$area)
 unfilter_sr_df$year_fac = as.factor(unfilter_sr_df$year)
 unfilter_sr_df$population_name = as.factor(unfilter_sr_df$population_name)
+
+# remove pop's with less than 4 pairs since that's the min to fit a plane
+unfilter_sr_df = unfilter_sr_df[which(
+  unfilter_sr_df$pop > 4), ]
 
 # run models ===================================================================
 
