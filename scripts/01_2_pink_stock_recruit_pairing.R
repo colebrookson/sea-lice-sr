@@ -455,13 +455,17 @@ all_rivers[which(all_rivers$area == 12 &
                         all_rivers$year < 2001), "lice"] = 0
 
 # now do the area 12 that we can
-for(yr in 2001:2016) {
+for(yr in 2002:2017) {
   
   # get the subset 
   all_rivers[which(all_rivers$area == 12 & 
                           all_rivers$year == yr), "lice"] = 
     # find the value from the other dataset
-    lice_pred[which(lice_pred$year == yr), "all_lep"]
+    lice_pred[which(lice_pred$year == yr-1), "all_lep"]
+  ## NOTE ###
+  # the -1 in line above is supposed to be there, to pair the year of the lice
+  # infection with the return year
+  ## END NOTE ##
   
 }
 
