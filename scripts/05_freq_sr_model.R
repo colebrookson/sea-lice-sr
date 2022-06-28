@@ -46,24 +46,24 @@ sr_df$population_name = as.factor(sr_df$population_name)
 #                       unfilter_sr_df$year %in% c(1990:2000)), "lice"] = NA
 #unfilter_sr_df = unfilter_sr_df[which(unfilter_sr_df$year > 1961),]
 
-unfilter_sr_df$area = as.factor(unfilter_sr_df$area)
-unfilter_sr_df$year_fac = as.factor(unfilter_sr_df$year)
-unfilter_sr_df$population_name = as.factor(unfilter_sr_df$population_name)
-
-# remove pop's with less than 4 pairs since that's the min to fit a plane
-unfilter_sr_df = unfilter_sr_df[which(
-  unfilter_sr_df$pop > 4), ]
+# unfilter_sr_df$area = as.factor(unfilter_sr_df$area)
+# unfilter_sr_df$year_fac = as.factor(unfilter_sr_df$year)
+# unfilter_sr_df$population_name = as.factor(unfilter_sr_df$population_name)
+# 
+# # remove pop's with less than 4 pairs since that's the min to fit a plane
+# unfilter_sr_df = unfilter_sr_df[which(
+#   unfilter_sr_df$pop > 4), ]
 
 # run models ===================================================================
 
-null_model = glmmTMB::glmmTMB(log_survival ~ scale(S):population_name +
+null_model = lme4::lmer(log_survival ~ S:population_name +
                                 (1|year_fac/area),
                               data = sr_df)
 saveRDS(null_model, here::here(
   "./data/model-outputs/stock-recruit-null-model.RDS"
 ))
-alt_model = glmmTMB::glmmTMB(log_survival ~ scale(S):population_name +
-                               scale(lice) + (1|year_fac/area),
+alt_model = lme4::lmer(log_survival ~ S:population_name +
+                               lice + (1|year_fac/area),
                              data = sr_df)
 saveRDS(alt_model, here::here(
   "./data/model-outputs/stock-recruit-alternative-model.RDS"
@@ -73,28 +73,27 @@ summary(null_model)
 summary(alt_model)
 anova(null_model, alt_model)
 
-cat("value of fitted r (growth rate) is ", alt_model$fit$par[[1]],
-      " and the value of c (effect of sea lice) is ", alt_model$fit$par[[2]])
-
+cat("with lmer(), value of fitted r (growth rate) is ", fixef(alt_lmer)[1],
+    " and the value of c (effect of sea lice) is ", fixef(alt_lmer)[2])
 # attempt to fit models with observations not excluded 
 
-unfilter_null_model = glmmTMB::glmmTMB(log_survival ~ scale(S):population_name +
-                                (1|year_fac/area),
-                              data = unfilter_sr_df)
-saveRDS(unfilter_null_model, here::here(
-  "./data/model-outputs/unfiltered-data-stock-recruit-null-model.RDS"
-))
-unfilter_alt_model = glmmTMB::glmmTMB(log_survival ~ scale(S):population_name +
-                                        scale(lice) + 
-                                        (1|year_fac/area),
-                                      data = unfilter_sr_df)
-saveRDS(alt_model, here::here(
-  "./data/model-outputs/unfiltered-data-stock-recruit-alternative-model.RDS"
-))
+# unfilter_null_model = glmmTMB::glmmTMB(log_survival ~ scale(S):population_name +
+#                                          (1|year_fac/area),
+#                                        data = unfilter_sr_df)
+# saveRDS(unfilter_null_model, here::here(
+#   "./data/model-outputs/unfiltered-data-stock-recruit-null-model.RDS"
+# ))
+# unfilter_alt_model = glmmTMB::glmmTMB(log_survival ~ scale(S):population_name +
+#                                         scale(lice) + 
+#                                         (1|year_fac/area),
+#                                       data = unfilter_sr_df)
+# saveRDS(alt_model, here::here(
+#   "./data/model-outputs/unfiltered-data-stock-recruit-alternative-model.RDS"
+# ))
 
-summary(unfilter_null_model)
-summary(unfilter_alt_model)
-anova(unfilter_null_model, unfilter_alt_model)
+# summary(unfilter_null_model)
+# summary(unfilter_alt_model)
+#anova(unfilter_null_model, unfilter_alt_model)
 
 # bootstrap confidence intervals ===============================================
 
@@ -103,8 +102,8 @@ sr_df$year_area = rep(0, nrow(sr_df))
 sr_df$r = rep(0, nrow(sr_df))
 
 # get the different levels of the random effect 
-rand_effects = rownames(glmmTMB::ranef(alt_model)$cond$`area:year_fac`)
-fixed_effects = names(fixef(alt_model)$cond)[3:length(fixef(alt_model)$cond)]
+rand_effects = rownames(lme4::ranef(alt_model)$`area:year_fac`)
+fixed_effects = names(lme4::fixef(alt_model))[3:length(lme4::fixef(alt_model))]
 
 # loop to get the values from the fitted model object
 for(i in 1:length(rand_effects)) {
@@ -146,12 +145,12 @@ bootstrap = function(x) {
   
   # calculate R 
   R = sr_df$S * exp(
-      scale(a + 
+    a + 
       b_i[sr_df$r] * sr_df$S + 
-        c * sr_df$lice + 
-        theta_ya[sr_df$year_area] + 
-        theta_y[as.numeric(sr_df$year_fac)] +
-        epsilon))
+      c * sr_df$lice + 
+      theta_ya[sr_df$year_area] + 
+      theta_y[as.numeric(sr_df$year_fac)] +
+      epsilon)
   
   # get survival 
   SS = log(R/sr_df$S)
@@ -167,23 +166,24 @@ bootstrap = function(x) {
   )
   
   # actually fit the model
-  model = glmmTMB::glmmTMB(survival ~ scale(S):population_name + 
-                             scale(lice) + (1|year_fac/area),
+  model = lme4::lmer(survival ~ S:population_name + 
+                             lice + (1|year_fac/area),
                            data = temp_sr_df, REML = TRUE)
   
   # get the results 
-  params_result = glmmTMB::fixef(model)[1:2]
+  params_result = lme4::fixef(model)[1:2]
+  return(params_result)
 }
 
 # set up estimated variances for bootstrap algorithm
-b = as.numeric(glmmTMB::fixef(alt_model)$cond[3:length(fixef(alt_model)$cond)])
-a = as.numeric(glmmTMB::fixef(alt_model)$cond[1]) # intercept 
-c = as.numeric(glmmTMB::fixef(alt_model)$cond[2]) # lice
+b = as.numeric(lme4::fixef(alt_model)[3:length(fixef(alt_model))])
+a = as.numeric(lme4::fixef(alt_model)[1]) # intercept 
+c = as.numeric(lme4::fixef(alt_model)[2]) # lice
 
 # get the standard deviations 
-sigma_ya = attr(VarCorr(alt_model)[[1]]$`area:year_fac`, "stddev")[[1]]
-sigma_y = attr(VarCorr(alt_model)[[1]]$`year`, "stddev")[[1]]
-sigma_e = attr(VarCorr(alt_model)[[1]], "sc")
+sigma_ya = attr(lme4::VarCorr(alt_model)$`area:year_fac`, "stddev")[[1]]
+sigma_y = attr(VarCorr(alt_model)$`year`, "stddev")[[1]]
+sigma_e = attr(VarCorr(alt_model), "sc")
 
 parameters = list(a, b, c, sigma_ya, sigma_y, sigma_e)
 
@@ -191,32 +191,49 @@ parameters = list(a, b, c, sigma_ya, sigma_y, sigma_e)
 cores = detectCores()-1 # keep one for processing other things 
 
 # get random sequences for different chains 
-n_jobs = 2
+n_jobs = 100
 RNGkind("L'Ecuyer-CMRG")
 set.seed(1234)
-job_seeds = matrix(nrow = cores, ncol = 7)
+job_seeds = matrix(nrow = n_jobs, ncol = 7)
 job_seeds[1,] = .Random.seed
 
 for(i in 2:n_jobs) job_seeds[i,] = parallel::nextRNGStream(job_seeds[i-1,])
 
 t0 = proc.time()
 cl = parallel::makeCluster(cores)
-parallel::clusterExport(cl, carlist = list("job_seeds", "sr_df", "parameters"))
-output = parallel::clusterApply(cl, x = c(1:1000), fun = bootstrap)
+parallel::clusterExport(cl, varlist = list("job_seeds", "sr_df", "parameters"))
+output = parallel::clusterApply(cl, x = c(1:n_jobs), fun = bootstrap)
 
 saveRDS(output, here::here("./data/model-outputs/parallel-bootstrapping.RDS"))
+output = readRDS(
+  here::here("./data/model-outputs/parallel-bootstrapping.RDS")
+)
 cat("Process time (minutes) = ", (proc.time()-t0)[3]/60)
 
 # unlist all results 
-p_all = matrix(nrow = 1000, ncol = 2)
-for(i in 1:10000) p_all[i,] = as.numeric(output[[i]])
+p_all = matrix(nrow = n_jobs, ncol = 2)
+for(i in 1:n_jobs) p_all[i,] = as.numeric(output[[i]])
 
 # now make the actual confidence intervals 
 ci = apply(p_all, 2, quantile, c(0.025, 0.975))
 ci = rbind(ci[1,], as.numeric(
-  glmmTMB::fixef(alt_model)[[1]][1:2]), ci[2,]) 
+  lme4::fixef(alt_model)[1:2]), ci[2,]) 
 colnames(ci) = c("r", "c")
 rownames(ci) = c("2.5%", "MLE", "97.5%")
 print(ci)
 
+# get percent mortality estimates ==============================================
+
+# make a df for the louse values 
+lice_df = unique(sr_df[which(sr_df$area == 12 & 
+                               sr_df$year > 2001), c("lice", "year")])
+
+# get mortality extimates
+mortality = cbind(ci[2,2]*lice_df$lice, # mle
+            ci[1,2]*lice_df$lice, # 2.5%
+            ci[3,2]*lice_df$lice) # 97.5%
+# percentage mortality 
+p_mort = 100*(1-exp(mortality))
+colnames(p_mort) = c("MLE", "97.5%", "2.5%")
+rownames(p_mort) = c(2002:2017)
 
