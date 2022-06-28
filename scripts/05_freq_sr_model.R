@@ -11,6 +11,7 @@ library(tidyverse)
 library(here)
 library(glmmTMB)
 library(parallel)
+library(PNWColors)
 
 # pull in file with all functions to clean data 
 source(here::here("./src/01_plot_themes.R"))
@@ -234,24 +235,64 @@ mortality = cbind(ci[2,2]*lice_df$lice, # mle
             ci[3,2]*lice_df$lice) # 97.5%
 # percentage mortality 
 p_mort = 100*(1-exp(mortality))
-colnames(p_mort) = c("MLE", "97.5%", "2.5%")
-rownames(p_mort) = c(2002:2017)
+colnames(p_mort) = c("MLE", "upper", "lower")
+rownames(p_mort) = c(2002:2016)
+p_mort = data.frame(p_mort)
+p_mort$year = rownames(p_mort)
 
 # make plots ===================================================================
-require(gplots)
-par(mfrow=c(2,1), mar=c(5,5,2,2), oma=c(0,0,0,0), cex=0.9)
 
-# a) Pink salmon survival
-plot(Z1$S[Z1$Area!=12]*10^(-6), Z1$Survival[Z1$Area!=12], col=c(grey(0.7)), 
-     ylim=c(-7,8), bty="l", las=1, ylab="Pink salmon survival", 
-     xlab=expression(paste("Spawner abundance (x",10^6,")")), pch=8)
+# plot survival first
+point_plot_df = data.frame(
+  survival = sr_df$log_survival,
+  x_val = sr_df$S*10^(-6),
+  area = sr_df$area,
+  year = sr_df$year,
+  group = character(length(sr_df$log_survival))
+)
+point_plot_df[which(point_plot_df$area != 12), "group"] = "Non-area 12"
+point_plot_df[which(point_plot_df$area == 12 & 
+                      point_plot_df$year < 2002), "group"] = "Area 12, pre-lice"
+point_plot_df[which(point_plot_df$area == 12 & 
+                      point_plot_df$year >= 2002), "group"] = "Area 12, lice"
 
-points(Z1$S[Z1$Area==12&Z1$Yr.numeric<2002]*10^(-6), 
-       Z1$Survival[Z1$Area==12&Z1$Yr.numeric<2002], col=grey(0.7), pch=8)
-points(Z1$S[Z1$Area==12&Z1$Yr.numeric>=2002]*10^(-6), 
-       Z1$Survival[Z1$Area==12&Z1$Yr.numeric>=2002], pch=21, bg="white")
-points(Z1$S[Z1$Area==12&Z1$Yr.numeric==2004]*10^(-6), 
-       Z1$Survival[Z1$Area==12&Z1$Yr.numeric==2004], pch=19)
+non_12 = point_plot_df[which(point_plot_df$group == "Non-area 12"),]
+no_lice_12 = point_plot_df[which(point_plot_df$group == "Area 12, pre-lice"),]
+lice_12 = point_plot_df[which(point_plot_df$group == "Area 12, lice"),]
+
+data_spread = ggplot() + 
+  geom_point(data = non_12, 
+             aes(x = x_val, y = survival, fill = group), colour = "white",
+             alpha = 0.8, shape = 21, size = 3) + 
+  geom_point(data = no_lice_12,
+             aes(x = x_val, y = survival, fill = group), colour = "white",
+             alpha = 0.8, shape = 21, size = 3) + 
+  geom_point(data = lice_12,
+             aes(x = x_val, y = survival, fill = group), 
+             alpha = 0.6, size = 4, shape = 21) + 
+  theme_area_grouping() + 
+  scale_fill_manual(" ", values = c("purple", "goldenrod2", "grey60")) + 
+  labs(
+    x = bquote("Spawner Abundance "(x10^6)),
+    y = "Survival"
+  )
+ggsave(here::here("./figs/three-classes-of-data.png"), data_spread,
+       width = 10, height = 5)
+
+# plot the estimated mortalities
+est_mortality = ggplot(data = p_mort) +
+  geom_errorbar(aes(x = year, ymin = lower, ymax = upper), width = 0) +
+  geom_point(aes(x = year, y = MLE, fill = MLE),
+             colour = "black", shape = 21, size = 5) +
+  theme_farm_grouping() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)
+  ) +
+  labs(x = "Year", y = "Max. Like. Estimate & 95% CI's") + 
+  scale_fill_gradientn(colours = rev(PNWColors::pnw_palette("Sunset2",
+                                                          type = "continuous")))
+ggsave(here::here("./figs/estimated-mortality.png"), est_mortality,
+       height = 7, width = 10)
 
 
 
