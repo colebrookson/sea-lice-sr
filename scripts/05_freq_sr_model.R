@@ -33,7 +33,8 @@ cat("Final dataset: \n Total number of populations (even/odd): ",
     length(unique(unfilter_sr_df$river)))
 # last touch-up's of the data ==================================================
 
-#sr_df[which(sr_df$area == 12 & (sr_df$year %in% c(1990:2000)), "lice"] = NA
+sr_df[which(sr_df$area == 12 & sr_df$year %in% c(1991:2001)), "lice"] = NA
+sr_df = subset(sr_df, is.na(lice)==FALSE)
 #sr_df = sr_df[which(sr_df$year > 1961),]
 
 sr_df$area = as.factor(sr_df$area)
@@ -131,11 +132,12 @@ for(i in 1:length(fixed_effects)) {
 bootstrap = function(x) {
   
   # set the values that we want 
-  a = params[[1]]; b_i = params[[2]]; c = params[[3]]; sigma_ya = params[[4]]
-  sigma_y = params[[5]]; sigma_e = params[[6]]
+  a = parameters[[1]]; b_i = parameters[[2]]; c = parameters[[3]]; 
+  sigma_ya = parameters[[4]]; sigma_y = parameters[[5]]
+  sigma_e = parameters[[6]]
   
   # set a seed 
-  set.seed(job.seeds[x,2])
+  set.seed(job_seeds[x,2])
   
   R = numeric(length(sr_df$S)) # this will be simulated survival
   theta_y = rnorm(length(levels(sr_df$year_fac)), 0, sigma_y)
@@ -143,9 +145,13 @@ bootstrap = function(x) {
   epsilon = rnorm(length(sr_df$S), 0, sigma_e)
   
   # calculate R 
-  R = sr_df$S * (a + b_i[sr_df$r] * sr_df$S + c * sr_df$lice + 
-                   theta_ya[sr_df$year_area] + theta_y[as.numeric(sr_df$year)] +
-                   epsilon)
+  R = sr_df$S * exp(
+      scale(a + 
+      b_i[sr_df$r] * sr_df$S + 
+        c * sr_df$lice + 
+        theta_ya[sr_df$year_area] + 
+        theta_y[as.numeric(sr_df$year_fac)] +
+        epsilon))
   
   # get survival 
   SS = log(R/sr_df$S)
@@ -154,7 +160,7 @@ bootstrap = function(x) {
   temp_sr_df = data.frame(
     area = as.factor(sr_df$area),
     population_name = as.factor(sr_df$population_name),
-    year = as.factor(sr_df$year_fac),
+    year_fac = as.factor(sr_df$year_fac),
     S = sr_df$S,
     survival = SS,
     lice = sr_df$lice
@@ -185,13 +191,13 @@ parameters = list(a, b, c, sigma_ya, sigma_y, sigma_e)
 cores = detectCores()-1 # keep one for processing other things 
 
 # get random sequences for different chains 
-n_jobs = 1000
+n_jobs = 2
 RNGkind("L'Ecuyer-CMRG")
 set.seed(1234)
 job_seeds = matrix(nrow = cores, ncol = 7)
 job_seeds[1,] = .Random.seed
 
-for(i in 1:n_jobs) job_seeds[i,] = parallel::nextRNGStream(job_seeds[i-1,])
+for(i in 2:n_jobs) job_seeds[i,] = parallel::nextRNGStream(job_seeds[i-1,])
 
 t0 = proc.time()
 cl = parallel::makeCluster(cores)
