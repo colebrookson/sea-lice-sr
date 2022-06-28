@@ -237,3 +237,21 @@ p_mort = 100*(1-exp(mortality))
 colnames(p_mort) = c("MLE", "97.5%", "2.5%")
 rownames(p_mort) = c(2002:2017)
 
+# make plots ===================================================================
+require(gplots)
+par(mfrow=c(2,1), mar=c(5,5,2,2), oma=c(0,0,0,0), cex=0.9)
+
+# a) Pink salmon survival
+plot(Z1$S[Z1$Area!=12]*10^(-6), Z1$Survival[Z1$Area!=12], col=c(grey(0.7)), 
+     ylim=c(-7,8), bty="l", las=1, ylab="Pink salmon survival", 
+     xlab=expression(paste("Spawner abundance (x",10^6,")")), pch=8)
+
+points(Z1$S[Z1$Area==12&Z1$Yr.numeric<2002]*10^(-6), 
+       Z1$Survival[Z1$Area==12&Z1$Yr.numeric<2002], col=grey(0.7), pch=8)
+points(Z1$S[Z1$Area==12&Z1$Yr.numeric>=2002]*10^(-6), 
+       Z1$Survival[Z1$Area==12&Z1$Yr.numeric>=2002], pch=21, bg="white")
+points(Z1$S[Z1$Area==12&Z1$Yr.numeric==2004]*10^(-6), 
+       Z1$Survival[Z1$Area==12&Z1$Yr.numeric==2004], pch=19)
+
+
+
