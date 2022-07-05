@@ -17,6 +17,7 @@ library(raster)
 library(maps)
 library(ggrepel)
 library(PNWColors)
+library(zoo)
 
 # include themes script
 source(here("./src/01_plot_themes.R"))
@@ -33,7 +34,9 @@ raw_marty_data = readxl::read_excel(
 )
 dfo_open_data = read_csv(here(paste0(farm_file_location, 
                                 "fish-farm-sea-louse-counts-data.csv")))
-farm_locations_df = read_csv(here(here("./data/raw-farm/farm-locations.csv")))
+farm_locations_df = read_csv(here::here("./data/raw-farm/farm-locations.csv"))
+farm_regress = read_csv(
+  here::here("./data/clean-farm/marty-bati-data-joined-stocked-only.csv"))
 
 # pull together data for mapping ===============================================
 
@@ -112,3 +115,34 @@ ggsave(filename = here("./figs/numbered-farm-map.png"),
         width = 10,
         height = 8,
         dpi = 600)
+
+# farm timeseries ==============================================================
+
+farm_regress$year_fac = as.factor(farm_regress$year)
+farm_regress$month = as.factor(farm_regress$month)
+farm_timeseries = farm_regress %>% 
+  dplyr::filter(farm_name %notin% c("Arrow Pass", "NA_15", "NA_7", "NA_14")) %>% 
+  dplyr::filter(year < 2017) %>% 
+  dplyr::group_by(year_fac, month) %>% 
+  summarize(sum_invent = sum(inventory)/1000000,
+            sum_lep = sum(lep_tot)/1000000)
+
+farm_timeseries$date = zoo::as.yearmon(paste(farm_timeseries$year_fac, 
+                                             farm_timeseries$month), "%Y %m")
+fish_timeseries = ggplot(data = farm_timeseries) + 
+  geom_line(aes(x = date, y = sum_invent)) + 
+  geom_point(aes(x = date, y = sum_invent), 
+             fill = "purple", shape = 21, size = 3) +
+  theme_farm_grouping() +
+  labs(x = "Date", y = "Total Farmed Salmon (millions)")
+ggsave(here::here("./figs/fish-on-farms-timeseries.png"), fish_timeseries,
+       width = 10, height = 5)
+
+lice_timeseries = ggplot(data = farm_timeseries) + 
+  geom_line(aes(x = date, y = sum_lep)) + 
+  geom_point(aes(x = date, y = sum_lep), 
+             fill = "goldenrod2", shape = 21, size = 3) +
+  theme_farm_grouping() +
+  labs(x = "Date", y = "Total Lice on Farmed Salmon (millions)")
+ggsave(here::here("./figs/lice-on-farms-timeseries.png"), lice_timeseries,
+       width = 10, height = 5)
