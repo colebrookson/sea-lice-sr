@@ -8,6 +8,7 @@
 
 library(tidyverse)
 library(here)
+library(patchwork)
 
 # pull in file with all functions to clean data 
 source(here::here("./src/02_data_cleaning_funs.R"))
@@ -380,64 +381,64 @@ pop_count_df = data.frame(
   count = counts
 )
 
-enough_obs_df = pop_count_df[which(pop_count_df$count >= 20),]
+enough_obs_df_20 = pop_count_df[which(pop_count_df$count >= 20),]
+enough_obs_df_03 = pop_count_df[which(pop_count_df$count > 3),]
 
-final_rivers_df = new_esc_df[which(new_esc_df$pop %in% 
-                                     enough_obs_df$population),]
 
-# keep a copy that doesn't filter out rivers with not enough observations
-all_rivers = new_esc_df 
+final_rivers_df_20 = new_esc_df[which(new_esc_df$pop %in% 
+                                        enough_obs_df_20$population),]
+final_rivers_df_03 = new_esc_df[which(new_esc_df$pop %in% 
+                                        enough_obs_df_03$population),]
 
 # name the populations
-final_rivers_df$population_name = paste(
-  stringr::str_to_lower(gsub(" ", "_", final_rivers_df$river)),
-  final_rivers_df$even_odd,
+final_rivers_df_20$population_name = paste(
+  stringr::str_to_lower(gsub(" ", "_", final_rivers_df_20$river)),
+  final_rivers_df_20$even_odd,
   sep = "_"
 )
-
-all_rivers$population_name = paste(
-  stringr::str_to_lower(gsub(" ", "_", all_rivers$river)),
-  all_rivers$even_odd,
+final_rivers_df_03$population_name = paste(
+  stringr::str_to_lower(gsub(" ", "_", final_rivers_df_03$river)),
+  final_rivers_df_03$even_odd,
   sep = "_"
 )
 
 # remove NA observations of survival
-final_rivers_df = final_rivers_df %>% 
+final_rivers_df_20 = final_rivers_df_20 %>% 
   dplyr::filter(
     !is.na(survival)
   )
 
-all_rivers = all_rivers %>% 
+final_rivers_df_03 = final_rivers_df_03 %>% 
   dplyr::filter(
     !is.na(survival)
   )
 
 cat("Final dataset: \n Total number of populations (even/odd): ", 
-    length(unique(final_rivers_df$pop)), "\n Total number of S-R pairs: ", 
-    dim(final_rivers_df)[1], "\n Total number of rivers: ", 
-    length(unique(final_rivers_df$river)))
+    length(unique(final_rivers_df_20$pop)), "\n Total number of S-R pairs: ", 
+    dim(final_rivers_df_20)[1], "\n Total number of rivers: ", 
+    length(unique(final_rivers_df_20$river)))
 
 cat("Final dataset: \n Total number of populations (even/odd): ", 
-    length(unique(all_rivers$pop)), "\n Total number of S-R pairs: ", 
-    dim(all_rivers)[1], "\n Total number of rivers: ", 
-    length(unique(all_rivers$river)))
+    length(unique(final_rivers_df_03$pop)), "\n Total number of S-R pairs: ", 
+    dim(final_rivers_df_03)[1], "\n Total number of rivers: ", 
+    length(unique(final_rivers_df_03$river)))
 
 
 # bring in louse covariate =====================================================
 
-final_rivers_df$lice = NA
+final_rivers_df_20$lice = NA
 
 # deal with all zero values first - non-area 12, and pre-2001
-final_rivers_df[which(final_rivers_df$area != 12), "lice"] = 0
-final_rivers_df[which(final_rivers_df$area == 12 & 
-                        final_rivers_df$year < 2002), "lice"] = 0
+final_rivers_df_20[which(final_rivers_df_20$area != 12), "lice"] = 0
+final_rivers_df_20[which(final_rivers_df_20$area == 12 & 
+                        final_rivers_df_20$year < 2002), "lice"] = 0
 
 # now do the area 12 that we can
 for(yr in 2002:2017) {
   
   # get the subset 
-  final_rivers_df[which(final_rivers_df$area == 12 & 
-                          final_rivers_df$year == yr), "lice"] = 
+  final_rivers_df_20[which(final_rivers_df_20$area == 12 & 
+                          final_rivers_df_20$year == yr), "lice"] = 
     # find the value from the other dataset
     lice_pred[which(lice_pred$year == yr-1), "all_lep"]
     ## NOTE ###
@@ -447,19 +448,19 @@ for(yr in 2002:2017) {
 }
 
 # repeat for all versions one 
-all_rivers$lice = NA
+final_rivers_df_03$lice = NA
 
 # deal with all zero values first - non-area 12, and pre-2001
-all_rivers[which(all_rivers$area != 12), "lice"] = 0
-all_rivers[which(all_rivers$area == 12 & 
-                        all_rivers$year < 2001), "lice"] = 0
+final_rivers_df_03[which(final_rivers_df_03$area != 12), "lice"] = 0
+final_rivers_df_03[which(final_rivers_df_03$area == 12 & 
+                   final_rivers_df_03$year < 2001), "lice"] = 0
 
 # now do the area 12 that we can
 for(yr in 2002:2017) {
   
   # get the subset 
-  all_rivers[which(all_rivers$area == 12 & 
-                          all_rivers$year == yr), "lice"] = 
+  final_rivers_df_03[which(final_rivers_df_03$area == 12 & 
+                             final_rivers_df_03$year == yr), "lice"] = 
     # find the value from the other dataset
     lice_pred[which(lice_pred$year == yr-1), "all_lep"]
   ## NOTE ###
@@ -469,12 +470,165 @@ for(yr in 2002:2017) {
   
 }
 
-table(all_rivers$area)
-table(all_rivers$area[which(year == 2016)])
+# make dataframe of number of rivers sampled per year/year through time
+final_rivers_20_plot_df = data.frame(
+  table(final_rivers_df_20[,c("year", "area")])
+)
+final_rivers_20_plot_df$year_num = 
+  as.numeric(as.character(final_rivers_20_plot_df$year))
+final_rivers_20_plot_df = final_rivers_20_plot_df %>% 
+  dplyr::rowwise() %>% 
+  dplyr::mutate(`Even/Odd Year` = ifelse(year_num %% 2 == 0, "even", "odd")) %>% 
+  rename(Area = area)
+# check the length is correct
+if(
+  nrow(final_rivers_20_plot_df) != length(unique(final_rivers_df_20$year)) * 
+  length(unique(final_rivers_df_20$area))
+) {
+  stop("ERROR - table of incorect length")
+}
 
+# make dataframe of number of rivers sampled per year/year through time
+final_rivers_03_plot_df = data.frame(
+  table(final_rivers_df_03[,c("year", "area")])
+)
+final_rivers_03_plot_df$year_num = 
+  as.numeric(as.character(final_rivers_03_plot_df$year))
+final_rivers_03_plot_df = final_rivers_03_plot_df %>% 
+  dplyr::rowwise() %>% 
+  dplyr::mutate(`Even/Odd Year` = ifelse(year_num %% 2 == 0, "even", "odd")) %>% 
+  rename(Area = area)
+# check the length is correct
+if(
+  nrow(final_rivers_03_plot_df) != length(unique(final_rivers_df_03$year)) * 
+  length(unique(final_rivers_df_03$area))
+) {
+  stop("ERROR - table of incorect length")
+}
+
+# make plots of each
+col_vals = rev(PNWColors::pnw_palette("Bay",
+                                      type = "discrete", n = 5))
+
+# 20 cutoff plot
+final_rivers_20_plot = ggplot2::ggplot(data = final_rivers_20_plot_df) +
+  geom_line(aes(x = year_num, y = Freq, colour = Area,
+                linetype = `Even/Odd Year`, alpha = `Even/Odd Year`), 
+            size = 1.5) + 
+  geom_point(aes(x = year_num, y = Freq, fill = Area,
+                 shape = `Even/Odd Year`), size = 3) +
+  scale_alpha_manual(values = c(0.5, 0.4)) +
+  scale_shape_manual(values = c(21,22)) +
+  theme_area_grouping() +
+  theme(
+    legend.key.width = unit(1.5, "cm")
+  ) +
+  labs(
+    x = "Year", y = "Number of Rivers Surveyed"
+  ) +
+  scale_colour_manual(
+    "Area",
+    values = col_vals,
+    labels = c(7, 8, 9, 10, 12)
+  ) +
+  scale_fill_manual(
+    "Area",
+    values = col_vals,
+    labels = c(7, 8, 9, 10, 12)
+  ) +
+  annotate(
+    geom = "text", x = 2002, y = 32, label = "Cutoff >= 20 S-R pairs", size = 6
+  ) + 
+  ylim(c(0,35)) +
+  scale_x_continuous(
+    labels = c(1960, 1970, 1980, 1990, 2000, 2010, 2020),
+    breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)
+  ) +
+  guides(
+    fill = guide_legend(override.aes = list(shape = 21)),
+    shape = guide_legend(override.aes = list(fill = "grey20"))
+  ) +
+  coord_fixed(2) +
+  theme(
+    legend.position = "none"
+  )
+ggplot2::ggsave(
+  here::here("./figs/rivers-surveyed-through-time-20-pair-cutoff.png"),
+  final_rivers_20_plot,
+  height = 6, width = 10)
+
+# 03 plot
+final_rivers_03_plot = ggplot2::ggplot(data = final_rivers_03_plot_df) +
+  geom_line(aes(x = year_num, y = Freq, colour = Area,
+                linetype = `Even/Odd Year`, alpha = `Even/Odd Year`), 
+            size = 1.5) + 
+  geom_point(aes(x = year_num, y = Freq, fill = Area,
+                 shape = `Even/Odd Year`), size = 3) +
+  scale_alpha_manual(values = c(0.5, 0.4)) +
+  scale_shape_manual(values = c(21,22)) +
+  theme_area_grouping() +
+  theme(
+    legend.key.width = unit(1.5, "cm")
+  ) +
+  labs(
+    x = "Year", y = ""
+  ) +
+  scale_colour_manual(
+    "Area",
+    values = col_vals,
+    labels = c(7, 8, 9, 10, 12)
+  ) +
+  scale_fill_manual(
+    "Area",
+    values = col_vals,
+    labels = c(7, 8, 9, 10, 12)
+  ) +
+  ylim(c(0,35)) +
+  scale_x_continuous(
+    labels = c(1960, 1970, 1980, 1990, 2000, 2010, 2020),
+    breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)
+  ) +
+  annotate(
+    geom = "text", x = 2002, y = 32, label = "Cutoff > 3 S-R pairs", size = 6
+  ) + 
+  guides(
+    fill = guide_legend(override.aes = list(shape = 21)),
+    shape = guide_legend(override.aes = list(fill = "grey20"))
+  ) +
+  coord_fixed(2) 
+  # theme(
+  #  legend.position = "none"
+  # )
+ggplot2::ggsave(
+  here::here("./figs/rivers-surveyed-through-time-03-pair-cutoff.png"),
+  final_rivers_03_plot,
+  height = 6, width = 10)
+
+# bind them together
+cutoff_comp = final_rivers_20_plot + final_rivers_03_plot
+ggplot2::ggsave(
+  here::here("./figs/rivers-surveyed-through-time-comparison.png"),
+  cutoff_comp,
+  height = 6, width = 20)
 # make final data base =========================================================
-readr::write_csv(final_rivers_df, 
-                 here::here("./data/for-model-runs/stock-recruit-data.csv"))
-readr::write_csv(all_rivers, 
+cat("Final dataset: \n Total number of populations (even/odd): ", 
+    length(unique(final_rivers_df_20$pop)), "\n Total number of S-R pairs: ", 
+    dim(final_rivers_df_20)[1], "\n Total number of rivers: ", 
+    length(unique(final_rivers_df_20$river)))
+
+cat("Final dataset: \n Total number of populations (even/odd): ", 
+    length(unique(final_rivers_df_03$pop)), "\n Total number of S-R pairs: ", 
+    dim(final_rivers_df_03)[1], "\n Total number of rivers: ", 
+    length(unique(final_rivers_df_03$river)))
+
+print(final_rivers_03_plot_df[which(final_rivers_03_plot_df$year_num == 2016), 
+                               c("Area", "year_num", "Freq")])
+print(final_rivers_20_plot_df[which(final_rivers_20_plot_df$year_num == 2016), 
+                              c("Area", "year_num", "Freq")])
+
+readr::write_csv(final_rivers_df_20, 
                  here::here(
-                   "./data/for-model-runs/non-filtered-stock-recruit-data.csv"))
+                   "./data/for-model-runs/stock-recruit-data-cut-off-20.csv"))
+readr::write_csv(final_rivers_df_03, 
+                 here::here(
+                   "./data/for-model-runs/stock-recruit-data-cut-off-03.csv"))
