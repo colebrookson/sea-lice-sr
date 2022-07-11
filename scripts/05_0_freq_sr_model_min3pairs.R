@@ -221,6 +221,54 @@ non_12 = point_plot_df[which(point_plot_df$group == "Non-area 12"),]
 no_lice_12 = point_plot_df[which(point_plot_df$group == "Area 12, pre-lice"),]
 lice_12 = point_plot_df[which(point_plot_df$group == "Area 12, lice"),]
 
+# for the lice_12 dataset, label the outliers on the bottom 
+lice_12$label = "NA"
+non_12$label = ""
+no_lice_12$label = ""
+
+
+# NOTE ######
+# in the labeling process below, the -1 is to show the labels as the out year 
+# not the return year 
+# END NOTE ######
+for(row in seq_len(nrow(lice_12))) {
+  if(lice_12[row, "x_val"] > 1){
+    lice_12[row, "label"] = lice_12[row, "year"] -1
+  } else if((lice_12[row, "x_val"] > 0.37) & 
+             (lice_12[row, "survival"] < -2.5)) {
+    lice_12[row, "label"] = lice_12[row, "year"] -1
+  } else if(lice_12[row, "survival"] < -6) {
+    lice_12[row, "label"] = lice_12[row, "year"] -1
+  } else {
+    lice_12[row, "label"] = ""
+  }
+}
+
+
+
+# bind df all together
+surv_df = rbind(non_12, no_lice_12, lice_12)
+
+ggplot(data = surv_df, aes(x = x_val, y = survival, label = label)) + 
+  geom_point(aes(fill = group, size = group, colour = group, alpha = group), 
+             shape = 21) + 
+  theme_area_grouping() + 
+  scale_fill_manual(" ", values = c("purple", "goldenrod2", "grey60")) + 
+  scale_alpha_manual(values = c(0.8, 0.8, 0.6)) + 
+  scale_colour_manual(values = c("white", "white", "white")) + 
+  scale_size_manual(values = c(4, 3, 3)) + 
+  labs(
+    x = bquote("Spawner Abundance "(x10^6)),
+    y = "Survival"
+  ) +
+  geom_text(hjust = -0.2, vjust = 0.5) + 
+  guides(
+    fill = guide_legend(override.aes = list(fill = c("purple", "goldenrod2", "grey60"))),
+    size = FALSE,
+    colour = FALSE,
+    alpha = FALSE
+  )
+
 data_spread = ggplot() + 
   geom_point(data = non_12, 
              aes(x = x_val, y = survival, fill = group), colour = "white",
@@ -231,6 +279,7 @@ data_spread = ggplot() +
   geom_point(data = lice_12,
              aes(x = x_val, y = survival, fill = group), 
              alpha = 0.6, size = 4, shape = 21) + 
+  geom_text(data = lice_12, hjust = 0, vjust = 0, label = label) +
   theme_area_grouping() + 
   scale_fill_manual(" ", values = c("purple", "goldenrod2", "grey60")) + 
   labs(

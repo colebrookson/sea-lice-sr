@@ -537,7 +537,7 @@ final_rivers_20_plot = ggplot2::ggplot(data = final_rivers_20_plot_df) +
     labels = c(7, 8, 9, 10, 12)
   ) +
   annotate(
-    geom = "text", x = 2002, y = 32, label = "Cutoff >= 20 S-R pairs", size = 6
+    geom = "text", x = 1998, y = 32, label = "Cutoff >= 20 S-R pairs", size = 6
   ) + 
   ylim(c(0,35)) +
   scale_x_continuous(
@@ -589,7 +589,7 @@ final_rivers_03_plot = ggplot2::ggplot(data = final_rivers_03_plot_df) +
     breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)
   ) +
   annotate(
-    geom = "text", x = 2002, y = 32, label = "Cutoff > 3 S-R pairs", size = 6
+    geom = "text", x = 1998, y = 32, label = "Cutoff > 3 S-R pairs", size = 6
   ) + 
   guides(
     fill = guide_legend(override.aes = list(shape = 21)),
