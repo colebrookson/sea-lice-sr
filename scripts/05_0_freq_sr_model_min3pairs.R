@@ -249,7 +249,8 @@ for(row in seq_len(nrow(lice_12))) {
 # bind df all together
 surv_df = rbind(non_12, no_lice_12, lice_12)
 
-ggplot(data = surv_df, aes(x = x_val, y = survival, label = label)) + 
+# make plot
+data_spread = ggplot(data = surv_df, aes(x = x_val, y = survival, label = label)) + 
   geom_point(aes(fill = group, size = group, colour = group, alpha = group), 
              shape = 21) + 
   theme_area_grouping() + 
@@ -264,27 +265,9 @@ ggplot(data = surv_df, aes(x = x_val, y = survival, label = label)) +
   geom_text(hjust = -0.2, vjust = 0.5) + 
   guides(
     fill = guide_legend(override.aes = list(fill = c("purple", "goldenrod2", "grey60"))),
-    size = FALSE,
-    colour = FALSE,
-    alpha = FALSE
-  )
-
-data_spread = ggplot() + 
-  geom_point(data = non_12, 
-             aes(x = x_val, y = survival, fill = group), colour = "white",
-             alpha = 0.8, shape = 21, size = 3) + 
-  geom_point(data = no_lice_12,
-             aes(x = x_val, y = survival, fill = group), colour = "white",
-             alpha = 0.8, shape = 21, size = 3) + 
-  geom_point(data = lice_12,
-             aes(x = x_val, y = survival, fill = group), 
-             alpha = 0.6, size = 4, shape = 21) + 
-  geom_text(data = lice_12, hjust = 0, vjust = 0, label = label) +
-  theme_area_grouping() + 
-  scale_fill_manual(" ", values = c("purple", "goldenrod2", "grey60")) + 
-  labs(
-    x = bquote("Spawner Abundance "(x10^6)),
-    y = "Survival"
+    size = "none",
+    colour = "none",
+    alpha = "none"
   )
 ggsave(here::here("./figs/three-classes-of-data.png"), data_spread,
        width = 10, height = 5)
@@ -299,8 +282,8 @@ est_mortality = ggplot(data = p_mort) +
     axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)
   ) +
   labs(x = "Year", y = "Max. Like. Estimate & 95% CI's") + 
-  scale_fill_gradientn(colours = rev(PNWColors::pnw_palette("Sunset2",
-                                                          type = "continuous")))
+  scale_fill_gradientn(colours = PNWColors::pnw_palette("Sunset2",
+                                                          type = "continuous"))
 ggsave(here::here("./figs/estimated-mortality.png"), est_mortality,
        height = 7, width = 10)
 
