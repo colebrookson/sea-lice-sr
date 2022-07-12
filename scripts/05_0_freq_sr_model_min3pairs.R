@@ -201,7 +201,7 @@ p_mort = 100*(1-exp(mortality))
 colnames(p_mort) = c("MLE", "upper", "lower")
 rownames(p_mort) = c(2002:2016)
 p_mort = data.frame(p_mort)
-p_mort$year = rownames(p_mort)
+p_mort$year = as.numeric(rownames(p_mort))
 
 ### NOTE #######
 # since we determine the survival is directly equal to 1 - exp(-cWa,t-1)
@@ -221,20 +221,33 @@ add_years$surv_low = NA
 for(i in 2:nrow(add_years)) {
   
   # use the MLE to get the estimated value
-  add_years[i, "surv"] = 1 - exp(
-    -0.2346664 * add_years[i-1, "all_lep"]
+  add_years[i, "surv"] = 100*(1 - exp(
+    -0.2346664 * add_years[i-1, "all_lep"])
   )
   # use the upper and lower bounds ofthe 95% CI to get the same for the est here
-  add_years[i, "surv_up"] = 1 - exp(
-    -0.2346664 * add_years[i-1, "upper"]
+  add_years[i, "surv_up"] = 100*(1 - exp(
+    -0.2346664 * add_years[i-1, "upper"])
   )
-  add_years[i, "surv_low"] = 1 - exp(
-    -0.2346664 * add_years[i-1, "lower"]
+  add_years[i, "surv_low"] = 100*(1 - exp(
+    -0.2346664 * add_years[i-1, "lower"])
   )
 }
 
 # get rid of extraneous years 
-add_years = add_years[which(!is.na(add_years$surv)), ]
+add_years = add_years %>% 
+  dplyr::select(surv, surv_up, surv_low, year) %>% 
+  dplyr::filter(!is.na(surv)) %>% 
+  dplyr::rename(MLE = surv, upper = surv_up, lower = surv_low)
+
+# put the two data pieces together and make a column to differentiate
+est_mort_df = rbind(
+  p_mort,
+  add_years
+)
+est_mort_df = est_mort_df %>% 
+  dplyr::rowwise() %>% 
+  dplyr::mutate(predict = ifelse(year > 2016, "predicted", "estimated"))
+
 
 # make plots ===================================================================
 
@@ -307,18 +320,25 @@ ggsave(here::here("./figs/three-classes-of-data.png"), data_spread,
        width = 10, height = 5)
 
 # plot the estimated mortalities
-est_mortality = ggplot() +
-  geom_errorbar(data = p_mort, aes(x = year, ymin = lower, ymax = upper), 
-                width = 0) +
-  geom_point(data = p_mort, aes(x = year, y = MLE, fill = MLE),
-             colour = "black", shape = 21, size = 5) +
-  theme_farm_grouping() +
+est_mortality = ggplot(data = est_mort_df) +
+  geom_errorbar(aes(x = year, ymin = lower, 
+                                      ymax = upper), width = 0) + 
+  geom_point(aes(x = year, y = MLE, fill = MLE, shape = predict),
+             colour = "black", size = 5) +
+  theme_area_grouping() +
   theme(
     axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)
   ) +
-  labs(x = "Year", y = "Max. Like. Estimate & 95% CI's") + 
+  labs(x = "Outmigration Year", y = "Max. Like. Estimate & 95% CI's") + 
   scale_fill_gradientn(colours = PNWColors::pnw_palette("Sunset2",
-                                                          type = "continuous"))
+                                                          type = "continuous"))+
+  scale_shape_manual(values = c(21, 10)) + 
+  scale_x_continuous(breaks = c(2002:2021), 
+                     labels = c(2001:2020)) + 
+  guides(
+    fill = "none",
+    shape = guide_legend(title = "Estimated vs. Predicted")
+  )
 ggsave(here::here("./figs/estimated-mortality.png"), est_mortality,
        height = 7, width = 10)
 
