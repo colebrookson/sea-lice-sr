@@ -50,28 +50,36 @@ scfs_regress %>%
 predict_data = data.frame(year = as.character(c(2001:2021)),
                         week = NA,
                         farm_name = NA)
-predict_data$all_lep = predict(tmb_fit, newdata = predict_data,
+all_lep = data.frame(predict(tmb_fit, newdata = predict_data,
             type = "response",
             re.form = NA,
-            )
+            se.fit = TRUE
+            ))
+predict_data$all_lep = all_lep$fit
+predict_data$lower = all_lep$fit - (1.96*all_lep$se.fit)
+predict_data$upper = all_lep$fit + (1.96*all_lep$se.fit)
 
 # add in log data 
 predict_data$log_all_lep = log10(predict_data$all_lep)
 
 # plot of model predictions
 just_wild_timeline = ggplot(data = predict_data) +
+  geom_errorbar(aes(x = year, ymin = lower, ymax = upper), width = 0) +
     geom_point(aes(x = year, y = all_lep, fill = all_lep), 
                 shape = 21, 
                 colour = "black",
-                size = 3.5) + 
+                size = 4.5) + 
     stat_smooth(aes(x = year, y = all_lep),
                     colour = "black") +
-    labs(x = "Year", y = "Number of Lice per Fish", title = "Wild Leps") +
+    labs(x = "Year", y = "Number of Lice per Fish") +
     scale_fill_gradientn(
         colours = rev(PNWColors::pnw_palette("Sunset2",
                                         type = "continuous"))) +
-    scale_x_discrete(breaks = c(2005, 2010, 2015, 2020)) +
-    theme_raw_comp()
+    #scale_x_discrete(breaks = c(2005, 2010, 2015, 2020)) +
+    theme_raw_comp() +
+  theme(
+    axis.text.x = element_text(angle = 90)
+  )
 ggsave(filename = here::here("./figs/just-wild-raw-comparison.png"),
         plot = just_wild_timeline,
         width = 8,
