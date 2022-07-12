@@ -78,7 +78,7 @@ just_wild_timeline = ggplot(data = predict_data) +
     #scale_x_discrete(breaks = c(2005, 2010, 2015, 2020)) +
     theme_raw_comp() +
   theme(
-    axis.text.x = element_text(angle = 90)
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
   )
 ggsave(filename = here::here("./figs/just-wild-raw-comparison.png"),
         plot = just_wild_timeline,

@@ -19,6 +19,8 @@ source(here::here("./src/01_plot_themes.R"))
 sr_df = readr::read_csv(here::here(
   "./data/for-model-runs/stock-recruit-data-cut-off-03.csv"
 ))
+predict_df = readr::read_csv(here::here(
+                     "./data/regression-data/predicted-lice-abundance.csv"))
 cat("Final dataset: \n Total number of populations (even/odd): ", 
     length(unique(sr_df$pop)), "\n Total number of S-R pairs: ", 
     dim(sr_df)[1], "\n Total number of rivers: ", 
@@ -201,6 +203,39 @@ rownames(p_mort) = c(2002:2016)
 p_mort = data.frame(p_mort)
 p_mort$year = rownames(p_mort)
 
+### NOTE #######
+# since we determine the survival is directly equal to 1 - exp(-cWa,t-1)
+# we can predict the survival values for 2017-2021
+### END NOTE #######
+
+add_years = data.frame(
+  predict_df[which(predict_df$year >= 2016), "all_lep"],
+  predict_df[which(predict_df$year >= 2016), "year"],
+  predict_df[which(predict_df$year >= 2016), "upper"],
+  predict_df[which(predict_df$year >= 2016), "lower"]
+)
+add_years$surv = NA
+add_years$surv_up = NA
+add_years$surv_low = NA
+# use established relationship to make prediction for further years
+for(i in 2:nrow(add_years)) {
+  
+  # use the MLE to get the estimated value
+  add_years[i, "surv"] = 1 - exp(
+    -0.2346664 * add_years[i-1, "all_lep"]
+  )
+  # use the upper and lower bounds ofthe 95% CI to get the same for the est here
+  add_years[i, "surv_up"] = 1 - exp(
+    -0.2346664 * add_years[i-1, "upper"]
+  )
+  add_years[i, "surv_low"] = 1 - exp(
+    -0.2346664 * add_years[i-1, "lower"]
+  )
+}
+
+# get rid of extraneous years 
+add_years = add_years[which(!is.na(add_years$surv)), ]
+
 # make plots ===================================================================
 
 # plot survival first
@@ -226,7 +261,6 @@ lice_12$label = "NA"
 non_12$label = ""
 no_lice_12$label = ""
 
-
 # NOTE ######
 # in the labeling process below, the -1 is to show the labels as the out year 
 # not the return year 
@@ -244,13 +278,12 @@ for(row in seq_len(nrow(lice_12))) {
   }
 }
 
-
-
 # bind df all together
 surv_df = rbind(non_12, no_lice_12, lice_12)
 
 # make plot
-data_spread = ggplot(data = surv_df, aes(x = x_val, y = survival, label = label)) + 
+data_spread = ggplot(data = surv_df, aes(x = x_val, y = survival, 
+                                         label = label)) + 
   geom_point(aes(fill = group, size = group, colour = group, alpha = group), 
              shape = 21) + 
   theme_area_grouping() + 
@@ -264,7 +297,8 @@ data_spread = ggplot(data = surv_df, aes(x = x_val, y = survival, label = label)
   ) +
   geom_text(hjust = -0.2, vjust = 0.5) + 
   guides(
-    fill = guide_legend(override.aes = list(fill = c("purple", "goldenrod2", "grey60"))),
+    fill = guide_legend(override.aes = list(fill = c("purple", 
+                                                     "goldenrod2", "grey60"))),
     size = "none",
     colour = "none",
     alpha = "none"
@@ -273,9 +307,10 @@ ggsave(here::here("./figs/three-classes-of-data.png"), data_spread,
        width = 10, height = 5)
 
 # plot the estimated mortalities
-est_mortality = ggplot(data = p_mort) +
-  geom_errorbar(aes(x = year, ymin = lower, ymax = upper), width = 0) +
-  geom_point(aes(x = year, y = MLE, fill = MLE),
+est_mortality = ggplot() +
+  geom_errorbar(data = p_mort, aes(x = year, ymin = lower, ymax = upper), 
+                width = 0) +
+  geom_point(data = p_mort, aes(x = year, y = MLE, fill = MLE),
              colour = "black", shape = 21, size = 5) +
   theme_farm_grouping() +
   theme(
