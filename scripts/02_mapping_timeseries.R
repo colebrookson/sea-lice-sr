@@ -18,6 +18,7 @@ library(maps)
 library(ggrepel)
 library(PNWColors)
 library(zoo)
+library(patchwork)
 
 # include themes script
 source(here("./src/01_plot_themes.R"))
@@ -130,40 +131,103 @@ farm_timeseries = farm_regress %>%
             sum_lep = sum(lep_tot)/1000000)
 farm_timeseries$date = zoo::as.yearmon(paste(farm_timeseries$year_fac, 
                                              farm_timeseries$month), "%Y %m")
+farm_timeseries$class = "All"
 
 # get dataset with only ktc farms
-farm_timeseries_ktc = farm_timeseries %>% 
-  dplyr::filter(ktc == "Knight Tribune Corridor")
 farm_timeseries_ktc = farm_regress %>% 
   dplyr::filter(ktc == "Knight Tribune Corridor") %>% 
   #dplyr::filter(year < 2017) %>% 
   dplyr::group_by(year_fac, month) %>% 
   summarize(sum_invent = sum(inventory)/1000000,
             sum_lep = sum(lep_tot)/1000000)
-# plot with all farms
-fish_timeseries_plot = ggplot(data = farm_timeseries) + 
-  geom_line(aes(x = date, y = sum_invent)) + 
-  geom_point(aes(x = date, y = sum_invent), 
-             fill = "purple", shape = 21, size = 3) +
-  theme_farm_grouping() +
-  labs(x = "Date", y = "Total Farmed Salmon (millions)")
-ggsave(here::here("./figs/fish-on-farms-timeseries.png"), fish_timeseries_plot,
+farm_timeseries_ktc$date = zoo::as.yearmon(paste(farm_timeseries_ktc$year_fac, 
+                                                 farm_timeseries_ktc$month), 
+                                           "%Y %m")
+farm_timeseries_ktc$class = "KTC"
+
+# get dataset with only NOT ktc farms
+farm_timeseries_br = farm_regress %>% 
+  dplyr::filter(ktc != "Knight Tribune Corridor") %>% 
+  #dplyr::filter(year < 2017) %>% 
+  dplyr::group_by(year_fac, month) %>% 
+  summarize(sum_invent = sum(inventory)/1000000,
+            sum_lep = sum(lep_tot)/1000000)
+farm_timeseries_br$date = zoo::as.yearmon(paste(farm_timeseries_br$year_fac, 
+                                                farm_timeseries_br$month), 
+                                          "%Y %m")
+farm_timeseries_br$class = "Non-KTC"
+
+if(all(names(farm_timeseries) == names(farm_timeseries_ktc)) & 
+   all(names(farm_timeseries) == names(farm_timeseries_br))) {
+  all_farm_ts = rbind(farm_timeseries_ktc, farm_timeseries_br, farm_timeseries)
+  all_farm_ts$class = as.factor(all_farm_ts$class)
+} else {
+  stop("ERROR - columns not matching")
+}
+
+# plot with three farm classifications
+fish_ts_plot_v1 = ggplot(data = all_farm_ts) +
+  geom_line(aes(x = date, y = sum_invent, linetype = class, alpha = class)) +
+  geom_point(aes(x = date, y = sum_invent, fill = class, alpha = class,
+                 shape = class), size = 3)+
+  theme_area_grouping() +
+  scale_alpha_manual(values = c(1, 0.3, 0.3)) +
+  scale_shape_manual(values = c(21, 22, 23)) + 
+  labs(x = "Date", y = "Farmed Farmed Salmon (millions)") +
+  scale_fill_manual("Farm", values = c("purple", "orange1", "lightblue1")) +
+  guides(
+    alpha = "none",
+    linetype = "none",
+    fill = guide_legend(override.aes = list(shape = c(21, 22, 23))),
+    shape = "none"
+  )
+ggsave(here::here("./figs/fish-on-farms-timeseries.png"), fish_ts_plot_v1,
        width = 10, height = 5)
 
-# plot with ktc farms only
-fish_timeseries_ktc = ggplot(data = farm_timeseries_ktc) + 
-  geom_line(aes(x = date, y = sum_invent)) + 
-  geom_point(aes(x = date, y = sum_invent), 
-             fill = "purple", shape = 21, size = 3) +
-  theme_farm_grouping() +
-  labs(x = "Date", y = "Total Farmed Salmon (millions)")
+# make version with no x axis text
+fish_ts_plot_v2 = ggplot(data = all_farm_ts) +
+  geom_line(aes(x = date, y = sum_invent, linetype = class, alpha = class)) +
+  geom_point(aes(x = date, y = sum_invent, fill = class, alpha = class,
+                 shape = class), size = 3)+
+  theme_area_grouping() +
+  scale_alpha_manual(values = c(1, 0.3, 0.3)) +
+  scale_shape_manual(values = c(21, 22, 23)) + 
+  labs(x = "", y = "Farmed Salmon (millions)") +
+  scale_fill_manual("Farm", values = c("purple", "orange1", "lightblue1")) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.title.y = element_text(size = 18)
+  ) +
+  guides(
+    alpha = "none",
+    linetype = "none",
+    fill = guide_legend(override.aes = list(shape = c(21, 22, 23))),
+    shape = "none"
+  )
 
-
-lice_timeseries = ggplot(data = farm_timeseries) + 
-  geom_line(aes(x = date, y = sum_lep)) + 
-  geom_point(aes(x = date, y = sum_lep), 
-             fill = "goldenrod2", shape = 21, size = 3) +
-  theme_farm_grouping() +
-  labs(x = "Date", y = "Total Lice on Farmed Salmon (millions)")
-ggsave(here::here("./figs/lice-on-farms-timeseries.png"), lice_timeseries,
+lice_ts_plot = ggplot(data = all_farm_ts) +
+  geom_line(aes(x = date, y = sum_lep, linetype = class, alpha = class)) +
+  geom_point(aes(x = date, y = sum_lep, fill = class, alpha = class,
+                 shape = class), size = 3) +
+  theme_area_grouping() +
+  scale_alpha_manual(values = c(1, 0.3, 0.3)) +
+  scale_shape_manual(values = c(21, 22, 23)) +
+  labs(x = "Date", y = "Lice on Farmed Salmon (millions)") +
+  scale_fill_manual("Farm", values = c("purple", "orange1", "lightblue1")) +
+  theme(
+    axis.title.y = element_text(size = 18)
+  ) +
+  guides(
+    alpha = "none",
+    linetype = "none",
+    fill = guide_legend(override.aes = list(shape = c(21, 22, 23))),
+    shape = "none"
+  )
+ggsave(here::here("./figs/lice-on-farms-timeseries.png"), lice_ts_plot,
        width = 10, height = 5)
+
+# add both plots together
+ts_both = fish_ts_plot_v2 / lice_ts_plot
+ggsave(here::here("./figs/fish-and-lice-on-farms-timeseries.png"), ts_both,
+       width = 10, height = 10)
+

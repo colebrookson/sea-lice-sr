@@ -329,7 +329,7 @@ est_mortality = ggplot(data = est_mort_df) +
   theme(
     axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)
   ) +
-  labs(x = "Outmigration Year", y = "Max. Like. Estimate & 95% CI's") + 
+  labs(x = "Outmigration Year", y = "Estimated mortality (%)") + 
   scale_fill_gradientn(colours = PNWColors::pnw_palette("Sunset2",
                                                           type = "continuous"))+
   scale_shape_manual(values = c(21, 10)) + 

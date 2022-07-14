@@ -41,6 +41,7 @@ farm_regress$year = as.factor(as.character(farm_regress$year))
 
 # read in model object
 tmb_fit = readRDS(here::here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
+summary(tmb_fit)
 
 scfs_regress %>% 
     dplyr::group_by(year) %>% 
@@ -350,3 +351,6 @@ ggsave(filename = here::here("./figs/wild-to-farm-models-comparison.png"),
 #         width = 20,
 #         height = 8,
 #         dpi = 600)
+
+ggplot(data = scfs_regress) + 
+  geom_point(aes(x = date, y = all_lep))
