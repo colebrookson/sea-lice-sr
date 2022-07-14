@@ -120,23 +120,44 @@ ggsave(filename = here("./figs/numbered-farm-map.png"),
 
 farm_regress$year_fac = as.factor(farm_regress$year)
 farm_regress$month = as.factor(farm_regress$month)
+
+# make dataset with all farms
 farm_timeseries = farm_regress %>% 
   dplyr::filter(farm_name %notin% c("Arrow Pass", "NA_15", "NA_7", "NA_14")) %>% 
-  dplyr::filter(year < 2017) %>% 
+  #dplyr::filter(year < 2017) %>% 
   dplyr::group_by(year_fac, month) %>% 
   summarize(sum_invent = sum(inventory)/1000000,
             sum_lep = sum(lep_tot)/1000000)
-
 farm_timeseries$date = zoo::as.yearmon(paste(farm_timeseries$year_fac, 
                                              farm_timeseries$month), "%Y %m")
-fish_timeseries = ggplot(data = farm_timeseries) + 
+
+# get dataset with only ktc farms
+farm_timeseries_ktc = farm_timeseries %>% 
+  dplyr::filter(ktc == "Knight Tribune Corridor")
+farm_timeseries_ktc = farm_regress %>% 
+  dplyr::filter(ktc == "Knight Tribune Corridor") %>% 
+  #dplyr::filter(year < 2017) %>% 
+  dplyr::group_by(year_fac, month) %>% 
+  summarize(sum_invent = sum(inventory)/1000000,
+            sum_lep = sum(lep_tot)/1000000)
+# plot with all farms
+fish_timeseries_plot = ggplot(data = farm_timeseries) + 
   geom_line(aes(x = date, y = sum_invent)) + 
   geom_point(aes(x = date, y = sum_invent), 
              fill = "purple", shape = 21, size = 3) +
   theme_farm_grouping() +
   labs(x = "Date", y = "Total Farmed Salmon (millions)")
-ggsave(here::here("./figs/fish-on-farms-timeseries.png"), fish_timeseries,
+ggsave(here::here("./figs/fish-on-farms-timeseries.png"), fish_timeseries_plot,
        width = 10, height = 5)
+
+# plot with ktc farms only
+fish_timeseries_ktc = ggplot(data = farm_timeseries_ktc) + 
+  geom_line(aes(x = date, y = sum_invent)) + 
+  geom_point(aes(x = date, y = sum_invent), 
+             fill = "purple", shape = 21, size = 3) +
+  theme_farm_grouping() +
+  labs(x = "Date", y = "Total Farmed Salmon (millions)")
+
 
 lice_timeseries = ggplot(data = farm_timeseries) + 
   geom_line(aes(x = date, y = sum_lep)) + 
