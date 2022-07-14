@@ -16,3 +16,15 @@ This work is licensed under a
 [cc-by]: http://creativecommons.org/licenses/by/4.0/
 [cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
+
+### To add Overleaf Document to Github Repo
+
+link that inspired this: [https://stackoverflow.com/questions/52961374/how-to-merge-a-overleaf-project-to-an-already-existing-github-repo](https://stackoverflow.com/questions/52961374/how-to-merge-a-overleaf-project-to-an-already-existing-github-repo)
+
+You can use the git address provided by overleaf to link to your repo as a submodule. 
+
+```
+git submodule add --force --name manuscript https://git.overleaf.com/62c1a311179c78326977844d manuscript
+```
+
+Then, to update, you can simply go into the manuscript directory and run `git fetch`
