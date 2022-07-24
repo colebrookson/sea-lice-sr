@@ -13,6 +13,11 @@ All files in the raw data folder are from separate sources, but have not been al
 
 This file was supplied to Cole from Sean Godwin via email on Monday, Februrary 28th, 2022. 
 
+### `BATI_farm_louse_data_RAW_UPDATED20200716.csv`
+
+This file was supplied to Cole from Sean Godwin via email on Saturday, July 16th, 2022. 
+
+
 ### `farm-locations.csv`
 
 This file was manually created by Cole via Google Maps points to have an easy way to plot farm locations in the Broughton.
