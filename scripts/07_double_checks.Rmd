@@ -1,0 +1,178 @@
+---
+title: "Data Checks & Re-Analysis"
+author: "Cole B. Brookson"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+First check is regarding Farms w/in or outside of BATI control. This is discussed in `Item 1` [here](https://docs.google.com/document/d/1DSz4dIq3jSZJhVYB1V_hgtJWveBP0WfGNSnaCQG8Ibw/edit)
+
+## Item 1 - Farms Used in Analysis
+
+We want to know which farms are under BATI control. 
+```{r, echo=FALSE}
+library(tidyverse)
+library(here)
+library(patchwork)
+
+source(here::here("./src/02_data_cleaning_funs.R"))
+
+# read in data on BATI farms
+bati_farms = readr::read_csv(
+  here::here(
+    "./data/farm-data/raw/BATI_farm_louse_data_RAW_UPDATED20220716.csv"
+    )
+)
+
+# read in manually collected information on farm locations
+farm_locs = readr::read_csv(
+  here::here("./data/farm-data/raw/farm-locations.csv")
+)
+
+# read in data from Marty 2010 (joined with BATI data)
+marty_df = readr::read_csv(
+  here::here("./data/farm-data/clean/marty-data.csv")
+)
+
+
+# figure out which farms are NOT under BATI control ============================
+
+# get the names of these farms
+bati_farm_names = bati_farms %>% 
+  dplyr::select(farm) %>% 
+  unique()
+
+bati_farm_names = bati_farm_names %>% 
+  dplyr::mutate(
+    fixed_names = case_when(
+      farm == "Arrow Passage" ~ "Arrow Pass",
+      farm == "Humphrey Rocks" ~ "Humphrey Rock",
+      farm == "Midsummer Island" ~ "Midsummer",
+      farm == "Sargeaunt Passage" ~ "Sargeaunt Pass",
+      farm == "Swanson Island" ~ "Swanson",
+      TRUE ~ farm
+    )) %>% 
+  dplyr::select(fixed_names) %>% 
+  unique()
+
+bati_farm_coverage = bati_farms %>% 
+    dplyr::mutate(
+    fixed_names = case_when(
+      farm == "Arrow Passage" ~ "Arrow Pass",
+      farm == "Humphrey Rocks" ~ "Humphrey Rock",
+      farm == "Midsummer Island" ~ "Midsummer",
+      farm == "Sargeaunt Passage" ~ "Sargeaunt Pass",
+      farm == "Swanson Island" ~ "Swanson",
+      TRUE ~ farm
+    )) %>% 
+  dplyr::select(fixed_names, year) %>% 
+  #dplyr::mutate(across(where(is.numeric), as.character)) %>% 
+  dplyr::mutate(across(where(is.character), as.factor))
+bati_cov_plot = ggplot(data = bati_farm_coverage) +
+  geom_tile(aes(x = year, fixed_names), colour = "black", fill = "purple") + 
+  theme_bw() + 
+  scale_x_continuous(limits = c(1999, 2022), breaks = c(1999:2022)) +
+  #scale_y_discrete(breaks = seq(0, 10, 0.1)) + 
+  theme(
+    axis.text.x = element_text(angle = 90)
+  ) + 
+  labs(y = "Farm Name", x = "Years BATI has Data For")
+
+```
+The above farms printed here are all the farms that are in the `.csv` file that Sean provided to Cole from the Nation. We can get GPS points for those farms from the open government data on average numbers of lice on farms:
+
+```{r}
+file_name = "fish-farm-sea-louse-counts-data.csv"
+farm_loc_data = readr::read_csv(
+  here::here(
+    paste0("./data/farm-data/raw/canadian-gov-open-data/", file_name)
+    )
+)
+
+# get only the farms that have the same name as the BATI document
+focal_farms = farm_loc_data %>% 
+  dplyr::select(`Site Common Name`, Latitude, Longitude) %>% 
+  dplyr::filter(`Site Common Name` %in% bati_farm_names) %>% 
+  dplyr::filter(Latitude > 0) %>% # for some reason many of the farms have 
+# multiple locations where the lat and long are switched, so get rid of this
+  unique()
+
+### NOTE #####
+# Only 12 farms are represented here, so find the farms where the names are 
+# just similar not exact since that is probably excluding the rest
+### END NOTE ##### 
+
+other_farms = farm_loc_data %>% 
+  dplyr::filter(`Finfish Aquaculture Reporting Zone` == 
+                  "Broughton Archipelago") %>% 
+  dplyr::select(`Site Common Name`, Latitude, Longitude, Year) %>% 
+  dplyr::filter(Latitude > 0) %>%
+  dplyr::rowwise() %>% 
+  dplyr::select(`Site Common Name`) %>% 
+  unique()
+
+# get all names of farms here
+temp_non_BATI_farms = other_farms %>% 
+  dplyr::filter(`Site Common Name` %notin% bati_farm_names$fixed_names) %>% 
+  dplyr::select(`Site Common Name`) %>% 
+  unique()
+
+gov_data_coverage = farm_loc_data %>% 
+  dplyr::filter(`Finfish Aquaculture Reporting Zone` == 
+                  "Broughton Archipelago") %>% 
+  dplyr::filter(Latitude > 0) %>%
+  dplyr::select(`Site Common Name`,Year) %>% 
+  unique() %>%  
+  dplyr::mutate(across(where(is.character), as.factor))
+
+gov_cov_plot = ggplot(data = gov_data_coverage) +
+  geom_tile(aes(x = Year, y = `Site Common Name`), 
+            colour = "black", fill = "yellow2") +
+  theme_bw() + 
+  scale_x_continuous(limits = c(1999, 2022), breaks = c(1999:2022)) +
+  #scale_y_discrete(breaks = seq(0, 10, 0.1)) + 
+  theme(
+    axis.text.x = element_text(angle = 90)
+  ) + 
+  labs(y = "Farm Name", x = "Years DFO Website has Data For")
+  
+```
+So the above farms are those that are in the DFO data from 2011 onwards that are *NOT* in the BATI dataset. 
+
+In addition there is data from Marty (2010):
+```{r}
+farms_not_in_bati = marty_df %>% 
+  dplyr::select(farm_name) %>% 
+  dplyr::filter(farm_name %notin% bati_farm_names) %>% 
+  unique()
+
+marty_coverage = marty_df %>% 
+  dplyr::select(farm_name, year) %>% 
+  unique() %>% 
+  dplyr::mutate(across(where(is.character), as.factor))
+
+marty_cov_plot = ggplot(data = marty_coverage) +
+  geom_tile(aes(x = year, y = farm_name), 
+            colour = "black", fill = "red4") +
+  theme_bw() + 
+  scale_x_continuous(limits = c(1998, 2022), breaks = c(1999:2022)) +
+  #scale_y_discrete(breaks = seq(0, 10, 0.1)) + 
+  theme(
+    axis.text.x = element_text(angle = 90)
+  ) + 
+  labs(y = "Farm Name", x = "Years Marty Dataset has Data For")
+```
+
+So there are three (overlapping data sources). Their coverage is the following: 
+```{r}
+bati_cov_plot
+gov_cov_plot
+marty_cov_plot
+```
+The farms that are in the DFO data that BATI doesn't have data for are:
+
+```{r}
+print(temp_non_BATI_farms)
+```
+
+

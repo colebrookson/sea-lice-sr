@@ -18,15 +18,16 @@ source(here::here("./src/02_data_cleaning_funs.R"))
 source(here::here("./src/01_plot_themes.R"))
 
 # set location of other data
-lice_file_location = "./data/louse-data/Sea-lice-database-master/Data/"
-farm_file_location = "./data/raw-farm/canadian-gov-open-data/"
+lice_file_location = "./data/wild-lice-data/Sea-lice-database-master/Data/"
+farm_file_location = "./data/farm-data/raw/canadian-gov-open-data/"
 
 # pull in data files 
 farm_data_raw = readr::read_csv(here(
-    "./data/raw-farm/BATI_farm_louse_data_RAW.csv"))
-farm_locations_df = readr::read_csv(here("./data/raw-farm/farm-locations.csv"))
+    "./data/farm-data/raw/BATI_farm_louse_data_RAW.csv"))
+farm_locations_df = readr::read_csv(
+  here("./data/farm-data/raw/farm-locations.csv"))
 raw_marty_data = readxl::read_excel(
-    path = here("./data/raw-farm/marty-2010-data/sd01.xlsx"),
+    path = here("./data/farm-data/raw/marty-2010-data/sd01.xlsx"),
     sheet = 2
 )
 dfo_open_data = read_csv(here(paste0(farm_file_location, 
@@ -71,6 +72,11 @@ marty_df = raw_marty_data %>%
 
     # step 3 - rename the months to the number of the month 
     fix_months()
+
+# write out Marty data now that it's cleaned
+readr::write_csv(marty_df,
+  here::here("./data/farm-data/clean/marty-data.csv")
+)
 
 # filter out times when stocks were empty (i.e. # of fish is zero)
 marty_df_stocked = marty_df %>% 
