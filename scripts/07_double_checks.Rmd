@@ -4,13 +4,15 @@ author: "Cole B. Brookson"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
-
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
 First check is regarding Farms w/in or outside of BATI control. This is discussed in `Item 1` [here](https://docs.google.com/document/d/1DSz4dIq3jSZJhVYB1V_hgtJWveBP0WfGNSnaCQG8Ibw/edit)
 
 ## Item 1 - Farms Used in Analysis
 
-We want to know which farms are under BATI control. 
-```{r, echo=FALSE}
+We want to know which farms are under BATI control. The below farms printed here are all the farms that are in the `.csv` file that Sean provided to Cole from the Nation. 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(here)
 library(patchwork)
@@ -77,11 +79,12 @@ bati_cov_plot = ggplot(data = bati_farm_coverage) +
     axis.text.x = element_text(angle = 90)
   ) + 
   labs(y = "Farm Name", x = "Years BATI has Data For")
-
+bati_farm_names_print = bati_farm_names$fixed_names
+print(bati_farm_names_print)
 ```
-The above farms printed here are all the farms that are in the `.csv` file that Sean provided to Cole from the Nation. We can get GPS points for those farms from the open government data on average numbers of lice on farms:
 
-```{r}
+
+```{r, message=FALSE}
 file_name = "fish-farm-sea-louse-counts-data.csv"
 farm_loc_data = readr::read_csv(
   here::here(
@@ -137,9 +140,23 @@ gov_cov_plot = ggplot(data = gov_data_coverage) +
   labs(y = "Farm Name", x = "Years DFO Website has Data For")
   
 ```
-So the above farms are those that are in the DFO data from 2011 onwards that are *NOT* in the BATI dataset. 
+There are 17 farms in the BATI dataset, but there are additional farms in the DFO data (available from the government portal) that have data after 2011, and have data from pre 2011 in the Marty dataset. The farms that are in the DFO dataset from 2011 onwards are:
+```{r}
+other_farms_print = other_farms$`Site Common Name`
+print(other_farms_print)
+```
 
-In addition there is data from Marty (2010):
+## Farms Missing From BATI Control
+
+So the farms that there are DFO data for, but that are not under BATI control are:
+
+```{r}
+print_non_bati_farms = temp_non_BATI_farms$`Site Common Name`
+print(print_non_bati_farms)
+```
+
+
+With respect the Marty (2010) dataset, most farms used in that dataset are farms that DFO has data for after 2011, but some farms don't have data past the first few years of the Marty dataset. Since nowhere in the Marty (2010) SI is there a set of common names for the farms, I named them `NA_XX` for convenience. The names of the farms in the Marty dataset are: 
 ```{r}
 farms_not_in_bati = marty_df %>% 
   dplyr::select(farm_name) %>% 
@@ -161,18 +178,37 @@ marty_cov_plot = ggplot(data = marty_coverage) +
     axis.text.x = element_text(angle = 90)
   ) + 
   labs(y = "Farm Name", x = "Years Marty Dataset has Data For")
+marty_farms_print = marty_coverage %>% 
+  dplyr::select(farm_name) %>% 
+  unique()
+marty_farms_print = marty_farms_print$farm_name
+print(sort(marty_farms_print))
 ```
 
 So there are three (overlapping data sources). Their coverage is the following: 
-```{r}
-bati_cov_plot
-gov_cov_plot
-marty_cov_plot
-```
-The farms that are in the DFO data that BATI doesn't have data for are:
+
+## BATI Coverage
+
+Timeline of which farms and for which years data exists for: 
 
 ```{r}
-print(temp_non_BATI_farms)
+bati_cov_plot
+```
+
+## DFO Coverage:
+
+Timeline of which farms and for which years data exists for: 
+
+```{r}
+gov_cov_plot
+```
+
+## Marty Coverage:
+
+Timeline of which farms and for which years data exists for: 
+
+```{r}
+marty_cov_plot
 ```
 
 
