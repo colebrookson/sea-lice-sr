@@ -172,6 +172,33 @@ ggplot2::ggsave(
   height = 6, width = 7
 )
 
+# now pair with DFO data 
+
+dfo_data_missing_farms = dfo_open_data %>% 
+  dplyr::filter(`Finfish Aquaculture Reporting Zone` 
+                == "Broughton Archipelago") %>% 
+  dplyr::select(Year, Month, `Site Common Name`, 
+                `Average L. salmonis motiles per fish`,
+                `Average caligus per fish`) %>% 
+  dplyr::rename(
+    year = Year, month = Month, farm_name = `Site Common Name`, 
+    lep_av = `Average L. salmonis motiles per fish`,
+    cal_av = `Average caligus per fish`
+  ) %>% 
+  dplyr::filter(farm_name %in% c(missing_farms, "Wehlis Bay")) %>% 
+  dplyr::mutate(farm_name = ifelse(farm_name == "Wehlis Bay", 
+                                   "Whlis Bay", 
+                                   farm_name))
+
+
+
+
+
+
+
+
+
+
 readr::write_csv(
     all_farm_data_stocked, 
         here("./data/farm-data/clean/marty-bati-data-joined-stocked-only.csv")
