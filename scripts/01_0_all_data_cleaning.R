@@ -12,6 +12,7 @@
 
 library(tidyverse)
 library(here)
+library(zoo)
 
 # pull in file with all functions to clean data 
 source(here::here("./src/02_data_cleaning_funs.R"))
@@ -122,8 +123,54 @@ all_farm_data_stocked = all_farm_data %>%
     # exclude where lep_tot is NA
     dplyr::filter(!is.na(lep_tot))
 
-# need to now inpute data for the 6 farms that have MARTY data but not BATI data
+### NOTE ########
+# there are a number of farms outside of BATI control that we don't have 
+# inventory data for. Four of those farms have inventory data in the 
+# Marty dataset, so we can use the inventories in that dataset to to infer the 
+# monthly inventories in the years after 2010 and then use DFO data for the 
+# lice numbers. Here, I'll calculate thsoe values, pair them with the DFO 
+# data of average lice values, and then bind that with the 
+# `all_farm_data_stocked` dataframe I've already created then write that out
+### END NOTE ########
 
+# get names of the farms we have inventory for in the Marty df
+missing_farms = c("Maude Island", "Whlis Bay", "Simmonds Point",
+                  "Noo-la")
+
+# get those inventories
+missing_inventories = marty_df %>% 
+  dplyr::filter(farm_name %in% missing_farms) %>% 
+  dplyr::select(inventory, month, year, farm_name) %>% 
+  dplyr::rowwise()
+
+# put in date
+missing_inventories$date = zoo::as.yearmon(
+  paste0(missing_inventories$year, 
+        missing_inventories$month), "%Y %m")
+
+# make new values for average monthly inventories for each farm 
+avg_missing_inventories = missing_inventories %>% 
+  dplyr::group_by(month, farm_name) %>% 
+  dplyr::summarize(mean_inventory = mean(inventory, na.rm = TRUE)) %>% 
+  dplyr::filter(month %in% c(3,4))
+
+# write out values
+readr::write_csv(
+  avg_missing_inventories,
+  here::here("./data/farm-data/clean/missing-farms-average-inventories.csv")
+)
+  
+# plot to visualize
+missing_inventories_plot = ggplot(data = missing_inventories) + 
+  geom_line(aes(x = date, y = inventory, colour = farm_name)) + 
+  geom_point(aes(x = date, y = inventory, fill = farm_name),
+             colour = "black", shape = 21) + 
+  theme_bw()
+ggplot2::ggsave(
+  here::here("./figs/missing-inventory-farms-timeline-pre-2010.png"),
+  missing_inventories_plot,
+  height = 6, width = 7
+)
 
 readr::write_csv(
     all_farm_data_stocked, 
