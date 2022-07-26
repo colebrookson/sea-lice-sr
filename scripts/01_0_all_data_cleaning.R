@@ -23,7 +23,7 @@ farm_file_location = "./data/farm-data/raw/canadian-gov-open-data/"
 
 # pull in data files 
 farm_data_raw = readr::read_csv(here(
-    "./data/farm-data/raw/BATI_farm_louse_data_RAW.csv"))
+    "./data/farm-data/raw/BATI_farm_louse_data_RAW_UPDATED20220716.csv"))
 farm_locations_df = readr::read_csv(
   here("./data/farm-data/raw/farm-locations.csv"))
 raw_marty_data = readxl::read_excel(
@@ -102,7 +102,7 @@ farm_map_nums = farm_loc %>%
     ) %>% 
     unique()
 readr::write_csv(farm_map_nums, 
-        here("./data/clean-farm/farm-numbers-names-according-to-map.csv")
+        here("./data/farm-data/clean/farm-numbers-names-according-to-map.csv")
 )
 
 # bind marty and bati data =====================================================
@@ -111,7 +111,7 @@ all_farm_data = join_marty_bati_data(
     marty_df, bati_df, farm_map_nums
 )
 readr::write_csv(
-    all_farm_data, here("./data/clean-farm/marty-bati-joined.csv")
+    all_farm_data, here("./data/farm-data/clean/marty-bati-joined.csv")
 )
 
 # check that there are no lep_tot measures when there is not a stock measurement
@@ -121,9 +121,13 @@ check_lep_total_calculations(all_farm_data)
 all_farm_data_stocked = all_farm_data %>% 
     # exclude where lep_tot is NA
     dplyr::filter(!is.na(lep_tot))
+
+# need to now inpute data for the 6 farms that have MARTY data but not BATI data
+
+
 readr::write_csv(
     all_farm_data_stocked, 
-        here("./data/clean-farm/marty-bati-data-joined-stocked-only.csv")
+        here("./data/farm-data/clean/marty-bati-data-joined-stocked-only.csv")
 )
 
 # prepare data sources for regression ==========================================
