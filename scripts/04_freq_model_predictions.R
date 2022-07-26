@@ -40,7 +40,7 @@ farm_regress$farm_name = as.factor(as.character(farm_regress$farm_name))
 farm_regress$year = as.factor(as.character(farm_regress$year))
 
 # read in model object
-tmb_fit = readRDS(here::here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
+tmb_fit = readRDS(here::here("./outputs/model-outputs/tmb-glmm-ap1-nb.RDS"))
 summary(tmb_fit)
 
 scfs_regress %>% 
@@ -90,7 +90,7 @@ ggsave(filename = here::here("./figs/just-wild-raw-comparison.png"),
 # write df 
 readr::write_csv(predict_data, 
                  here::here(
-                   "./data/regression-data/predicted-lice-abundance.csv"))
+                   "./data/prepped-data/predicted-lice-abundance.csv"))
 
 # add in farm data for comparison ==============================================
 
@@ -141,17 +141,17 @@ wild_to_all_farms =  mgcv::gam(all_lep ~ s(all_leps),
                         data = all_comp)
 summary(wild_to_all_farms)
 saveRDS(wild_to_all_farms, 
-    here::here("./data/model-outputs/wild-lice-to-all-farms-gam.RDS"))
+    here::here("./outputs/model-outputs/wild-lice-to-all-farms-gam.RDS"))
 wild_to_ktc_farms = mgcv::gam(all_lep ~ s(ktc_leps),
                         data = all_comp)
 summary(wild_to_ktc_farms)
 saveRDS(wild_to_ktc_farms, 
-    here::here("./data/model-outputs/wild-lice-to-ktc-farms-gam.RDS"))
+    here::here("./outputs/model-outputs/wild-lice-to-ktc-farms-gam.RDS"))
 wild_to_hsd_farms = mgcv::gam(all_lep ~ s(hsd_leps),
                         data = all_comp)
 summary(wild_to_hsd_farms)
 saveRDS(wild_to_hsd_farms, 
-    here::here("./data/model-outputs/wild-lice-to-hsd-farms-gam.RDS"))
+    here::here("./outputs/model-outputs/wild-lice-to-hsd-farms-gam.RDS"))
 
 all_comp$log_ktc = log10(all_comp$ktc_leps)
 all_comp$log_all_lep = log10(all_comp$all_lep)
@@ -160,7 +160,7 @@ plot(x = all_comp$log_ktc, y = all_comp$log_all_lep)
 # farm_grouping_regress = stats::lm(all_farms_measure ~ focal_farms_measure,
 #                             data = comp_data)
 # saveRDS(farm_grouping_regress, 
-#     here::here("./data/model-outputs/farm-grouping-comparisons.RDS"))
+#     here::here("./outputs/model-outputs/farm-grouping-comparisons.RDS"))
 # summary(farm_grouping_regress)
 
 # Compare farm and wild data with models =======================================
@@ -177,37 +177,37 @@ wild_to_all_farms =  mgcv::gam(all_lep ~ s(all_farms),
                         data = predict_data)
 summary(wild_to_all_farms)
 saveRDS(wild_to_all_farms, 
-    here::here("./data/model-outputs/wild-lice-to-all-farms-gam.RDS"))
+    here::here("./outputs/model-outputs/wild-lice-to-all-farms-gam.RDS"))
 
 wild_to_ktc_farms =  mgcv::gam(all_lep ~ s(ktc_leps),
                         data = predict_data)
 summary(wild_to_ktc_farms)
 saveRDS(wild_to_ktc_farms, 
-    here::here("./data/model-outputs/wild-lice-to-ktc-farms-gam.RDS"))
+    here::here("./outputs/model-outputs/wild-lice-to-ktc-farms-gam.RDS"))
 
 wild_to_hsd_farms =  mgcv::gam(all_lep ~ s(hsd_leps),
                                data = predict_data)
 summary(wild_to_hsd_farms)
 saveRDS(wild_to_hsd_farms, 
-        here::here("./data/model-outputs/wild-lice-to-hsd-farms-gam.RDS"))
+        here::here("./outputs/model-outputs/wild-lice-to-hsd-farms-gam.RDS"))
 
 log_wild_to_log_all_farms = stats::lm(log_all_lep ~ log_all_farms,
                         data = predict_data)
 summary(log_wild_to_log_all_farms)
 saveRDS(log_wild_to_log_all_farms, 
-    here::here("./data/model-outputs/log-wild-lice-to-log-all-farms-lm.RDS"))
+    here::here("./outputs/model-outputs/log-wild-lice-to-log-all-farms-lm.RDS"))
 
 log_wild_to_log_ktc_farms = stats::lm(log_all_lep ~ log_ktc_leps,
                         data = predict_data)
 summary(log_wild_to_log_ktc_farms)
 saveRDS(log_wild_to_log_ktc_farms, 
-    here::here("./data/model-outputs/log-wild-lice-to-log-ktc-farms-lm.RDS"))
+    here::here("./outputs/model-outputs/log-wild-lice-to-log-ktc-farms-lm.RDS"))
 
 log_wild_to_log_hsd_farms = stats::lm(log_all_lep ~ log_hsd_leps,
                                       data = predict_data)
 summary(log_wild_to_log_hsd_farms)
 saveRDS(log_wild_to_log_hsd_farms, 
-        here::here("./data/model-outputs/log-wild-lice-to-log-hsd-farms-lm.RDS"))
+        here::here("./outputs/model-outputs/log-wild-lice-to-log-hsd-farms-lm.RDS"))
 
 # do some data wrangling 
 predict_data_long = data.frame(
@@ -252,6 +252,96 @@ predict_data_long_wild = predict_data_long %>%
 summary(log_wild_to_log_all_farms)
 summary(log_wild_to_log_ktc_farms)
 summary(log_wild_to_log_hsd_farms)
+
+test_mod1 = lm(all_lep ~ all_farms, data = predict_data)
+test_mod2 = lm(all_lep ~ hsd_leps, data = predict_data)
+test_mod3 = lm(all_lep ~ ktc_leps, data = predict_data)
+summary(test_mod1)
+summary(test_mod2)
+summary(test_mod3)
+
+
+orig_scale1 = ggplot(data = predict_data,
+       aes(x = all_farms, y = all_lep)) +
+  geom_point(
+    shape = 21, 
+    colour = "black",
+    size = 4
+  ) + 
+  stat_smooth(method = stats::lm, formula = y ~ x) + 
+  scale_fill_gradientn(
+    colours = rev(PNWColors::pnw_palette("Sunset2",
+                                         type = "continuous"))
+  ) + 
+  labs(x = "Lice on All Farms",
+       y = "Lice on Wild Fish",
+       title = "All Farms"
+  ) +
+  theme_mod_comp() + 
+  annotate(geom = "text",
+           x = 2000000,
+           y = 11.0,
+           label = paste("R^2 ==", 0.40), 
+           size = 7,
+           parse = TRUE)
+orig_scale2 = ggplot(data = predict_data,
+                     aes(x = ktc_leps, y = all_lep)) +
+  geom_point(
+    shape = 21, 
+    colour = "black",
+    size = 4
+  ) + 
+  stat_smooth(method = stats::lm, formula = y ~ x) + 
+  scale_fill_gradientn(
+    colours = rev(PNWColors::pnw_palette("Sunset2",
+                                         type = "continuous"))
+  ) + 
+  labs(x = "Lice on KTC Farms",
+       y = "Lice on Wild Fish",
+       title = "KTC Farms"
+  ) +
+  theme_mod_comp() + 
+  annotate(geom = "text",
+           x = 2000000,
+           y = 11.0,
+           label = paste("R^2 ==", 0.33), 
+           size = 7,
+           parse = TRUE)
+orig_scale3 = ggplot(data = predict_data,
+                     aes(x = hsd_leps, y = all_lep)) +
+  geom_point(
+    shape = 21, 
+    colour = "black",
+    size = 4
+  ) + 
+  stat_smooth(method = stats::lm, formula = y ~ x) + 
+  scale_fill_gradientn(
+    colours = rev(PNWColors::pnw_palette("Sunset2",
+                                         type = "continuous"))
+  ) + 
+  labs(x = "Lice on HSD Farms",
+       y = "Lice on Wild Fish",
+       title = "HSD Farms"
+  ) +
+  theme_mod_comp() + 
+  annotate(geom = "text",
+           x = 2000000,
+           y = 11.0,
+           label = paste("R^2 ==", 0.6524), 
+           size = 7,
+           parse = TRUE)
+
+all_scale = orig_scale1 + orig_scale2 + orig_scale3
+ggsave(filename = here::here(
+  "./figs/orig-scalewild-to-farm-models-comparison.png"),
+       plot = all_scale,
+       width = 15,
+       height = 5,
+       dpi = 600)
+
+
+
+
 
 p1 = ggplot(data = predict_data, 
             aes(x = log_all_farms, y = log_all_lep, fill = log_all_lep)) + 

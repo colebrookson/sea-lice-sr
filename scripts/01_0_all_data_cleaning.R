@@ -13,6 +13,7 @@
 library(tidyverse)
 library(here)
 library(zoo)
+library(betareg)
 
 # pull in file with all functions to clean data 
 source(here::here("./src/02_data_cleaning_funs.R"))
@@ -174,6 +175,13 @@ ggplot2::ggsave(
 
 # now pair with DFO data 
 
+# make small month matching df
+month_matching = data.frame(
+  month = unique(dfo_open_data$Month),
+  month_num = c(1:12)
+)
+
+
 dfo_data_missing_farms = dfo_open_data %>% 
   dplyr::filter(`Finfish Aquaculture Reporting Zone` 
                 == "Broughton Archipelago") %>% 
@@ -188,19 +196,48 @@ dfo_data_missing_farms = dfo_open_data %>%
   dplyr::filter(farm_name %in% c(missing_farms, "Wehlis Bay")) %>% 
   dplyr::mutate(farm_name = ifelse(farm_name == "Wehlis Bay", 
                                    "Whlis Bay", 
-                                   farm_name))
+                                   farm_name)) %>% 
+  dplyr::left_join(x = ., 
+                   y = month_matching,
+                   by = "month") %>% 
+  dplyr::select(-month) %>% 
+  dplyr::rename(month = month_num) %>% 
+  dplyr::mutate(ktc = "Broughton", 
+                hump_sarg_doc = "Other") %>% 
+  dplyr::filter(month %in% c(3,4)) %>% 
+  dplyr::mutate(month = as.numeric(month)) %>% 
+  dplyr::left_join(x = .,
+                   y = avg_missing_inventories,
+                   by = c("month", "farm_name")) %>% 
+  dplyr::rename(inventory = mean_inventory) %>% 
+  dplyr::mutate(
+    lep_tot = inventory*lep_av,
+    cal_tot = inventory*cal_av
+  ) %>% 
+  dplyr::mutate(farm_num = 
+                  dplyr::case_when(
+                    farm_name == "Simmonds Point" ~ 1,
+                    farm_name == "Whlis Bay" ~ 2,
+                    farm_name == "Maude Island" ~ 3,
+                    farm_name == "Noo-la" ~ 26
+                  )
+  ) %>% 
+  # this gets the names in the right order
+  dplyr::select(names(all_farm_data_stocked))
+  
+# check all the right columns are present in this new df 
+if(all(sort(names(all_farm_data_stocked)) !=
+   sort(names(dfo_data_missing_farms)))) {
+  stop("ERROR - columns do not match")
+}
 
-
-
-
-
-
-
-
-
+# join the dataframes together
+all_farm_data_stocked_inc_missing = 
+  rbind(all_farm_data_stocked, 
+        dfo_data_missing_farms)
 
 readr::write_csv(
-    all_farm_data_stocked, 
+  all_farm_data_stocked_inc_missing, 
         here("./data/farm-data/clean/marty-bati-data-joined-stocked-only.csv")
 )
 
@@ -266,14 +303,41 @@ pred_prop = stats::predict(model,
 predicted_line = data.frame(cbind(pred_data_points, pred_prop)) %>% 
     dplyr::rename(prop_lep = pred_prop)
 
+# try it with a beta regression
+beta_reg = betareg::betareg(
+  prop_lep ~ mean_all,
+  data = mot_data
+)
+summary(beta_reg)
+plot(beta_reg)
+
+pred_prop_beta = stats::predict(
+  beta_reg, 
+  pred_data_points,
+  type = "response"
+)
+pred_prop_beta_quant = stats::predict(
+  beta_reg, 
+  pred_data_points,
+  type = "quantile",
+  at = c(0.0225, 0.5, 0.975)
+)
+predicted_beta_line = data.frame(
+  cbind(pred_data_points, pred_prop_beta_quant)
+  ) %>% 
+  dplyr::rename(lower = q_0.0225,
+                median = q_0.5,
+                upper = q_0.975)
+
+
 # make data for a plot 
 pred_data_all_points = rbind( # do this for the points 
         data.frame(year = 2001,
             mean_all = 3.44, 
             # get the predicted value for the missing
             prop_lep = 
-                predicted_line[which(
-                    predicted_line$mean_all == 3.44), "prop_lep"]
+              predicted_line[which(
+                predicted_line$mean_all == 3.44), "prop_lep"]
         ),
         data.frame(mot_data %>% 
             dplyr::select(-c(mean_lep)) 
@@ -282,9 +346,27 @@ pred_data_all_points = rbind( # do this for the points
     mutate(
         predicted = c("Predicted", rep("True", 20))
     ) 
+# include the other point option
+pred_data_all_points = rbind(
+  pred_data_all_points,
+  data.frame(
+    year = 2001,
+    mean_all = 3.44,
+    prop_lep = predicted_beta_line[which(
+      predicted_beta_line$mean_all == 3.44), "median"],
+    predicted = "Predicted"
+  )
+)
 pred_data_all_points$predicted = as.factor(pred_data_all_points$predicted)
 
 predicted_proportions = ggplot() +
+  geom_line(data = predicted_beta_line,
+            aes(x = mean_all, y = median),
+            colour = "grey65",
+            size = 1.25) + 
+  geom_ribbon(data = predicted_beta_line,
+              aes(x = mean_all, ymin = lower, ymax = upper),
+              fill = "steelblue2", alpha = 0.4) + 
     geom_point(data = pred_data_all_points, 
         aes(x = mean_all, y = prop_lep, fill = predicted),
         shape = 21, size = 2.8) + 

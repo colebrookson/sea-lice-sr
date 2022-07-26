@@ -16,10 +16,10 @@ library(glmmTMB)
 library(DHARMa)
 
 farm_regress = read_csv(
-    here::here("./data/clean-farm/marty-bati-data-joined-stocked-only.csv"))
+    here::here("./data/farm-data/clean/marty-bati-data-joined-stocked-only.csv"))
 scfs_regress = read_csv(
     here::here(
-        "./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
+        "./data/prepped-data/scfs-regression-leps-include-chals-data.csv"))
 
 # ensure all counts are integer valued
 scfs_regress$all_lep = as.integer(scfs_regress$all_lep)
@@ -45,7 +45,7 @@ tmb_glmm_1_nb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_name),
                                              optArgs = list(method = "BFGS"),
                                              parallel = n_cores)
 )
-saveRDS(tmb_glmm_1_nb, here::here("./data/model-outputs/tmb-glmm-ap1-nb.RDS"))
+saveRDS(tmb_glmm_1_nb, here::here("./outputs/model-outputs/tmb-glmm-ap1-nb.RDS"))
 tmb_glmm_1_zinb = glmmTMB(all_lep ~ year + (1 | week) + (1 | farm_name),
                     data = scfs_regress,
                     family = nbinom2,

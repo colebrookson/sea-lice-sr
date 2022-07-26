@@ -211,4 +211,38 @@ Timeline of which farms and for which years data exists for:
 marty_cov_plot
 ```
 
-# Figure 2 - 
+# Figure 2 - Re-done
+
+![](../figs/predicted-lep-proportions.png)
+We can see that the predicted value doesn't cahgne, but it does give us a lower bound with more variance to use. 
+
+# Inventory Inputation
+
+An important note is that while there are 6 farms outside of BATI control, only four of them exist back into the Marty dataset:
+
+1. Maude Island
+
+2. Noo-la
+
+3. Simmonds Point
+
+4. Wehlis Bay
+
+I went through the inventory we have in the Marty dataset and looked at how it changed through the months and years. The difference between years is actually relatively substantial: 
+
+![](../figs/missing-inventory-farms-timeline-pre-2010.png)
+So I took the mean values for the two months of interest (March & April) and used those to move it forwards in time. 
+
+# log-scale relationship
+
+So I redid this with a few different approaches. I started by fitting the models with GAMs. **The adjusted $R^2$ values were 0.98 for all farms, 0.901 for KTC farms, and 0.788 for HSD farms**. 
+
+I also tried looking with just a linear relationship. This plot is here: 
+
+![](../figs/orig-scalewild-to-farm-models-comparison.png)
+
+I don't know how useful this is as it's being driven by such small values on both axes. Open to suggestions on fixing this
+
+# Next things to do:
+
+Re-do SR calcs and those models based on discussion today 
