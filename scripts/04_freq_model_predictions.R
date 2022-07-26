@@ -23,9 +23,9 @@ source(here::here("./src/01_plot_themes.R"))
 source(here::here("./src/02_data_cleaning_funs.R"))
 
 farm_regress = read_csv(
-    here::here("./data/clean-farm/marty-bati-data-joined-stocked-only.csv"))
+    here::here("./data/farm-data/clean/marty-bati-data-joined-stocked-only.csv"))
 scfs_regress = readr::read_csv(
-    here::here("./data/regression-data/scfs-regression-leps-include-chals-data.csv"))
+    here::here("./data/prepped-data/scfs-regression-leps-include-chals-data.csv"))
 
 # ensure all counts are integer valued
 scfs_regress$all_lep = as.integer(scfs_regress$all_lep)

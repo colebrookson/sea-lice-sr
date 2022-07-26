@@ -211,4 +211,4 @@ Timeline of which farms and for which years data exists for:
 marty_cov_plot
 ```
 
-
+# Figure 2 - 

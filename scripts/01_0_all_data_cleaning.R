@@ -395,8 +395,3 @@ timeline_data = rbind(timeline_farm, timeline_scfs)
 
 
 
-
-
-
-
-# TUTORIAL: https://benalexkeen.com/creating-a-timeline-graphic-using-r-and-ggplot2/
