@@ -39,3 +39,4 @@ marty_df = readr::read_csv(
 # get rid of months we don't want
 marty_invent = marty_df %>% 
   dplyr::filter(month %in% c(3,4))
+

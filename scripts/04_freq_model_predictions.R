@@ -106,7 +106,7 @@ ktc_farms = farm_regress %>%
     dplyr::filter(ktc == "Knight Tribune Corridor") %>%
     dplyr::group_by(year) %>%
     dplyr::summarize(ktc_leps = mean(lep_tot, na.rm = TRUE))
-
+unique(farm_regress$farm_name)
 h_s_d_farms_df = farm_regress %>% 
     dplyr::filter(year != "2000") %>% 
     dplyr::filter(month %in% c(3, 4)) %>% 

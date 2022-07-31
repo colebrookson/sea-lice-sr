@@ -84,6 +84,17 @@ readr::write_csv(marty_df,
 marty_df_stocked = marty_df %>% 
     dplyr::filter(!is.na(inventory))
 
+
+marty_df_temp = marty_df %>% 
+  filter(farm_name %in% c("NA_12", "NA_7", "NA_14", "NA_15"))
+marty_df_temp$date = zoo::as.yearmon(
+  paste0(marty_df_temp$year, 
+         marty_df_temp$month), "%Y %m")
+ggplot(data = marty_df_temp) + 
+  geom_line(aes(x = date, y = inventory, colour = farm_name)) + 
+  theme_bw()
+
+
 # ensure that farm names/numbers are matching to map ===========================
 
 # put together relevant data
