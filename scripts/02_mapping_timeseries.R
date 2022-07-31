@@ -26,18 +26,19 @@ source(here("./src/02_data_cleaning_funs.R"))
 
 # set file locations
 lice_file_location = "./data/louse-data/Sea-lice-database-master/Data/"
-farm_file_location = "./data/raw-farm/canadian-gov-open-data/"
+farm_file_location = "./data/farm-data/raw/canadian-gov-open-data/"
 
 # read in data 
 raw_marty_data = readxl::read_excel(
-    path = here("./data/raw-farm/marty-2010-data/sd01.xlsx"),
+    path = here("./data/farm-data/raw/marty-2010-data/sd01.xlsx"),
     sheet = 2
 )
 dfo_open_data = read_csv(here(paste0(farm_file_location, 
                                 "fish-farm-sea-louse-counts-data.csv")))
-farm_locations_df = read_csv(here::here("./data/raw-farm/farm-locations.csv"))
+farm_locations_df = read_csv(here::here("./data/farm-data/raw/farm-locations.csv"))
 farm_regress = read_csv(
-  here::here("./data/clean-farm/marty-bati-data-joined-stocked-only.csv"))
+  here::here("./data/farm-data/clean/marty-bati-data-joined-stocked-only.csv"))
+all_farm_locations = read_csv(here::here("./data/farm-data/raw/farm-name-reference.csv"))
 
 # pull together data for mapping ===============================================
 
@@ -68,7 +69,7 @@ farm_loc$sampled = as.factor(farm_loc$sampled)
 
 # get map data
 province = "British Columbia"
-canada <- getData("GADM", country = "CAN", level = 1,
+canada <- raster::getData("GADM", country = "CAN", level = 1,
                     path = here("./data/geo-data"))
 canada_prov = canada[canada$NAME_1 %in% province] # subset to just BC
 
@@ -76,9 +77,23 @@ canada_prov = canada[canada$NAME_1 %in% province] # subset to just BC
 
 # set palette
 size_pal = rev(pnw_palette("Moth", 4, type = "continuous"))
+ggplot() +
+  geom_polygon(data = canada_prov,
+               aes(x = long, y = lat, group = group),
+               colour = "black",
+               size = 0.01,
+               fill = "grey65") +
+  coord_cartesian(xlim = c(-127, -126.1), ylim = c(50.5, 50.9)) +
+  geom_point(data = all_farm_locations, 
+             aes(x = Longitude, y = Latitude), shape = 22) + 
+  geom_text_repel(data = all_farm_locations,
+                  aes(x = Longitude, y = Latitude, 
+                      label = name#, colour = sampled
+                  )) 
 
 # create full plot
-system_map = ggplot() +
+#system_map = 
+ggplot() +
     geom_polygon(data = canada_prov,
         aes(x = long, y = lat, group = group),
         colour = "black",
@@ -90,6 +105,7 @@ system_map = ggplot() +
                     fill = ktc,
                     shape = sampled,
                     size = sampled)) +
+  geom_point(data = all_farm_locations, aes(x = Longitude, y = Latitude), shape = 22) + 
     geom_text_repel(data = farm_loc,
                     aes(x = long, y = lat, 
                         label = farm_num#, colour = sampled

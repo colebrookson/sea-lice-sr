@@ -77,12 +77,12 @@ farm_names = function(df) {
 
     # vector of common names of the farm 
     farm_name_vec = c(
-    "Simmonds Point", "Whlis Bay", "Maude Island", "Cecil Island",
+    "Simmonds Point", "Wehlis Bay", "Maude Island", "Cecil Island",
     "Cypress Harbour", "Sir Edmund Bay", "NA_7", "Cliff Bay", "Glacier Falls", 
     "Burdwood", "NA_12", "Wicklow Point", "NA_14", "NA_15",
     "Upper Retreat", "Arrow Pass", "Midsummer", "Potts Bay", "Port Elizabeth",
-    "Humphrey Rock", "Sargeaunt Pass", "Doctors Islets", "Swanson", 
-    "Larson Island", "Noo-la"
+    "Humphrey Rock", "Sargeaunt Pass", "Doctor Islets", "Swanson", 
+    "Larsen Island", "Noo-la"
     )
 
     # vector of the numbers assigned by Gary Mary (2010)

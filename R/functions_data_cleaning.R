@@ -97,6 +97,12 @@ get_marty_data = function(file, sheet_num) {
    as_tibble() 
 }
 
+
+##### TEST
+marty_df = get_marty_data(
+  here::here("./data/farm-data/raw/marty-2010-data/sd01.xlsx"),
+  2)
+
 trim_marty_data = function(df) {
   
   #' Rename the set of column names and only keep the columns that are of use
@@ -123,8 +129,42 @@ trim_marty_data = function(df) {
     )
 }
 
+##### TEST
+marty_df = trim_marty_data(marty_df)
 
+farm_names_marty = function(marty_df, farm_df) {
+  
+  #' Standardize the names of the farms in the Marty dataset
+  
+  dplyr::left_join(
+    # the marty dataframe 
+    marty_df,
+    # intermediate dataframe with the DFO reference numbers
+    dplyr::left_join(
+      # make dataframe with the names in the order to match the numbers that
+      # Marty 2010 used 
+      data.frame(
+        farm_name = c(
+          "Simmonds Point", "Wehlis Bay", "Maude Island", "Cecil Island",
+          "Cypress Harbour", "Sir Edmund Bay", "NA_7", "Cliff Bay", "Glacier Falls", 
+          "Burdwood", "NA_12", "Wicklow Point", "NA_14", "NA_15",
+          "Upper Retreat", "Arrow Pass", "Midsummer", "Potts Bay", "Port Elizabeth",
+          "Humphrey Rock", "Sargeaunt Pass", "Doctor Islets", "Swanson", 
+          "Larsen Island", "Noo-la"
+        ), 
+        farm_num = c(seq(1, 9, 1), seq(11, 26, 1))),
+        # other dataframe here is the DFO farm reference numbers dataframe
+        farm_df %>% dplyr::select(ref, name),
+        # by argument for inside left_join
+        by = c("farm_name" = "name")
+      ),
+    by = "farm_num"
+  )
+}
 
+##### TEST
+farm_df = read_csv(here::here("./data/farm-data/raw/farm-name-reference.csv"))
+named_marty = farm_names_marty(marty_df, farm_df)
 
 
 
