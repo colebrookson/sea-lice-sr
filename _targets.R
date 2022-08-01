@@ -10,8 +10,8 @@
 
 library(targets)
 library(here)
-source(here::here("./R/functions_data_cleaning.R"))
-tar_option_set(packages = c("readr", "readexl", "here", "dplyr"))
+source(here::here("./R/functions_farm_data_cleaning.R"))
+tar_option_set(packages = c("readr", "readxl", "here", "dplyr"))
 list(
   tar_target(raw_marty_data, 
              here::here("./data/farm-data/raw/marty-2010-data/sd01.xlsx"),
@@ -25,3 +25,4 @@ list(
                               dfo_farm_ref_data,
        here::here("./data/farm-data/clean/marty-data-clean.csv")))
 )
+

@@ -100,8 +100,7 @@ get_marty_data = function(file, sheet_num) {
   
   #' Read in the Marty (2010 - PNAS) dataset, noting which sheet is of use here
   
-  readxl::read_excel(file, sheet = sheet_num) %>% 
-   as_tibble() 
+  readxl::read_excel(file, sheet = sheet_num)
 }
 
 trim_marty_data = function(df) {
@@ -179,14 +178,12 @@ clean_marty_data = function(raw_file, sheet_number, dfo_path, output_path) {
   # read in raw excel 
   raw_data = get_marty_data(raw_file, sheet_number)
   
-  # read in dfo data 
-  dfo_data = get_dfo_ref_data(dfo_path)
   
   # trim out unneeded columns and rename columns
   trimmed_data = trim_marty_data(raw_data)
   
   # fix the farm names
-  named_data = farm_names_marty(trimmed_data, dfo_data)
+  named_data = farm_names_marty(trimmed_data, get_dfo_ref_data(dfo_path))
   
   # fix the months so they can match up later
   months_data = fix_months(named_data) 
@@ -246,6 +243,21 @@ write_data_bati = function(df, file) {
   readr::write_csv(df, file)
 }
 
+clean_data_bati = function(raw_file, dfo_path, output_path) {
+  
+  #' Compile helper functions that clean the BATI dataset and prepare 
+  #' the raw BATI file for joining and analysis
+  
+  bati_df = get_data_bati(raw_file)
+  
+  bati_named = farm_names_bati(bati_df, get_dfo_ref_data(dfo_path))
+  
+  write_data_bati(bati_named, output_path)
+  
+}
+
+
+
 bati_df = get_bati_data(here::here(
   "./data/farm-data/raw/BATI_farm_louse_data_RAW_UPDATED20220716.csv"))
 
@@ -253,6 +265,7 @@ bati_df = standardize_names(bati_df)
 dfo_names = get_dfo_ref_data(here::here("./data/farm-data/raw/farm-name-reference.csv"))
 bati_names = farm_names_bati(bati_df, dfo_names)
 write_data_bati(bati_names, here::here("./data/farm-data/clean/bati-data-cleaned.csv"))
+
 
 
 
