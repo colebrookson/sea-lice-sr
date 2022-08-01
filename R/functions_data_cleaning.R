@@ -87,6 +87,13 @@ fix_months = function(df) {
   
 }
 
+get_dfo_ref_data = function(file) {
+  
+  #' Read in .csv file with DFO farm reference numbers
+
+  readr::read_csv(file)
+}
+
 # marty data functions =========================================================
 
 get_marty_data = function(file, sheet_num) {
@@ -96,12 +103,6 @@ get_marty_data = function(file, sheet_num) {
   readxl::read_excel(file, sheet = sheet_num) %>% 
    as_tibble() 
 }
-
-
-##### TEST
-marty_df = get_marty_data(
-  here::here("./data/farm-data/raw/marty-2010-data/sd01.xlsx"),
-  2)
 
 trim_marty_data = function(df) {
   
@@ -129,9 +130,6 @@ trim_marty_data = function(df) {
     )
 }
 
-##### TEST
-marty_df = trim_marty_data(marty_df)
-
 farm_names_marty = function(marty_df, farm_df) {
   
   #' Standardize the names of the farms in the Marty dataset
@@ -146,11 +144,11 @@ farm_names_marty = function(marty_df, farm_df) {
       data.frame(
         farm_name = c(
           "Simmonds Point", "Wehlis Bay", "Maude Island", "Cecil Island",
-          "Cypress Harbour", "Sir Edmund Bay", "NA_7", "Cliff Bay", "Glacier Falls", 
-          "Burdwood", "NA_12", "Wicklow Point", "NA_14", "NA_15",
-          "Upper Retreat", "Arrow Pass", "Midsummer", "Potts Bay", "Port Elizabeth",
-          "Humphrey Rock", "Sargeaunt Pass", "Doctor Islets", "Swanson", 
-          "Larsen Island", "Noo-la"
+          "Cypress Harbour", "Sir Edmund Bay", "NA_7", "Cliff Bay", 
+          "Glacier Falls", "Burdwood", "NA_12", "Wicklow Point", "NA_14", 
+          "NA_15", "Upper Retreat", "Arrow Pass", "Midsummer", "Potts Bay", 
+          "Port Elizabeth", "Humphrey Rock", "Sargeaunt Pass", "Doctor Islets", 
+          "Swanson", "Larsen Island", "Noo-la"
         ), 
         farm_num = c(seq(1, 9, 1), seq(11, 26, 1))),
         # other dataframe here is the DFO farm reference numbers dataframe
@@ -159,16 +157,69 @@ farm_names_marty = function(marty_df, farm_df) {
         by = c("farm_name" = "name")
       ),
     by = "farm_num"
-  )
+  ) %>% 
+    # get rid of NA_12 and NA_14 since they don't have any data 
+    dplyr::filter(farm_name != c("NA_12", "NA_14"))
+}
+
+write_marty_data = function(df, file) {
+  
+  #' Write out final cleaned file for the Marty (2010 - PNAS) data
+  
+  readr::write_csv(df, file)
+}
+
+clean_marty_data = function(raw_file, sheet_number, dfo_path, output_path) {
+  
+  #' Compile helper functions above together to take the raw excel sheet from 
+  #' Marty et al. (2010 - PNAS) and turn it into a cleaned .csv file ready 
+  #' to be used in further analysis 
+  
+  # read in raw excel 
+  raw_data = get_marty_data(raw_file, sheet_number)
+  
+  # read in dfo data 
+  dfo_data = get_dfo_ref_data(dfo_path)
+  
+  # trim out unneeded columns and rename columns
+  trimmed_data = trim_marty_data(raw_data)
+  
+  # fix the farm names
+  named_data = farm_names_marty(trimmed_data, dfo_data)
+  
+  # fix the months so they can match up later
+  months_data = fix_months(named_data) 
+  
+  # write out cleaned version of file
+  write_marty_data(months_data, output_path)
+}
+
+
+clean_marty_data(
+  raw_file = here::here("./data/farm-data/raw/marty-2010-data/sd01.xlsx"),
+  sheet_number = 2, 
+  dfo_path = here::here("./data/farm-data/raw/farm-name-reference.csv"),
+  output_path = here::here("./data/farm-data/clean/marty-data-clean.csv")
+)
+
+# bati-data specific functions =================================================
+
+get_bati_data = function(file) {
+  
+  #' Read in the BATI dataset from the raw file 
+  
+  readr::read_csv(file)
 }
 
 ##### TEST
-farm_df = read_csv(here::here("./data/farm-data/raw/farm-name-reference.csv"))
-named_marty = farm_names_marty(marty_df, farm_df)
-
-
-
-
+# marty_df = get_marty_data(
+#   here::here("./data/farm-data/raw/marty-2010-data/sd01.xlsx"),
+#   2)
+# 
+# marty_df = trim_marty_data(marty_df)
+# 
+# farm_df = read_csv(here::here("./data/farm-data/raw/farm-name-reference.csv"))
+# named_marty = farm_names_marty(marty_df, farm_df)
 
 
 

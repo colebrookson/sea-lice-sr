@@ -110,7 +110,11 @@ farm_map_nums = farm_loc %>%
     dplyr::mutate(
         farm_name = ifelse(farm_name %in% 
                 c("Glacier Falls (1)", "Glacier Falls (2)"),
-            "Glacier Falls", farm_name),
+            "Glacier Falls", 
+            ifelse(farm_name == "Whlis Bay", "Wehlis Bay",
+            ifelse(farm_name == "Doctors Islets", "Doctor Islets", 
+                   ifelse(farm_name == "Larson Island", "Larsen Island",
+                          farm_name)))),
         farm_num = ifelse(farm_name == "Glacier Falls", 6, farm_num)
     ) %>% 
     unique()
@@ -130,20 +134,25 @@ readr::write_csv(
 # check that there are no lep_tot measures when there is not a stock measurement
 check_lep_total_calculations(all_farm_data)
 
-# add option that excludes non-stocked obs/no lep count obs 
-all_farm_data_stocked = all_farm_data %>% 
-    # exclude where lep_tot is NA
-    dplyr::filter(!is.na(lep_tot))
-
 ### NOTE ########
 # there are a number of farms outside of BATI control that we don't have 
 # inventory data for. Four of those farms have inventory data in the 
 # Marty dataset, so we can use the inventories in that dataset to to infer the 
 # monthly inventories in the years after 2010 and then use DFO data for the 
-# lice numbers. Here, I'll calculate thsoe values, pair them with the DFO 
+# lice numbers. For the farms we hav *no* inventory data for, I will simply 
+# take the average of the non-broodstock farms in those same years and use those
+# as a proxy. Here, I'll calculate those values, pair them with the DFO 
 # data of average lice values, and then bind that with the 
-# `all_farm_data_stocked` dataframe I've already created then write that out
+# `all_farm_data_stocked` dataframe 
 ### END NOTE ########
+
+# first, input average stocks for the two missing inventory farms (Wak-wa)
+
+# add option that excludes non-stocked obs/no lep count obs
+all_farm_data_stocked = all_farm_data %>%
+  # exclude where lep_tot is NA
+  dplyr::filter(!is.na(lep_tot)) %>% 
+  dplyr::filter(month %in% c(3, 4))
 
 # get names of the farms we have inventory for in the Marty df
 missing_farms = c("Maude Island", "Whlis Bay", "Simmonds Point",

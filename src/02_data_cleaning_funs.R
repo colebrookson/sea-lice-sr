@@ -179,11 +179,9 @@ join_marty_bati_data = function(marty_df, bati_df, farm_map_nums) {
             farm_name = forcats::fct_recode(farm, 
                 "Arrow Pass" = "Arrow Passage",
                 "Humphrey Rock" = "Humphrey Rocks",
-                "Larson Island" = "Larsen Island",
                 "Midsummer" = "Midsummer Island",
                 "Sargeaunt Pass" = "Sargeaunt Passage",
                 "Swanson" = "Swanson Island",
-                "Doctors Islets" = "Doctor Islets",
             )
         ) %>% 
 
