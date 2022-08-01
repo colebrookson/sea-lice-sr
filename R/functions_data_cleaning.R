@@ -159,10 +159,11 @@ farm_names_marty = function(marty_df, farm_df) {
     by = "farm_num"
   ) %>% 
     # get rid of NA_12 and NA_14 since they don't have any data 
-    dplyr::filter(farm_name != c("NA_12", "NA_14"))
+    dplyr::filter(farm_name != c("NA_12", "NA_14")) %>% 
+    dplyr::rename(farm_ref = ref)
 }
 
-write_marty_data = function(df, file) {
+write_data_marty = function(df, file) {
   
   #' Write out final cleaned file for the Marty (2010 - PNAS) data
   
@@ -191,7 +192,7 @@ clean_marty_data = function(raw_file, sheet_number, dfo_path, output_path) {
   months_data = fix_months(named_data) 
   
   # write out cleaned version of file
-  write_marty_data(months_data, output_path)
+  write_data_marty(months_data, output_path)
 }
 
 
@@ -211,15 +212,54 @@ get_bati_data = function(file) {
   readr::read_csv(file)
 }
 
-##### TEST
-# marty_df = get_marty_data(
-#   here::here("./data/farm-data/raw/marty-2010-data/sd01.xlsx"),
-#   2)
-# 
-# marty_df = trim_marty_data(marty_df)
-# 
-# farm_df = read_csv(here::here("./data/farm-data/raw/farm-name-reference.csv"))
-# named_marty = farm_names_marty(marty_df, farm_df)
+farm_names_bati = function(bati_df, dfo_names) {
+
+  #' Using the DFO reference data, change small inconsistencies in the names
+  #' of farms in the BATI dataset, and add in the reference number, so as to 
+  #' be consistent across all files
+  #' 
+  #' Note that the farms in the BATI dataset that are not named according to the
+  #' DFO naming convention are: "Arrow Passage", "Humphrey Rocks", 
+  #' "Midsummer Island", "Sargeaunt Passage", "Swanson Island"
+  
+  dplyr::left_join(
+    bati_df %>% 
+      dplyr::mutate(farm_name = dplyr::case_when(
+        farm == "Arrow Passage"     ~ "Arrow Pass",
+        farm == "Humphrey Rocks"    ~ "Humphrey Rock",
+        farm == "Midsummer Island"  ~ "Midsummer",
+        farm == "Sargeaunt Passage" ~ "Sargeaunt Pass",
+        farm == "Swanson Island"    ~ "Swanson",
+        TRUE                        ~ farm
+      )) %>% 
+      dplyr::select(-farm),
+    dfo_names %>% 
+      dplyr::select(name, ref),
+    by = c("farm_name" = "name")
+  )
+}
+
+write_data_bati = function(df, file) {
+  
+  #' Write out final cleaned file for the BATI-provided data
+  
+  readr::write_csv(df, file)
+}
+
+bati_df = get_bati_data(here::here(
+  "./data/farm-data/raw/BATI_farm_louse_data_RAW_UPDATED20220716.csv"))
+
+bati_df = standardize_names(bati_df)
+dfo_names = get_dfo_ref_data(here::here("./data/farm-data/raw/farm-name-reference.csv"))
+bati_names = farm_names_bati(bati_df, dfo_names)
+write_data_bati(bati_names, here::here("./data/farm-data/clean/bati-data-cleaned.csv"))
+
+
+
+
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-obs_num,farm_num,year,inventory,chal_av,lep_av_mot,lep_av_fem,cal_av,farm_name,ref,month
+obs_num,farm_num,year,inventory,chal_av,lep_av_mot,lep_av_fem,cal_av,farm_name,farm_ref,month
 1,1,2000,200000,NA,NA,NA,NA,Simmonds Point,1336,1
 2,1,2000,100000,NA,NA,NA,NA,Simmonds Point,1336,2
 3,1,2000,50000,NA,NA,NA,NA,Simmonds Point,1336,3
