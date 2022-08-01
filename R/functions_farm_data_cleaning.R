@@ -111,8 +111,7 @@ get_data_marty = function(file, sheet_num = 2) {
   
   #' Read in the Marty (2010 - PNAS) dataset, noting which sheet is of use here
   
-  readxl::read_excel(file, sheet = sheet_num) %>% 
-   as_tibble() 
+  readxl::read_excel(file, sheet = sheet_num)
 }
 
 #############################
@@ -197,22 +196,15 @@ clean_data_marty = function(raw_file, sheet_number, dfo_file, output_path) {
   #' to be used in further analysis 
   
   # read in raw excel 
-  raw_data = get_marty_data(raw_file, sheet_number)
-  
-  # read in dfo data 
-  dfo_data = get_dfo_ref_data(dfo_path)
-  
-  # trim out unneeded columns and rename columns
-  trimmed_data = trim_marty_data(raw_data)
-  
-  # fix the farm names
-  named_data = farm_names_marty(trimmed_data, dfo_data)
-  
-  # fix the months so they can match up later
-  months_data = fix_months(named_data) 
-  
-  # write out cleaned version of file
-  write_data_marty(months_data, output_path)
+  get_data_marty(raw_file, sheet_number) %>% 
+    # trim out unneeded columns and rename columns
+    trim_marty_data(.) %>% 
+    # fix the farm names
+    farm_names_marty(., dfo_file) %>% 
+    # fix the months so they can match up later
+    fix_months(.) %>% 
+    # fix the months so they can match up later
+    write_data_marty(., output_path)
 }
 
 # bati-data specific functions =================================================
@@ -267,10 +259,17 @@ write_data_bati = function(df, file) {
   readr::write_csv(df, file)
 }
 
-# bati_df = get_bati_data(here::here(
-#   "./data/farm-data/raw/BATI_farm_louse_data_RAW_UPDATED20220716.csv"))
-# 
-# bati_df = standardize_names(bati_df)
-# dfo_names = get_dfo_ref_data(here::here("./data/farm-data/raw/farm-name-reference.csv"))
-# bati_names = farm_names_bati(bati_df, dfo_names)
-# write_data_bati(bati_names, here::here("./data/farm-data/clean/bati-data-cleaned.csv"))
+
+#############################
+# clean_data_bati() function
+#############################
+clean_data_bati = function(raw_file, dfo_path, output_path) {
+  
+  #' Compile helper functions that clean the BATI dataset and prepare 
+  #' the raw BATI file for joining and analysis
+  
+  get_data_bati(raw_file) %>% 
+    standardize_names(.) %>% 
+    farm_names_bati(., get_data_dfo_ref(dfo_path)) %>% 
+    write_data_bati(., output_path)
+}
