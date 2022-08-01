@@ -5,14 +5,16 @@
 ##########
 ##########
 # AUTHOR: Cole B. Brookson
-# DATE OF CREATION: 2022-02-02
+# DATE OF CREATION: 2022-07-20
 ##########
 ##########
 
 # global functions =============================================================
 
-`%notin%` = Negate(`%in%`)
 
+#############################
+# standardize_names() function
+#############################
 standardize_names = function(df) {
   
   #' Removes any capital letters, ".", or anytime where cals or leps are not 
@@ -43,6 +45,9 @@ standardize_names = function(df) {
   return(df)
 }
 
+#############################
+# fix_months() function
+#############################
 fix_months = function(df) {
   
   #' Takes in a dataframe with named months in string format and returns a 
@@ -87,7 +92,10 @@ fix_months = function(df) {
   
 }
 
-get_dfo_ref_data = function(file) {
+#############################
+# get_data_dfo_ref() function
+#############################
+get_data_dfo_ref = function(file) {
   
   #' Read in .csv file with DFO farm reference numbers
 
@@ -96,7 +104,10 @@ get_dfo_ref_data = function(file) {
 
 # marty data functions =========================================================
 
-get_marty_data = function(file, sheet_num) {
+#############################
+# get_data_marty() function
+#############################
+get_data_marty = function(file, sheet_num = 2) {
   
   #' Read in the Marty (2010 - PNAS) dataset, noting which sheet is of use here
   
@@ -104,6 +115,9 @@ get_marty_data = function(file, sheet_num) {
    as_tibble() 
 }
 
+#############################
+# trim_marty_data() function
+#############################
 trim_marty_data = function(df) {
   
   #' Rename the set of column names and only keep the columns that are of use
@@ -130,6 +144,9 @@ trim_marty_data = function(df) {
     )
 }
 
+#############################
+# farm_names_marty() function
+#############################
 farm_names_marty = function(marty_df, farm_df) {
   
   #' Standardize the names of the farms in the Marty dataset
@@ -163,6 +180,9 @@ farm_names_marty = function(marty_df, farm_df) {
     dplyr::rename(farm_ref = ref)
 }
 
+#############################
+# write_data_marty() function
+#############################
 write_data_marty = function(df, file) {
   
   #' Write out final cleaned file for the Marty (2010 - PNAS) data
@@ -170,7 +190,7 @@ write_data_marty = function(df, file) {
   readr::write_csv(df, file)
 }
 
-clean_marty_data = function(raw_file, sheet_number, dfo_path, output_path) {
+clean_data_marty = function(raw_file, sheet_number, dfo_file, output_path) {
   
   #' Compile helper functions above together to take the raw excel sheet from 
   #' Marty et al. (2010 - PNAS) and turn it into a cleaned .csv file ready 
@@ -195,23 +215,21 @@ clean_marty_data = function(raw_file, sheet_number, dfo_path, output_path) {
   write_data_marty(months_data, output_path)
 }
 
-
-clean_marty_data(
-  raw_file = here::here("./data/farm-data/raw/marty-2010-data/sd01.xlsx"),
-  sheet_number = 2, 
-  dfo_path = here::here("./data/farm-data/raw/farm-name-reference.csv"),
-  output_path = here::here("./data/farm-data/clean/marty-data-clean.csv")
-)
-
 # bati-data specific functions =================================================
 
-get_bati_data = function(file) {
+#############################
+# get_data_bati() function
+#############################
+get_data_bati = function(file) {
   
   #' Read in the BATI dataset from the raw file 
   
   readr::read_csv(file)
 }
 
+#############################
+# farm_names_bati() function
+#############################
 farm_names_bati = function(bati_df, dfo_names) {
 
   #' Using the DFO reference data, change small inconsistencies in the names
@@ -239,6 +257,9 @@ farm_names_bati = function(bati_df, dfo_names) {
   )
 }
 
+#############################
+# write_data_bati() function
+#############################
 write_data_bati = function(df, file) {
   
   #' Write out final cleaned file for the BATI-provided data
@@ -246,59 +267,10 @@ write_data_bati = function(df, file) {
   readr::write_csv(df, file)
 }
 
-bati_df = get_bati_data(here::here(
-  "./data/farm-data/raw/BATI_farm_louse_data_RAW_UPDATED20220716.csv"))
-
-bati_df = standardize_names(bati_df)
-dfo_names = get_dfo_ref_data(here::here("./data/farm-data/raw/farm-name-reference.csv"))
-bati_names = farm_names_bati(bati_df, dfo_names)
-write_data_bati(bati_names, here::here("./data/farm-data/clean/bati-data-cleaned.csv"))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# bati_df = get_bati_data(here::here(
+#   "./data/farm-data/raw/BATI_farm_louse_data_RAW_UPDATED20220716.csv"))
+# 
+# bati_df = standardize_names(bati_df)
+# dfo_names = get_dfo_ref_data(here::here("./data/farm-data/raw/farm-name-reference.csv"))
+# bati_names = farm_names_bati(bati_df, dfo_names)
+# write_data_bati(bati_names, here::here("./data/farm-data/clean/bati-data-cleaned.csv"))
