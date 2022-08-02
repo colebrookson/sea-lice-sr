@@ -99,7 +99,8 @@ get_data_dfo_ref = function(file) {
   
   #' Read in .csv file with DFO farm reference numbers
 
-  readr::read_csv(file)
+  readr::read_csv(file, show_col_types = FALSE) %>% 
+    dplyr::select(ref, name)
 }
 
 # marty data functions =========================================================
@@ -107,11 +108,11 @@ get_data_dfo_ref = function(file) {
 #############################
 # get_data_marty() function
 #############################
-get_data_marty = function(file, sheet_num = 2) {
+get_data_marty = function(file) {
   
   #' Read in the Marty (2010 - PNAS) dataset, noting which sheet is of use here
   
-  readxl::read_excel(file, sheet = sheet_num)
+  readr::read_csv(file, show_col_types = FALSE)
 }
 
 #############################
@@ -121,14 +122,12 @@ trim_marty_data = function(df) {
   
   #' Rename the set of column names and only keep the columns that are of use
 
-  df %>% 
+  df[,c(1,2,4,5,9:12,15)] %>% 
     # keep only columns of use
-    dplyr::select(
-      `#`, `Farm # on  Map`, `Month`, `Year`, `# fish`, `Chalimus/ fish`,
-      `Motile L.s./ fish`, `Female L.s./ fish`, `Caligus/ fish`
-    ) %>% 
-    # get rid of the bottom rows that are just empty white space
-    dplyr::slice(-(2507:nrow(df))) %>% 
+    # dplyr::select(
+    #   `#`, `Farm # on  Map`, `Month`, `Year`, `# fish`, `Chalimus/ fish`,
+    #   `Motile L.s./ fish`, `Female L.s./ fish`, `Caligus/ fish`
+    # ) %>% 
     # rename the variables to new_names
     dplyr::rename(
       obs_num = `#`,
@@ -168,14 +167,14 @@ farm_names_marty = function(marty_df, farm_df) {
         ), 
         farm_num = c(seq(1, 9, 1), seq(11, 26, 1))),
         # other dataframe here is the DFO farm reference numbers dataframe
-        farm_df %>% dplyr::select(ref, name),
+        data.frame(farm_df),
         # by argument for inside left_join
         by = c("farm_name" = "name")
       ),
     by = "farm_num"
   ) %>% 
     # get rid of NA_12 and NA_14 since they don't have any data 
-    dplyr::filter(farm_name != c("NA_12", "NA_14")) %>% 
+    dplyr::filter(farm_name %notin% c("NA_12", "NA_14")) %>% 
     dplyr::rename(farm_ref = ref)
 }
 
@@ -189,22 +188,28 @@ write_data_marty = function(df, file) {
   readr::write_csv(df, file)
 }
 
-clean_data_marty = function(raw_file, sheet_number, dfo_file, output_path) {
+clean_data_marty = function(raw_file, dfo_file, output_path) {
   
   #' Compile helper functions above together to take the raw excel sheet from 
   #' Marty et al. (2010 - PNAS) and turn it into a cleaned .csv file ready 
   #' to be used in further analysis 
   
   # read in raw excel 
-  get_data_marty(raw_file, sheet_number) %>% 
-    # trim out unneeded columns and rename columns
-    trim_marty_data(.) %>% 
-    # fix the farm names
-    farm_names_marty(., dfo_file) %>% 
-    # fix the months so they can match up later
-    fix_months(.) %>% 
-    # fix the months so they can match up later
-    write_data_marty(., output_path)
+  # get_data_marty(raw_file) %>% 
+  #   # trim out unneeded columns and rename columns
+  #   trim_marty_data(.) %>% 
+  #   # fix the farm names
+  #   farm_names_marty(., dfo_file) %>% 
+  #   # fix the months so they can match up later
+  #   fix_months(.) %>% 
+  #   # fix the months so they can match up later
+  #   write_data_marty(., output_path)
+  df = get_data_marty(raw_file)
+  trim_df = trim_marty_data(df)
+  farm_names = farm_names_marty(trim_df, get_data_dfo_ref(dfo_file))
+  months = fix_months(farm_names)
+  write_data_marty(months, output_path)
+  
 }
 
 # bati-data specific functions =================================================
@@ -216,7 +221,7 @@ get_data_bati = function(file) {
   
   #' Read in the BATI dataset from the raw file 
   
-  readr::read_csv(file)
+  readr::read_csv(file, show_col_types = FALSE)
 }
 
 #############################

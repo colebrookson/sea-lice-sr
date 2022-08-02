@@ -1,11 +1,10 @@
 library(here)
-library(tidyvers)
+library(tidyverse)
 source("./R/functions_farm_data_cleaning.R")
 
 clean_data_marty(
- raw_file = here::here("./data/farm-data/raw/marty-2010-data/sd01.xlsx"),
- sheet_number = 2,
- dfo_file = get_data_dfo_ref(here::here("./data/farm-data/raw/farm-name-reference.csv")),
+ raw_file = here::here("./data/farm-data/raw/marty-2010-data/marty-data-copied.csv"),
+ dfo_file = here::here("./data/farm-data/raw/farm-name-reference.csv"),
  output_path = here::here("./data/farm-data/clean/marty-data-clean.csv")
 )
 
