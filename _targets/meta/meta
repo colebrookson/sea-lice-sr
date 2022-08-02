@@ -2,8 +2,9 @@ name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iterat
 .Random.seed|object|ee2e23219684eccb|||||||||||||||
 %notin%|function|c5de772db35799a7|||||||||||||||
 bati_data|stem|39d1cfc679ac56a8|15cf45363a6e2bf3|1ddc461cb99852a1|499463961||t19206.2935228711s|46458c79ba623acd|48901|rds|local|vector|||0.088||
+calculate_missing_averages|function|2dead9817edfb357|||||||||||||||
 clean_data_bati|function|e46a928529838a5c|||||||||||||||
-clean_data_marty|function|4db48a292bbc2337|||||||||||||||
+clean_data_marty|function|3a93bfd4c0aef7b3|||||||||||||||
 df|object|de6a0928ab3ebb22|||||||||||||||
 dfo_farm_ref_data|stem|02aa0092b5469095|84f590bceeb6cea2|c3b5fc02cdc369c1|-1486775753|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/farm-name-reference.csv|t19205.9599767471s|54f0cde7a83f527b|7999|file|local|vector|||0.218||
 dfo_file|object|a999c69c8fb5fac0|||||||||||||||
@@ -11,17 +12,24 @@ farm_df|object|a999c69c8fb5fac0|||||||||||||||
 farm_names_bati|function|72589cb21f7ae795|||||||||||||||
 farm_names_marty|function|dc64f9017565c4ea|||||||||||||||
 file|object|39b1a29d58e81d5f|||||||||||||||
+fill_in_missing_inventories|stem||b009b4206a3e43f4|b6ddf6126aa3a136|937209866||t19206.3419435569s||0|rds|local|vector|||0.278||can only read from a binary connection
+fill_in_missing_inventory_data|function|b39c70274ed9562c|||||||||||||||
 fix_months|function|ae0b59aeb50159d7|||||||||||||||
 get_data_bati|function|f55fbb93cbb1e4ef|||||||||||||||
+get_data_dfo_open|function|f55fbb93cbb1e4ef|||||||||||||||
 get_data_dfo_ref|function|23997d3025932882|||||||||||||||
 get_data_marty|function|f55fbb93cbb1e4ef|||||||||||||||
-marty_data|stem|c4ab7ec277269254|15c300f56e5a141a|ba992c2f2d1765c2|-2054066338||t19206.2970866809s|23ba7cf05e073bd5|26387|rds|local|vector|||0.252||
+get_data_marty_cleaned|function|f55fbb93cbb1e4ef|||||||||||||||
+marty_data|stem|c4ab7ec277269254|480b14f0679f7986|d966a481dcf82bb6|-2054066338||t19206.3608842097s|23ba7cf05e073bd5|26387|rds|local|vector|||0.223||
 marty_df|object|3a45d93842d4016a|||||||||||||||
 raw_data_file_bati|stem|6d96959c79df455c|62384c9ea6781323|c3b5fc02cdc369c1|1852314142|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/BATI_farm_louse_data_raw.csv|t19205.9567149792s|d77d99e406208760|235133|file|local|vector|||0||
 raw_data_file_marty|stem|42b6c4186aaf3c0a|b5fe940b90e237f5|c3b5fc02cdc369c1|711235436|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/marty-2010-data/marty-data-copied.csv|t19206.2643899503s|75969f2ee2633e1c|207114|file|local|vector|||0.243||
 raw_file|object|6dc53415d1551df7|||||||||||||||
+raw_open_dfo_data|stem|0678236ff26e6aa8|59391ac5a229611a|33217b43f1415251|-2026564613|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/canadian-gov-open-data/fish-farm-sea-louse-counts-data.csv|t19198.283145907s|416a24a875ba145b|2394595|file|local|vector|||0.225||
 standardize_names|function|df4fc583e60014a9|||||||||||||||
 temp|object|de6a0928ab3ebb22|||||||||||||||
+trim_clean_dfo_open_data|function|4ba8a87d360359c3|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
 write_data_bati|function|bfa517e14148f2ec|||||||||||||||
 write_data_marty|function|bfa517e14148f2ec|||||||||||||||
+write_dfo_filled_missing_data|function|bfa517e14148f2ec|||||||||||||||

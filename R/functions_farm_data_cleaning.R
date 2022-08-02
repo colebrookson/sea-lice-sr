@@ -10,7 +10,7 @@
 ##########
 
 # global functions =============================================================
-
+options(dplyr.summarise.inform = FALSE)
 
 #############################
 # standardize_names() function
@@ -188,7 +188,7 @@ write_data_marty = function(df, file) {
   readr::write_csv(df, file)
 }
 
-clean_data_marty = function(raw_file, dfo_file, output_path) {
+clean_data_marty = function(raw_file, dfo_file) {
   
   #' Compile helper functions above together to take the raw excel sheet from 
   #' Marty et al. (2010 - PNAS) and turn it into a cleaned .csv file ready 
@@ -201,9 +201,9 @@ clean_data_marty = function(raw_file, dfo_file, output_path) {
     # fix the farm names
     farm_names_marty(., dfo_file) %>%
     # fix the months so they can match up later
-    fix_months(.) %>%
+    fix_months(.)
     # fix the months so they can match up later
-    write_data_marty(., output_path)
+   # write_data_marty(., output_path)
 }
 
 # bati-data specific functions =================================================
@@ -272,3 +272,147 @@ clean_data_bati = function(raw_file, dfo_path, output_path) {
     farm_names_bati(., get_data_dfo_ref(dfo_path)) %>% 
     write_data_bati(., output_path)
 }
+
+# DFO farm data cleaning functions =============================================
+
+#############################
+# get_data_marty_cleaned() function
+#############################
+get_data_marty_cleaned = function(file) {
+  
+  #' Read in cleaned and prepped Marty (2010) data
+  
+  readr::read_csv(file, show_col_types = FALSE)
+}
+
+#############################
+# get_data_dfo_open() function
+#############################
+get_data_dfo_open = function(file) {
+  
+  #' Read in data from open DFO website on average lice counts
+  
+  readr::read_csv(file, show_col_types = FALSE)
+}
+
+#############################
+# calculate_missing_averages() function
+#############################
+calculate_missing_averages = function(df) {
+  
+  #' Using the cleaned Marty (2010) data, calculate the inventory averages
+  #' during the time periods we need to fill in for dates post-2009, for farms
+  #' outside of BATI control. These farms we have lice data for from open DFO
+  #' data, but not inventory data, so we have to extrapolate
+  
+  df %>% 
+    # keep only farms that are in our list of 4 farms that have missing data
+    dplyr::filter(
+      farm_name %in% c("Maude Island", "Wehlis Bay", "Simmonds Point",
+                       "Noo-la")
+    ) %>% 
+    # shrink df down
+    dplyr::select(
+      inventory, month, year, farm_name, farm_ref
+    ) %>% 
+    # now filter down to just the months we want
+    dplyr::filter(
+      month %in% c(3, 4)
+    ) %>% 
+    # now group by month and farm name to use summarize
+    dplyr::group_by(
+      month, farm_name, farm_ref
+    ) %>% 
+    # summarize to get a mean inventory across each month/farm combo
+    dplyr::summarize(
+      mean_inventory = mean(inventory, na.rm = TRUE),
+      message = FALSE
+    )
+}
+
+#############################
+# trim_clean_dfo_open_data() function
+#############################
+trim_clean_dfo_open_data = function(dfo_df, clean_marty_df) {
+  
+  #' Summarise from the open DFO data, the information for the four missing 
+  #' farms that we want information for 
+  
+  dfo_df %>% 
+    # rename first for easier referencing
+    dplyr::rename(
+      year = Year, month = Month, farm_name = `Site Common Name`, 
+      lep_av = `Average L. salmonis females per fish`,
+      cal_av = `Average caligus per fish`
+    ) %>% 
+    # keep relevant columns only
+    dplyr::select(
+      year, month, farm_name, lep_av, cal_av
+    ) %>% 
+    # keep only the farms we want
+    dplyr::filter(
+      farm_name %in% c("Maude Island", "Wehlis Bay", "Simmonds Point",
+                       "Noo-la")
+    ) %>% 
+    # keep only the months we want
+    dplyr::filter(
+      month %in% c("March", "April")
+    ) %>% 
+    # get an average value for each month/year/farm combo 
+    dplyr::group_by(farm_name, year, month) %>% 
+    dplyr::summarize(
+      lep_av = mean(lep_av, na.rm = TRUE),
+      cal_av = mean(cal_av, na.rm = TRUE),
+      message = FALSE
+    ) %>% 
+    # rename the months to numbers for consistency & make other import. columns
+    dplyr::mutate(
+      month = ifelse(month == "March", 3, 4),
+      ktc = "Broughton", 
+      hump_sarg_doc = "Other"
+    ) %>% 
+    # now join with the mean inventory calculations from the clean marty df
+    dplyr::left_join(
+      x = .,
+      y = calculate_missing_averages(clean_marty_df),
+      by = c("month", "farm_name")
+    ) %>% 
+    # rename for consistency
+    dplyr::rename(inventory = mean_inventory) %>% 
+    # now calculate total caligus and l. salmonis counts 
+    dplyr::mutate(
+      lep_tot = inventory * lep_av,
+      cal_tot = inventory * cal_av
+    ) %>% 
+    # sort names for easy joining
+    dplyr::select(
+      sort(names(.))
+    )
+}
+
+#############################
+# write_dfo_filled_missing_data() function
+#############################
+write_dfo_filled_missing_data = function(df, file) {
+  
+  #' Write out file of DFO/Marty (2010) paired data which fills in inventory
+  #' gaps with extrapolated info 
+  
+  readr::write_csv(df, file)
+}
+
+fill_in_missing_inventory_data = function(dfo_df, marty_df) {
+  
+  #' Use helper functions to fill in the missing inventory data for four 
+  #' farms post 2009 with averages from pre-2009 for inventory data, and DFO 
+  #' open data on lice averages 
+  
+  get_data_dfo_open(dfo_df) %>% 
+    # perform all trimming and preparing
+    trim_clean_dfo_open_data(., 
+        # use cleaning function here to prep marty_df for this join
+        get_data_marty_cleaned(marty_df)) %>% 
+    # write out result
+    write_dfo_filled_missing_data(.)
+}
+
