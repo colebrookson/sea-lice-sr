@@ -194,22 +194,16 @@ clean_data_marty = function(raw_file, dfo_file, output_path) {
   #' Marty et al. (2010 - PNAS) and turn it into a cleaned .csv file ready 
   #' to be used in further analysis 
   
-  # read in raw excel 
-  # get_data_marty(raw_file) %>% 
-  #   # trim out unneeded columns and rename columns
-  #   trim_marty_data(.) %>% 
-  #   # fix the farm names
-  #   farm_names_marty(., dfo_file) %>% 
-  #   # fix the months so they can match up later
-  #   fix_months(.) %>% 
-  #   # fix the months so they can match up later
-  #   write_data_marty(., output_path)
-  df = get_data_marty(raw_file)
-  trim_df = trim_marty_data(df)
-  farm_names = farm_names_marty(trim_df, get_data_dfo_ref(dfo_file))
-  months = fix_months(farm_names)
-  write_data_marty(months, output_path)
-  
+  # read in raw file 
+  get_data_marty(raw_file) %>%
+    # trim out unneeded columns and rename columns
+    trim_marty_data(.) %>%
+    # fix the farm names
+    farm_names_marty(., dfo_file) %>%
+    # fix the months so they can match up later
+    fix_months(.) %>%
+    # fix the months so they can match up later
+    write_data_marty(., output_path)
 }
 
 # bati-data specific functions =================================================
