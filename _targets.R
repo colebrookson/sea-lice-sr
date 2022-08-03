@@ -24,17 +24,22 @@ list(
              here::here("./data/farm-data/raw/farm-name-reference.csv"),
              format = "file"),
   tar_target(raw_data_file_bati,
-             here::here("./data/farm-data/raw/BATI_farm_louse_data_raw.csv"),
+             here::here("./data/farm-data/raw/BATI_farm_louse_data_RAW.csv"),
              format = "file"),
   tar_target(raw_open_dfo_data,
              here::here(
-               paste0("./data/farm-data/raw/canadian-gov-open-data/",
-                  "fish-farm-sea-louse-counts-data.csv")),
+    "./data/farm-data/raw/gov-open-data/fish-farm-sea-louse-counts-data.csv"),
              format = "file"),
+  tar_target(clean_open_dfo_data,
+             clean_dfo_open_data(
+               get_data_dfo_open(raw_open_dfo_data),
+               here::here("./data/farm-data/clean/dfo-open-data-clean.csv")
+             )),
   tar_target(marty_data,
              clean_data_marty(
                raw_data_file_marty,
-               get_data_dfo_ref(dfo_farm_ref_data)),
+               get_data_dfo_ref(dfo_farm_ref_data),
+               here::here("./data/farm-data/clean/marty-data-clean.csv")),
              format = "rds"),
                #here::here("./data/farm-data/clean/marty-data-clean.csv"))),
   tar_target(bati_data,
@@ -44,8 +49,17 @@ list(
                here::here("./data/farm-data/clean/bati-data-clean.csv"))),
   tar_target(fill_in_missing_inventories,
              fill_in_missing_inventory_data(
-               raw_open_dfo_data, 
-               marty_data
+               clean_open_dfo_data, 
+               get_data_marty_cleaned(
+                 here::here("./data/farm-data/clean/marty-data-clean.csv")),
+               here::here(
+                 "./data/farm-data/clean/missing-inventory-filled-data.csv")
+             )),
+  tar_target(fill_in_late_timeseries_inventories,
+             match_inventory_data(
+               bati_data,
+               clean_open_dfo_data,
+               here::here("./data/farm-data/clean/wakwa-tsaya-inventory.csv")
              ))
 )
 # tar_make(callr_function = NULL, names = any_of("marty_data"), 

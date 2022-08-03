@@ -188,7 +188,7 @@ write_data_marty = function(df, file) {
   readr::write_csv(df, file)
 }
 
-clean_data_marty = function(raw_file, dfo_file) {
+clean_data_marty = function(raw_file, dfo_file, output_path) {
   
   #' Compile helper functions above together to take the raw excel sheet from 
   #' Marty et al. (2010 - PNAS) and turn it into a cleaned .csv file ready 
@@ -201,9 +201,9 @@ clean_data_marty = function(raw_file, dfo_file) {
     # fix the farm names
     farm_names_marty(., dfo_file) %>%
     # fix the months so they can match up later
-    fix_months(.)
+    fix_months(.) %>% 
     # fix the months so they can match up later
-   # write_data_marty(., output_path)
+    write_data_marty(., output_path)
 }
 
 # bati-data specific functions =================================================
@@ -296,16 +296,47 @@ get_data_dfo_open = function(file) {
 }
 
 #############################
+# clean_dfo_open_data() function
+#############################
+clean_dfo_open_data = function(df, output_file) {
+  
+  #' Function to read in messy DFO data, clean it, and write it out 
+  df %>% 
+    # rename first for easier referencing
+    dplyr::rename(
+      year = Year, month = Month, farm_name = "Site Common Name", 
+      lep_av = "Average L. salmonis females per fish",
+      cal_av = "Average caligus per fish",
+      ref = "Facility Reference Number"
+    ) %>% 
+    # keep relevant columns only
+    dplyr::select(
+      year, month, farm_name, lep_av, cal_av, ref
+    ) %>%       
+    # perform quick join to get months in number format
+    dplyr::left_join(.,
+                   data.frame(
+                     month = unique(.$month),
+                     month_num = seq(1,12,1)
+                   ),
+                   by = "month") %>% 
+    dplyr::select(-month) %>% 
+    dplyr::rename(month = month_num) %>% 
+    readr::write_csv(., output_file)
+    
+}
+
+#############################
 # calculate_missing_averages() function
 #############################
-calculate_missing_averages = function(df) {
+calculate_missing_averages = function(marty_df) {
   
   #' Using the cleaned Marty (2010) data, calculate the inventory averages
   #' during the time periods we need to fill in for dates post-2009, for farms
   #' outside of BATI control. These farms we have lice data for from open DFO
   #' data, but not inventory data, so we have to extrapolate
   
-  df %>% 
+  marty_df %>% 
     # keep only farms that are in our list of 4 farms that have missing data
     dplyr::filter(
       farm_name %in% c("Maude Island", "Wehlis Bay", "Simmonds Point",
@@ -325,30 +356,19 @@ calculate_missing_averages = function(df) {
     ) %>% 
     # summarize to get a mean inventory across each month/farm combo
     dplyr::summarize(
-      mean_inventory = mean(inventory, na.rm = TRUE),
-      message = FALSE
+      mean_inventory = mean(inventory, na.rm = TRUE)
     )
 }
 
 #############################
 # trim_clean_dfo_open_data() function
 #############################
-trim_clean_dfo_open_data = function(dfo_df, clean_marty_df) {
+trim_clean_dfo_open_data = function(dfo_df, marty_df) {
   
   #' Summarise from the open DFO data, the information for the four missing 
   #' farms that we want information for 
   
-  temp = dfo_df %>% 
-    # rename first for easier referencing
-    dplyr::rename(
-      year = Year, month = Month, farm_name = `Site Common Name`, 
-      lep_av = `Average L. salmonis females per fish`,
-      cal_av = `Average caligus per fish`
-    ) %>% 
-    # keep relevant columns only
-    dplyr::select(
-      year, month, farm_name, lep_av, cal_av
-    ) %>% 
+  dfo_df %>% 
     # keep only the farms we want
     dplyr::filter(
       farm_name %in% c("Maude Island", "Wehlis Bay", "Simmonds Point",
@@ -362,8 +382,7 @@ trim_clean_dfo_open_data = function(dfo_df, clean_marty_df) {
     dplyr::group_by(farm_name, year, month) %>% 
     dplyr::summarize(
       lep_av = mean(lep_av, na.rm = TRUE),
-      cal_av = mean(cal_av, na.rm = TRUE),
-      message = FALSE
+      cal_av = mean(cal_av, na.rm = TRUE)
     ) %>% 
     # rename the months to numbers for consistency & make other import. columns
     dplyr::mutate(
@@ -374,7 +393,7 @@ trim_clean_dfo_open_data = function(dfo_df, clean_marty_df) {
     # now join with the mean inventory calculations from the clean marty df
     dplyr::left_join(
       x = .,
-      y = calculate_missing_averages(clean_marty_df),
+      y = calculate_missing_averages(marty_df),
       by = c("month", "farm_name")
     ) %>% 
     # rename for consistency
@@ -390,14 +409,6 @@ trim_clean_dfo_open_data = function(dfo_df, clean_marty_df) {
     )
 }
 
-add_late_timeseries_missing_farms = function(dfo_df, bati_df) {
-  
-  #' Use the inventory data from the bati_df dataset to extrapolate some 
-  #' guestimate inventory data for the two farms that appear later in the 
-  #' timeseries but don't have any inventory data: Wa-kwa & Tsa-ya
-  
-  
-}
 #############################
 # write_dfo_filled_missing_data() function
 #############################
@@ -409,20 +420,92 @@ write_dfo_filled_missing_data = function(df, file) {
   readr::write_csv(df, file)
 }
 
-fill_in_missing_inventory_data = function(dfo_df, marty_df) {
+fill_in_missing_inventory_data = function(dfo_df, marty_df, output_file) {
   
   #' Use helper functions to fill in the missing inventory data for four 
   #' farms post 2009 with averages from pre-2009 for inventory data, and DFO 
   #' open data on lice averages 
   
-  get_data_dfo_open(dfo_df) %>% 
+  dfo_df %>% 
     # perform all trimming and preparing
-    trim_clean_dfo_open_data(., 
-        # use cleaning function here to prep marty_df for this join
-        get_data_marty_cleaned(marty_df)) %>% 
+    trim_clean_dfo_open_data(., marty_df) %>% 
     # write out result
-    write_dfo_filled_missing_data(.)
+    write_dfo_filled_missing_data(., output_file)
 }
 
-# all farm combining functions =================================================
+# missing inventory data for late timeseries farms functions ===================
 
+match_inventory_data = function(bati_df, dfo_df, output_path) {
+  
+  #' Check when we have no inventory if there is a lice measurement for that 
+  #' time period 
+  
+  # make df with the lep mean measures for the months that there is at least 
+  # one count for 
+  dfo_df %>% 
+    # filter both the months we want and only the farms in the BATI data
+    dplyr::filter(month %in% c(3,4) &
+                    ref %in% bati_df$ref
+    ) %>% 
+    dplyr::group_by(
+      month, year, ref
+    ) %>% 
+    dplyr::summarize(
+      lep_av = mean(lep_av, na.rm = TRUE)
+    ) %>% 
+    # need to ungroup to use the complete() function
+    dplyr::ungroup() %>% 
+    tidyr::complete(
+      ., year, month, ref
+    ) %>% 
+    # make a column for the inventory data to come in from 
+    #dplyr::mutate(inventory = vector(mode = "numeric", length = nrow(.))) %>% 
+    # left join to BATI data to get inventory data
+    dplyr::left_join(.,
+                     bati_df %>% 
+                       dplyr::select(ref, month, year, inventory, farm_name),
+                     by = c("ref", "month", "year")
+    ) %>% 
+    unique() %>% 
+    # ungroup to regroup 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(
+      ref, month
+    ) %>% 
+    # get one value for each farm/month combo 
+    dplyr::summarize(
+      inventory = mean(inventory, na.rm = TRUE)
+    ) %>% 
+    # keep out the broodstock farms - cecil, cyprus, and pott's bay 
+    dplyr::filter(
+      ref %notin% c(1145, 458, 819)
+    ) %>% 
+    # ungroup and group again
+    dplyr::ungroup() %>% 
+    # get rid of farm identifiers so it's just month and inventory
+    dplyr::select(
+      -ref
+    ) %>% 
+    dplyr::group_by(month) %>% 
+    # get just two monthly averages
+    dplyr::summarize(
+      inventory = mean(inventory)
+    ) %>% 
+    # now join back to the dfo data, bringing in the other important information
+    dplyr::left_join(.,
+                     dfo_df %>% 
+                       # Tsa-ya is 7273 and Wa-kwa is 1839
+                       dplyr::filter(ref %in% c(7273, 1839) &
+                                       month %in% c(3, 4)) %>% 
+                       dplyr::group_by(year, ref, month, farm_name) %>% 
+                       dplyr::summarize(lep_av = mean(lep_av, na.rm = TRUE)) %>% 
+                       dplyr::filter(!is.nan(lep_av)),
+                     by = c("month")) %>% 
+    # add in other columns that are handy to have in 
+    dplyr::mutate(
+      lep_tot = inventory * lep_av,
+    ) %>% 
+    # write the result for future use
+    readr::write_csv(.,
+                     output_path)
+}

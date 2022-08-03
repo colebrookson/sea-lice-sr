@@ -9,6 +9,11 @@ clean_data_marty(
  output_path = here::here("./data/farm-data/clean/marty-data-clean.csv")
 )
 
+marty_df = read_csv(here("./data/farm-data/clean/marty-data-clean.csv"))
+dfo_df = read_csv(here::here(
+  paste0("./data/farm-data/raw/canadian-gov-open-data/",
+         "fish-farm-sea-louse-counts-data.csv")))
+
 
 
 bati_df = get_data_bati(here::here(
@@ -39,8 +44,9 @@ dfo_df = read_csv(here::here(
   paste0("./data/farm-data/raw/canadian-gov-open-data/",
          "fish-farm-sea-louse-counts-data.csv"))) %>% 
   rename(year = Year, month = Month, ref = `Facility Reference Number`,
-         lep_av = `Average L. salmonis females per fish`) %>% 
-  select(year, month, ref, lep_av) %>% 
+         lep_av = `Average L. salmonis females per fish`,
+         farm_name = `Site Common Name`) %>% 
+  select(year, month, ref, lep_av, farm_name) %>% 
   left_join(.,
             data.frame(
               month = unique(.$month),
@@ -73,31 +79,85 @@ match_inventory_data = function(bati_df, dfo_df) {
   #' Check when we have no inventory if there is a lice measurement for that 
   #' time period 
   
-  dfo_df1 = dfo_df %>% 
-    dplyr::filter(month %in% c(3,4)) %>% 
-    group_by(month, year, ref) %>% 
-    summarize(lep_av = mean(lep_av, na.rm = TRUE)) %>% 
-    ungroup()
-  
   # make df with the lep mean measures for the months that there is at least 
   # one count for 
-  value_holder = 
-    complete(dfo_df1, year, month, ref) %>% 
-    mutate(inventory = NA) %>% 
-    filter(ref %in% bati_df$ref) 
-  
-  for(row in seq_len(nrow(value_holder))) {
-    value_holder$inventory[row] = bati_df %>% 
-      filter(year == value_holder$year[row] &
-               month == value_holder$month[row] & 
-               ref == value_holder$ref[row]) %>% 
-      summarize(inventory = mean(inventory, na.rm = TRUE))
-  }
-  
-  value_holder = value_holder %>% 
-    filter(!is.na(lep_av)) %>% 
-    filter(is.na(inventory))
-  
+  dfo_df %>% 
+    # rename the columns we care about in the dfo data 
+    dplyr::rename(year = Year, month = Month, ref = `Facility Reference Number`,
+           lep_av = `Average L. salmonis females per fish`,
+           farm_name = `Site Common Name`) %>% 
+    # keep only relevant columns
+    dplyr::select(year, month, ref, lep_av, farm_name) %>% 
+    # perform quick join to get months in number format
+    dplyr::left_join(.,
+              data.frame(
+                month = unique(.$month),
+                month_num = seq(1,12,1)
+              )) %>% 
+    dplyr::select(-month) %>% 
+    dplyr::rename(month = month_num) %>% 
+    # filter both the months we want and only the farms in the BATI data
+    dplyr::filter(month %in% c(3,4) &
+                    ref %in% bati_df$ref
+      ) %>% 
+    dplyr::group_by(
+      month, year, ref
+      ) %>% 
+    dplyr::summarize(
+      lep_av = mean(lep_av, na.rm = TRUE)
+      ) %>% 
+    # need to ungroup to use the complete() function
+    dplyr::ungroup() %>% 
+    tidyr::complete(
+      ., year, month, ref
+      ) %>% 
+    # make a column for the inventory data to come in from 
+    #dplyr::mutate(inventory = vector(mode = "numeric", length = nrow(.))) %>% 
+    # left join to BATI data to get inventory data
+    dplyr::left_join(.,
+        bati_df %>% 
+          dplyr::select(ref, month, year, inventory, farm_name),
+        by = c("ref", "month", "year")
+      ) %>% 
+    unique() %>% 
+    # ungroup to regroup 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(
+      ref, month
+      ) %>% 
+    # get one value for each farm/month combo 
+    dplyr::summarize(
+      inventory = mean(inventory, na.rm = TRUE)
+      ) %>% 
+    # keep out the broodstock farms - cecil, cyprus, and pott's bay 
+    dplyr::filter(
+      ref %notin% c(1145, 458, 819)
+      ) %>% 
+    # ungroup and group again
+    dplyr::ungroup() %>% 
+    # get rid of farm identifiers so it's just month and inventory
+    dplyr::select(
+      -ref
+    ) %>% 
+    dplyr::group_by(month) %>% 
+    # get just two monthly averages
+    dplyr::summarize(
+      inventory = mean(inventory)
+      ) %>% 
+    # now join back to the dfo data, bringing in the other important information
+    dplyr::left_join(.,
+        dfo_df %>% 
+          # Tsa-ya is 7273 and Wa-kwa is 1839
+          dplyr::filter(ref %in% c(7273, 1839) &
+                          month %in% c(3, 4)) %>% 
+          dplyr::group_by(year, ref, month, farm_name) %>% 
+          dplyr::summarize(lep_av = mean(lep_av, na.rm = TRUE)) %>% 
+          dplyr::filter(!is.nan(lep_av)),
+        by = c("month")) %>% 
+    # add in other columns that are handy to have in 
+    dplyr::mutate(
+      lep_tot = inventory * lep_av,
+    )
 }
 
 ggplot(data = bati_df_ts_comp) +
