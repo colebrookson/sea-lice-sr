@@ -83,17 +83,20 @@ match_inventory_data = function(bati_df, dfo_df) {
   # one count for 
   value_holder = 
     complete(dfo_df1, year, month, ref) %>% 
-    mutate(inventory = NA)
+    mutate(inventory = NA) %>% 
+    filter(ref %in% bati_df$ref) 
   
   for(row in seq_len(nrow(value_holder))) {
-    bati_df %>% 
+    value_holder$inventory[row] = bati_df %>% 
       filter(year == value_holder$year[row] &
                month == value_holder$month[row] & 
-               ref == value_holder$ref[row])
+               ref == value_holder$ref[row]) %>% 
+      summarize(inventory = mean(inventory, na.rm = TRUE))
   }
   
-  
-  
+  value_holder = value_holder %>% 
+    filter(!is.na(lep_av)) %>% 
+    filter(is.na(inventory))
   
 }
 
