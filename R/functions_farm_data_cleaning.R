@@ -412,14 +412,17 @@ trim_clean_dfo_open_data = function(dfo_df, marty_df) {
 #############################
 # write_dfo_filled_missing_data() function
 #############################
-write_dfo_filled_missing_data = function(df, file) {
+write_dfo_filled_missing_data = function(data, file) {
   
   #' Write out file of DFO/Marty (2010) paired data which fills in inventory
   #' gaps with extrapolated info 
   
-  readr::write_csv(df, file)
+  readr::write_csv(data, file)
 }
 
+#############################
+# fill_in_missing_inventory_data() function
+#############################
 fill_in_missing_inventory_data = function(dfo_df, marty_df, output_file) {
   
   #' Use helper functions to fill in the missing inventory data for four 
@@ -435,6 +438,9 @@ fill_in_missing_inventory_data = function(dfo_df, marty_df, output_file) {
 
 # missing inventory data for late timeseries farms functions ===================
 
+#############################
+# match_inventory_data() function
+#############################
 match_inventory_data = function(bati_df, dfo_df, output_path) {
   
   #' Check when we have no inventory if there is a lice measurement for that 
@@ -508,4 +514,166 @@ match_inventory_data = function(bati_df, dfo_df, output_path) {
     # write the result for future use
     readr::write_csv(.,
                      output_path)
+}
+
+# functions to join all farm data together =====================================
+
+# bati_df = read_csv(here("./data/farm-data/clean/bati-data-cleaned.csv"))
+# marty_df = read_csv(here("./data/farm-data/clean/marty-data-clean.csv"))
+# missing_df = read_csv(here("./data/farm-data/clean/missing-inventory-filled-data.csv"))
+# late_df = read_csv(here("./data/farm-data/clean/wakwa-tsaya-inventory.csv"))
+
+#############################
+# join_clean_bati() function
+#############################
+join_clean_bati = function(bati_df) {
+  
+  #' Clean BATI to prepare to join into one dataframe with other data sources
+  
+  bati_df %>% 
+    # add data source identifier
+    dplyr::mutate(
+      data_source = "BATI"
+      ) %>% 
+    dplyr::select(
+      -c(date, cal_av, cal_tot)
+      ) %>% 
+    dplyr::mutate(
+      hump_sarg_doc = dplyr::case_when(
+        farm_name == "Sargeaunt Pass" ~ 1,
+        farm_name == "Doctor Islets"  ~ 1,
+        farm_name == "Humphrey Rock"  ~ 1,
+        TRUE                          ~ 0
+      ),
+      ktc = dplyr::case_when(
+        ref %in% c(728, 821, 1144, 820,
+                   136, 1586, 1086, 1618)  ~ 1,
+        farm_name == "NA_7"               ~ 1,
+        TRUE                              ~ 0
+      ),
+      # also make unique farm/year/month identifier
+      time_place_id = paste(ref, year, month, sep = "_")
+    ) %>% 
+    select(sort(names(.)))
+}
+
+#############################
+# join_clean_marty() function
+#############################
+join_clean_marty = function(marty_df) {
+  
+  #' Clean Marty (2010) to join into one dataframe with other data sources
+  
+  marty_df %>% 
+    dplyr::mutate(
+      data_source = "MARTY"
+      ) %>% 
+    dplyr::filter(
+      month %in% c(3, 4)
+      ) %>% 
+    dplyr::select(
+      -c(obs_num, farm_num, chal_av, lep_av_mot, cal_av)
+      ) %>% 
+    dplyr::rename(
+      ref = farm_ref,
+      lep_av = lep_av_fem
+      ) %>% 
+    dplyr::mutate(
+      hump_sarg_doc = dplyr::case_when(
+        farm_name == "Sargeaunt Pass" ~ 1,
+        farm_name == "Doctor Islets"  ~ 1,
+        farm_name == "Humphrey Rock"  ~ 1,
+        TRUE                          ~ 0
+      ),
+      ktc = dplyr::case_when(
+        ref %in% c(728, 821, 1144, 820,
+                   136, 1586, 1086, 1618)  ~ 1,
+        farm_name == "NA_7"               ~ 1,
+        TRUE                              ~ 0
+      ),
+      lep_tot = inventory * lep_av,
+      # also make unique farm/year/month identifier
+      time_place_id = paste(ref, year, month, sep = "_")
+    ) %>% 
+    select(sort(names(.)))
+}
+
+#############################
+# join_clean_missing() function
+#############################
+join_clean_missing = function(missing_df) {
+  
+  #' Clean missing data from later years for the identified farms 
+  #'  to prepare to join into one dataframe with other data sources
+  
+  missing_df %>% 
+    dplyr::mutate(
+      data_source = "AVG_PREV_YRS"
+      ) %>% 
+    select(
+      -c(cal_av, cal_tot)
+      ) %>% 
+    rename(
+      ref = farm_ref
+      ) %>% 
+    mutate(
+      # also make unique farm/year/month identifier
+      time_place_id = paste(ref, year, month, sep = "_")
+    ) %>% 
+    select(sort(names(.)))
+}
+
+#############################
+# join_clean_late() function
+#############################
+join_clean_late = function(late_df) {
+  
+  #' Clean data from the late farms in the timeseries to prepare to bind all 
+  #' sources of farm data together
+  
+  late_df %>% 
+    dplyr::mutate(
+      data_source = "AVG_ALL_FARMS",
+      ktc = 0,
+      hump_sarg_doc = 0,
+      # also make unique farm/year/month identifier
+      time_place_id = paste(ref, year, month, sep = "_")
+      ) %>% 
+    select(sort(names(.)))
+}
+
+#############################
+# write_data_joined_farm() function
+#############################
+write_data_joined_farm = function(df, output_path) {
+  
+  readr::write_csv(df, output_path)
+}
+
+#############################
+# join_farm_data() function
+#############################
+join_farm_data = function(bati_df, marty_df, missing_df, late_df, output_path) {
+  
+  #' Function to join four data sources. BATI data, which has a good chunk of 
+  #' the data we're using, Marty (2010) data, which has more information 
+  #' earlier in the timeseries, and two others. Here, missing_df is 
+  #' extrapolated data for 4 farms that we don't have inventory data for past
+  #' 2009. In addition, the late_df is the extrapolated inventory data for 
+  #' two farms that popped up late in the timeseries and that we don't have
+  #' any inventory data for at all. Note that I will default to BATI data, 
+  #' then Marty, then the other two can just get joined at the end
+  
+  rbind(
+    join_clean_bati(bati_df),
+    # this is the deferment step
+    join_clean_marty(marty_df) %>% 
+      filter(time_place_id %notin% join_clean_bati(bati_df)$time_place_id),
+    join_clean_missing(missing_df),
+    join_clean_late(late_df)
+    ) %>% 
+    write_data_joined_farm(., output_path)
+
+    
+  
 }

@@ -60,6 +60,15 @@ list(
                bati_data,
                clean_open_dfo_data,
                here::here("./data/farm-data/clean/wakwa-tsaya-inventory.csv")
+             )),
+  tar_target(join_all_farm_data,
+             join_farm_data(
+               bati_data,
+               get_data_marty_cleaned(
+                 here::here("./data/farm-data/clean/marty-data-clean.csv")),
+               fill_in_missing_inventories,
+               fill_in_late_timeseries_inventories,
+               here::here("./data/farm-data/clean/all-farms-joined-clean.csv")
              ))
 )
 # tar_make(callr_function = NULL, names = any_of("marty_data"), 
