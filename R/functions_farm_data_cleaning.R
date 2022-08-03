@@ -338,7 +338,7 @@ trim_clean_dfo_open_data = function(dfo_df, clean_marty_df) {
   #' Summarise from the open DFO data, the information for the four missing 
   #' farms that we want information for 
   
-  dfo_df %>% 
+  temp = dfo_df %>% 
     # rename first for easier referencing
     dplyr::rename(
       year = Year, month = Month, farm_name = `Site Common Name`, 
@@ -390,6 +390,14 @@ trim_clean_dfo_open_data = function(dfo_df, clean_marty_df) {
     )
 }
 
+add_late_timeseries_missing_farms = function(dfo_df, bati_df) {
+  
+  #' Use the inventory data from the bati_df dataset to extrapolate some 
+  #' guestimate inventory data for the two farms that appear later in the 
+  #' timeseries but don't have any inventory data: Wa-kwa & Tsa-ya
+  
+  
+}
 #############################
 # write_dfo_filled_missing_data() function
 #############################
@@ -415,4 +423,6 @@ fill_in_missing_inventory_data = function(dfo_df, marty_df) {
     # write out result
     write_dfo_filled_missing_data(.)
 }
+
+# all farm combining functions =================================================
 
