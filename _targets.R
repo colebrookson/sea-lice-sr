@@ -35,6 +35,11 @@ list(
                get_data_dfo_open(raw_open_dfo_data),
                here::here("./data/farm-data/clean/dfo-open-data-clean.csv")
              )),
+  tar_target(scfs_raw_data_file,
+             here::here(
+               paste0("./data/wild-lice-data/raw/Sea-lice-database-master/",
+                      "Data/BroughtonSeaLice_fishData.csv")),
+             format = "file"),
   tar_target(marty_data,
              clean_data_marty(
                raw_data_file_marty,
