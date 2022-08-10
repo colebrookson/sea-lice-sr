@@ -32,7 +32,7 @@ clean_scfs_data = function(df) {
     # remove bad characters and make names standrdized
     standardize_names() %>% 
     dplyr::rowwise() %>% 
-    dplyr::elect(year, unid_cope, lep_cope, cal_cope, lep_cope, chala, chalb, 
+    dplyr::select(year, unid_cope, lep_cope, cal_cope, lep_cope, chala, chalb, 
            chal_unid, lep_pamale, lep_male, lep_nongravid, lep_gravid,
            lep_pafemale, cal_mot, cal_gravid, unid_adult, unid_pa) %>% 
     # IMPORTANT - make all NA values zeros since they're true zeros 
@@ -61,8 +61,7 @@ summary_columns = function(df) {
         na.rm = TRUE),    
       # all motiles
       all_mot = sum(
-          c(lep_pamale, 
-            lep_male, lep_nongravid, lep_gravid, lep_pafemale,
+          c(lep_pamale, lep_male, lep_nongravid, lep_gravid, lep_pafemale,
             cal_mot, cal_gravid, unid_pa),
           na.rm = TRUE),
       # all copes
@@ -80,7 +79,7 @@ summary_columns = function(df) {
     )
 }
 
-
+write_csv(scfs_df_all_col, here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
 
 pred_data_points_mot = data.frame(
   all_mot = seq(0,24,0.01)
