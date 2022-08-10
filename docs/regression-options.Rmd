@@ -1,0 +1,142 @@
+---
+title: "log-regression-attempt"
+author: "Cole Brookson"
+date: '2022-08-09'
+output: html_document
+---
+
+```{r}
+raw_df = read.csv(here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
+```
+
+We care about only a handful of columns - those that distinguish all of the motiles, all of the copepodites, and the proportions of leps for both of those. 
+```{r}
+raw_df = raw_df[, c("year", "prop_lep_mot", "prop_lep_cope", "all_mot", "all_cope")]
+
+# also remove all of 2001
+df = raw_df[which(raw_df$year != 2001),]
+df_2001 = raw_df[which(raw_df$year == 2001),]
+```
+
+We can look at how the proportions lie out against the raw data: 
+```{r}
+plot(x = jitter(df$all_mot, 5), y = jitter(df$prop_lep_mot, 5), 
+     col = "black", 
+     bg = "red",
+     pch = 21, 
+     cex = 0.7, 
+     xlab = "Number of All Motiles",
+     ylab = "Proportion of L. salmonis")
+```
+```{r}
+plot(x = jitter(df$all_cope, 5), y = jitter(df$prop_lep_cope, 5), 
+     col = "black", 
+     bg = "blue",
+     pch = 21, 
+     cex = 0.7, 
+     xlab = "Number of All Copepodites",
+     ylab = "Proportion of L. salmonis")
+```
+
+Here are the values of just the proportions in a histogram: 
+
+```{r}
+hist(df$prop_lep_cope,
+     xlab = "Proportion of Copepodids that are L. salmonis",
+     main = "")
+```
+
+```{r}
+hist(df$prop_lep_mot,
+     xlab = "Proportion of Motiles that are L. salmonis",
+     main = "")
+```
+
+
+
+To fit our logistic regression, we simply pass our proportion as the response variable. **Note importantly here, this is a regression with the proportion against all motiles, NOT all lice, just all motiles, as described in the scenarios document.**
+
+```{r}
+# motile regression
+mot_reg = glm(prop_lep_mot ~ all_mot, 
+              # binomial family 
+              family = binomial(link = "logit"),
+              data = df)
+# cope regression 
+cope_reg = glm(prop_lep_cope ~ all_cope,
+               # binomial family
+               family = binomial(link = "logit"),
+               data = df)
+
+# look at the output of both:
+summary(mot_reg)
+summary(cope_reg)
+```
+
+Get predicted values:
+
+```{r}
+# find max of both raw values:
+max_mot = max(df$all_mot)
+max_cope = max(df$all_cope)
+
+# make sequence of values to predict on
+mot_seq = data.frame(all_mot = seq(0, max_mot, 
+                                   # use this "by" to make it the same length as the df
+                                   0.0005422381))
+cope_seq = data.frame(all_cope = seq(0, max_cope, 
+                                     # same here for the "by"
+                                     0.0004292719))
+
+# make prediction for mots
+pred_mot = data.frame(
+  all_mots = mot_seq$all_mot,
+  pred_prop = stats::predict(
+    mot_reg, 
+    mot_seq,
+    type = "response")
+)
+pred_mot_2001 = data.frame(
+  all_mot = df_2001[which(!is.na(df_2001$all_mot)), "all_mot"],
+  pred_prop = stats::predict(
+    mot_reg,
+    data.frame(all_mot = df_2001[which(!is.na(df_2001$all_mot)), "all_mot"]),
+    type = "response")
+)
+
+# make prediction for copes
+pred_copes = data.frame(
+  all_copes = cope_seq$all_cope,
+  # predicted column
+  pred_prop = stats::predict(
+    cope_reg,
+    cope_seq,
+    type = "response")
+)
+
+```
+
+Now make prediction plots: 
+```{r}
+library(ggplot2)
+
+ggplot() + 
+  geom_point(data = df, aes(x = all_mot, y = prop_lep_mot), 
+             shape = 21,
+             colour = "black",
+             fill = "red2",
+             alpha = 0.3,
+             position = position_jitter()) +
+  geom_line(data = pred_mot, aes(x = all_mots, y = pred_prop)) + 
+  geom_point(data = pred_mot_2001, aes(x = all_mot, y = pred_prop),
+             shape = 21,
+             colour = "black",
+             fill = "purple",
+             size = 2,
+             position = position_jitter()) +
+  theme_bw() + 
+  geom_vline(aes(xintercept = 3.44), colour = "blue") +
+  labs(x = "Number of All Motiles", y = "Proportion of L. salmonis") +
+  scale_size_manual(values = c(3, 1))
+```
+The plot above is for motiles, the black line is the regression prediction line, and the blue horizontal line shows what the estimate will be based on just that model for 3.44 motiles, which is the average of the 
