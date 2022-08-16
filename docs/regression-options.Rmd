@@ -6,6 +6,9 @@ output: html_document
 ---
 
 ```{r}
+library(tidyverse)
+library(here)
+
 raw_df = read.csv(here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
 ```
 
@@ -94,15 +97,9 @@ pred_mot = data.frame(
   pred_prop = stats::predict(
     mot_reg, 
     mot_seq,
-    type = "response")
+    type = "response",
+    se.fit = TRUE)
 )
-# pred_mot_2001 = data.frame(
-#   all_mot = df_2001[which(!is.na(df_2001$all_mot)), "all_mot"],
-#   pred_prop = stats::predict(
-#     mot_reg,
-#     data.frame(all_mot = df_2001[which(!is.na(df_2001$all_mot)), "all_mot"]),
-#     type = "response")
-# )
 
 # make prediction for copes
 pred_copes = data.frame(
@@ -111,17 +108,18 @@ pred_copes = data.frame(
   pred_prop = stats::predict(
     cope_reg,
     cope_seq,
-    type = "response")
+    type = "response", 
+    se.fit = TRUE)
 )
 
-# pred_cope_2002_2004 = data.frame(
-#   all_cope = df_2002_2004[which(!is.na(df_2002_2004$all_cope)), "all_cope"],
-#   pred_prop = stats::predict(
-#     cope_reg,
-#     data.frame(all_cope = df_2002_2004[which(!is.na(df_2002_2004$all_cope)), "all_cope"]),
-#     type = "response")
-# )
+# add in 95% CI's
+pred_mot$pred_prop = pred_mot$pred_prop.fit
+pred_mot$lower = pred_mot$pred_prop.fit - 1.96*pred_mot$pred_prop.se.fit
+pred_mot$upper = pred_mot$pred_prop.fit + 1.96*pred_mot$pred_prop.se.fit
 
+pred_copes$pred_prop = pred_copes$pred_prop.fit
+pred_copes$lower = pred_copes$pred_prop.fit - 1.96*pred_copes$pred_prop.se.fit
+pred_copes$upper = pred_copes$pred_prop.fit + 1.96*pred_copes$pred_prop.se.fit
 ```
 
 Now make prediction plots: 
@@ -137,19 +135,15 @@ ggplot() +
              fill = "red2",
              alpha = 0.1,
              position = position_jitter()) +
+    geom_ribbon(data = pred_mot, aes(x = all_mots, ymin = lower, ymax = upper),
+              fill = "grey80") +
   geom_line(data = pred_mot, aes(x = all_mots, y = pred_prop)) + 
-  # geom_point(data = pred_mot_2001, aes(x = all_mot, y = pred_prop),
-  #            shape = 21,
-  #            colour = "black",
-  #            fill = "purple",
-  #            size = 2,
-  #            position = position_jitter()) +
   theme_bw() + 
-  geom_vline(aes(xintercept = 2.175373), colour = "blue") +
+  #geom_vline(aes(xintercept = 2.175373), colour = "blue") +
   labs(x = "Number of All Motiles", y = "Proportion of L. salmonis") +
   scale_size_manual(values = c(3, 1))
 ```
-The plot above is for motiles, the black line is the regression prediction line. The mean value for the number of motiles in 2001 is 2.175373, and that is denoted by the blue vertical line.
+The plot above is for motiles, the black line is the regression prediction line. 
 
 ## Prediction Plot for Copes
 
@@ -161,8 +155,71 @@ ggplot() +
              fill = "blue",
              alpha = 0.3,
              position = position_jitter()) +
+      geom_ribbon(data = pred_copes, aes(x = all_copes, ymin = lower, ymax = upper),
+              fill = "grey80") +
   geom_line(data = pred_copes, aes(x = all_copes, y = pred_prop)) + 
-  # geom_point(data = pred_cope_2002_2004, aes(x = all_cope, y = pred_prop),
+  theme_bw() + 
+  #geom_vline(aes(xintercept = 2.175373), colour = "blue") +
+  labs(x = "Number of All Copepodites", y = "Proportion of L. salmonis") +
+  scale_size_manual(values = c(3, 1))
+```
+
+
+**NOTE:** There are two options from this point - since the regression is on the scale of the number of lice on single fish, not regarding year, I can simply take the projection of the model, apply the model prediction to each data point in the years we are extrapolating to and then average those predictions. 
+
+```{r}
+# make projection for each of the new values in the new years
+
+## motile model prediction:
+# make prediction for mots
+mot_2001_pred = cbind(
+  df_2001,
+  pred_prop = stats::predict(
+    mot_reg, 
+    data.frame(all_mot = df_2001$all_mot),
+    type = "response")
+)
+
+## copes model prediction:
+cope_2002_2004_pred = data.frame(
+  df_2002_2004,
+  # predicted column
+  pred_prop = stats::predict(
+    cope_reg,
+    data.frame(all_cope = df_2002_2004$all_cope),
+    type = "response")
+)
+
+```
+
+The values that we want are the proportion of the `unid_adult` and `unid_cope` that are leps: 
+```{r}
+mot_2001_pred$unid_adult_lep = mot_2001_pred$unid_adult * mot_2001_pred$pred_prop
+cope_2002_2004_pred$unid_cope_lep = cope_2002_2004_pred$unid_cope * cope_2002_2004_pred$pred_prop
+```
+
+
+
+
+
+
+
+
+Let's plot those predicted points on top of the existing plots: 
+
+```{r}
+ggplot() + 
+  geom_point(data = df, aes(x = all_mot, y = prop_lep_mot), 
+             shape = 21,
+             colour = "black",
+             fill = "red2",
+             alpha = 0.1,
+             position = position_jitter()) +
+    geom_ribbon(data = pred_mot, aes(x = all_mots, ymin = lower, ymax = upper),
+              fill = "grey80") +
+  geom_line(data = pred_mot, aes(x = all_mots, y = pred_prop)) + 
+  geom_point()
+  # geom_point(data = pred_mot_2001, aes(x = all_mot, y = pred_prop),
   #            shape = 21,
   #            colour = "black",
   #            fill = "purple",
@@ -170,11 +227,8 @@ ggplot() +
   #            position = position_jitter()) +
   theme_bw() + 
   geom_vline(aes(xintercept = 2.175373), colour = "blue") +
-  labs(x = "Number of All Copepodites", y = "Proportion of L. salmonis") +
+  labs(x = "Number of All Motiles", y = "Proportion of L. salmonis") +
   scale_size_manual(values = c(3, 1))
 ```
-
-# Regression Attempt with All Lice instead of just Motiles
-
 
 
