@@ -195,8 +195,9 @@ prediction_plot_mot = function(df, pred_df) {
     mot_plot,
     here::here(".figs/mot-regression/motile-model-predictions.png")
   )
-  
 }
+
+
   
 ### testing
 library(tidyverse)
