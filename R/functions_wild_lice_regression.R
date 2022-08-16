@@ -24,9 +24,9 @@ read_data_clean_scfs = function(file) {
 }
 
 #############################
-# prep_mot_data() function
+# prep_data_mot() function
 #############################
-prep_mot_data = function(df) {
+prep_data_mot = function(df) {
   
   #' Take in raw dataframe and cut it down to size, making two dataframes, one
   #' with data from 2001 onwards and one with only 2001 for comparison
@@ -46,6 +46,21 @@ prep_mot_data = function(df) {
   return(return_list)
 }
 
-
+#############################
+# prep_data_cope() function
+#############################
+prep_data_cope =function(df) {
+  
+  #' Prep data on copepeodites to model 
+  
+  df_subset = df %>% 
+    dplyr::select(year, prop_lep_cope, all_cope)
+  
+  df_2005_onwards = df_subset %>% 
+    dplyr::filter(year > 2004)
+  
+  df_2002_2004 = df_subset %>% 
+    dplyr::filter(year > 2001 & year < 2005)
+}
   
 
