@@ -67,9 +67,8 @@ prep_data_cope = function(df) {
 }
 
 #############################
-# () function
+# motile_regression() function
 #############################
-
 motile_regression = function(df) {
   
   #' Perform logistic regression on motile data, using the proportion as our 
@@ -93,6 +92,9 @@ motile_regression = function(df) {
   
 }
 
+#############################
+# save_regression_mots() function
+#############################
 save_regression_mots = function(results_list, file) {
   
   #' take output of the multiple model objects and save them to a useful 
@@ -100,24 +102,106 @@ save_regression_mots = function(results_list, file) {
   #' `.rds` file, the rest are saved as text files
   
   # save model object
-  saveRDS(results_list[[1]], 
-          here::here(paste0(file, "mot_regress_model_ob.rds"))
+  saveRDS(
+    results_list[[1]], 
+    here::here(paste0(file, "mot_regress_model_ob.rds"))
   )
   # save coefs
   readr::write_csv(
-    results_list[[2]], here::here(paste0(file, "mot_regression_coefs.csv"))
+    results_list[[2]], 
+    here::here(paste0(file, "mot_regression_coefs.csv"))
   )
   # save fitted values 
   readr::write_csv(
-    results_list[[3]], here::here(
-      paste0(file, "mot_regression_fitted_vals.csv")
-      )
+    results_list[[3]], 
+    here::here(paste0(file, "mot_regression_fitted_vals.csv"))
   )
+  # save glance object
+  readr::write_csv(
+    results_list[[4]],
+    here::here(paste0(file, "mot_regression_glance_aic.csv"))
+  )
+}
+
+read_regression_mot = function(file) {
+  
+  #' Read in the fitted model object to make predictions on the dataframe from 
+  
+  readRDS(file)
+}
+
+#############################
+# predicted_values_mots() function
+#############################
+predicted_values_mots = function(model, df) {
+  
+  #' Take in the fitted model object and make predictions for the values that 
+  #' the model actually covers out to the maximum count of number of motiles
+  
+  # find the maximum number of motiles
+  max_mot = max(df$all_mot)
+  
+  # make sequence of values ot predict on
+  mot_seq = data.frame(all_mot = seq(0, max_mot, 0.01))
+  
+  # prediction for motiles
+  pred_mot = data.frame(
+    # all motiles count
+    all_mots = mot_seq$all_mot,
+    pred_prop = stats::predict(
+      # model object here
+      model, 
+      mot_seq,
+      type = "response",
+      se.fit = TRUE
+    )
+  )
+  
+  # add 95% CI's
+  pred_mot_ci = pred_mot %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+      # fitted value
+      pred_prop = pred_prop.fit,
+      # lower CI bound
+      lower = pred_prop - 1.96 * pred_prop.se.fit,
+      # upper CI bound
+      upper = pred_prop + 1.96 * pred_prop.se.fit) %>% 
+    # keep only columns of use
+    dplyr::select(all_mots, pred_prop, lower, upper)
+  
+  return(pred_mot_ci)
+}
+
+prediction_plot_mot = function(df, pred_df) {
+  
+  #' Make and save the prediction plot from the motiles regression 
+  
+  mot_plot = ggplot2::ggplot() + 
+    geom_point(data = df, aes(x = all_mot, y = prop_lep_mot), 
+               shape = 21,
+               colour = "black",
+               fill = "red2",
+               alpha = 0.1,
+               position = position_jitter()) +
+    geom_ribbon(data = pred_df, aes(x = all_mots, ymin = lower, ymax = upper),
+                fill = "grey80") +
+    geom_line(data = pred_df, aes(x = all_mots, y = pred_prop)) + 
+    theme_base() + 
+    labs(x = "Number of All Motiles", y = "Proportion of L. salmonis") +
+    scale_size_manual(values = c(3, 1))
+  
+  ggplot2::ggsave(
+    mot_plot,
+    here::here(".figs/mot-regression/motile-model-predictions.png")
+  )
+  
 }
   
 ### testing
 library(tidyverse)
 library(here)
+library(ggthemes)
 
 raw_df = read.csv(here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
 df = raw_df
