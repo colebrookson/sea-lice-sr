@@ -441,6 +441,9 @@ lep_regression_cope = function(df, path) {
 
 # Nonlinear regression functions ===============================================
 
+#############################
+# prep_data_nonlinear() function
+#############################
 prep_data_nonlinear = function(df) {
   
   #' Use the raw dataset, and clean it to prepare for the non-linear regression
@@ -450,7 +453,12 @@ prep_data_nonlinear = function(df) {
     dplyr::mutate( # make columns that divide the lice into species 
       all_lep = sum(lep_pamale, lep_pafemale, lep_male, 
                     lep_nongravid, lep_gravid, unid_pa, 
-                    na.rm = TRUE)
+                    na.rm = TRUE),
+      all_lice = sum(lep_pamale, 
+                     lep_pafemale, lep_male, lep_nongravid, 
+                     lep_gravid, cal_mot, cal_gravid,
+                     unid_adult, unid_pa, 
+                     na.rm = TRUE)
       ) %>% 
       dplyr::select( # keep only the columns we want
       year, all_lep, all_lice
@@ -471,6 +479,9 @@ prep_data_nonlinear = function(df) {
       )
 }
 
+#############################
+# nonlinear_regression() function
+#############################
 nonlinear_regression = function(df) {
   
   #' Take prepared dataset and fit the non-linear model from Bateman et al. 
@@ -485,6 +496,118 @@ nonlinear_regression = function(df) {
     start = list(c = 2), 
     data = df)
   
+  # save object as nice neat file 
+  coefs = broom::tidy(model)
+  fitted_vals = broom::augment(model)
+  model_vals = broom::glance(model)
+  
+  # list results objects
+  results_list = list(model, coefs, fitted_vals, model_vals)
+  
+  
 }
+
+#############################
+# save_nonlinear_regression() function
+#############################
+save_nonlinear_regression = function(results_list, file) {
+  
+  #' take output of the multiple model objects and save them to a useful 
+  #' location for further inspection if needed. The model object is saved as a
+  #' `.rds` file, the rest are saved as text files
+  
+  # save model object
+  saveRDS(
+    results_list[[1]], 
+    here::here(paste0(file, "nonlinear_regress_model_ob.rds"))
+  )
+  # save coefs
+  readr::write_csv(
+    results_list[[2]], 
+    here::here(paste0(file, "nonlinear_regress_coefs.csv"))
+  )
+  # save fitted values 
+  readr::write_csv(
+    results_list[[3]], 
+    here::here(paste0(file, "nonlinear_regress_fitted_vals.csv"))
+  )
+  # save glance object
+  readr::write_csv(
+    results_list[[4]],
+    here::here(paste0(file, "nonlinear_regress_glance_aic.csv"))
+  )
+}
+
+nonlinear_prediction = function(df, model) {
+  
+  #' Use the model object to predict across new values of all lice to get an 
+  #' estimate for higher numbers of total lice - thus to predict 2001
+  
+  # predict the data back from the model 
+  pred_data_points = data.frame(
+    mean_all = seq(0,4,0.01)
+  )
+  
+  # make prediction
+  pred_prop = stats::predict(
+    model, 
+    pred_data_points,
+    type = "response")
+  
+  # predicted dataframe
+  df_line = 
+    data.frame(
+      cbind(pred_data_points, pred_prop)
+      ) %>% 
+    dplyr::rename(
+      prop_lep = pred_prop
+      )
+}
+
+nonlinear_plot = function(df, df_line) {
+  
+  #' Make and save a plot of the non-linear prediction based off the prediction
+  #' for 2001 in this framework
+  
+  # make data for a plot 
+  pred_data_all_points = rbind( # do this for the points 
+    data.frame(year = 2001,
+               mean_all = 3.44, 
+               # get the predicted value for the missing
+               prop_lep = 
+                 df_line[which(
+                   df_line$mean_all == 3.44), "prop_lep"]
+    ),
+    data.frame(df %>% 
+                 dplyr::select(-c(mean_lep)) 
+    )
+  ) %>% 
+    mutate(
+      predicted = as.factor(c("Predicted", rep("True", 20)))
+    ) 
+  
+  predicted_proportions = ggplot() +
+    geom_point(data = pred_data_all_points, 
+               aes(x = mean_all, y = prop_lep, fill = predicted),
+               shape = 21, size = 2.8) + 
+    geom_text(data = pred_data_all_points, 
+              aes(x = mean_all, y = prop_lep, label = year),
+              hjust = 0, nudge_x = 0.05, size = 3.0) +
+    geom_line(data = df_line,
+              aes(x = mean_all, y = prop_lep),
+              linetype = "dashed", colour = "grey50") + 
+    scale_fill_manual(" ", values = c("purple1", "goldenrod2")) + 
+    theme_bw() + 
+    theme_mod_comp() +
+    labs(x = "Mean number of lice per fish (all louse species)", 
+         y = "Proportion of L. salmonis")
+  
+  ggplot2::ggsave(
+    here::here("./figs/nonlinear-regression/nonlinear-model-predictions.png"),
+    predicted_proportions
+  )
+}
+
+
 
 df = read_csv(here::here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
