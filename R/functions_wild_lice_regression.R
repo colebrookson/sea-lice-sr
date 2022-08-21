@@ -504,7 +504,7 @@ nonlinear_regression = function(df) {
   # list results objects
   results_list = list(model, coefs, fitted_vals, model_vals)
   
-  
+  return(results_list)
 }
 
 #############################
@@ -538,6 +538,9 @@ save_nonlinear_regression = function(results_list, file) {
   )
 }
 
+#############################
+# nonlinear_prediction() function
+#############################
 nonlinear_prediction = function(df, model) {
   
   #' Use the model object to predict across new values of all lice to get an 
@@ -562,8 +565,13 @@ nonlinear_prediction = function(df, model) {
     dplyr::rename(
       prop_lep = pred_prop
       )
+  
+  return(df_line)
 }
 
+#############################
+# nonlinear_plot() function
+#############################
 nonlinear_plot = function(df, df_line) {
   
   #' Make and save a plot of the non-linear prediction based off the prediction
@@ -608,6 +616,27 @@ nonlinear_plot = function(df, df_line) {
   )
 }
 
-
-
-df = read_csv(here::here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
+#############################
+# nonlinear_regression_scenario() function
+#############################
+nonlinear_regression_scenario = function(df, file) {
+  
+  #' Use the cleaned SCFS wild lice data to run through a scenario option where
+  #' we predict the number of lice in 2001 via non-linear regression 
+  
+  # prep the data from the raw df
+  prepped_df = prep_data_nonlinear(df)
+  
+  # run regression 
+  results_list = nonlinear_regression(prepped_df)
+  
+  # save model objects
+  save_nonlinear_regression(results_list, file)
+  
+  # make prediction dataframe 
+  pred_df = nonlinear_prediction(prepped_df, results_list[[1]])
+  
+  # plot results and save the plot
+  nonlinear_plot(prepped_df, pred_df)
+  
+}

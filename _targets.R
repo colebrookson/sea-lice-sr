@@ -12,6 +12,7 @@ library(targets)
 library(tarchetypes)
 library(here)
 
+source(here::here("./R/functions_plot_themes.R"))
 source(here::here("./R/functions_farm_data_cleaning.R"))
 source(here::here("./R/functions_general_data_cleaning.R"))
 source(here::here("./R/functions_wild_lice_cleaning.R"))
@@ -102,7 +103,17 @@ list(
              lep_regression_cope(
                prepare_wild_lice_data,
                here::here("./outputs/model-outputs/cope-regression/")
-             ))
+             )),
+  ####################
+  # wild lice regressions
+  ####################
+  tar_target(wild_lice_nonlinear_regression,
+             nonlinear_regression_scenario(
+               prepare_wild_lice_data,
+               here::here("./outputs/model-outputs/nonlinear-regression/")
+             )
+    
+  )
   
 )
 # tar_make(callr_function = NULL, names = any_of("marty_data"), 
