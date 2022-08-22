@@ -631,4 +631,38 @@ nonlinear_regression_scenario = function(df, file) {
   # plot results and save the plot
   nonlinear_plot(prepped_df, pred_df)
   
+  # bind all of these results objects into a list
+  results_list = list(prepped_df, results_list, pred_df)
+  
+  # save list of results
+  saveRDS(results_list, paste0(file, 
+                               "nonlinear_regression_full_analysis_object.rds"))
+  
+  return(results_list)
+  
 }
+
+# beta regression option =======================================================
+
+#############################
+# nonlinear_regression() function
+#############################
+nonlinear_regression = function(df) {
+  
+  #' Take prepared dataset and fit using a beta regression 
+  
+  beta_reg = betareg::betareg(
+    prop_lep ~ mean_all,
+    data = df)
+  
+  # save object as nice neat file 
+  coefs = broom::tidy(model)
+  fitted_vals = broom::augment(model)
+  model_vals = broom::glance(model)
+  
+  # list results objects
+  results_list = list(model, coefs, fitted_vals, model_vals)
+  
+  return(results_list)
+}
+

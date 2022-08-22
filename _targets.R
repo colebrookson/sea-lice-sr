@@ -19,7 +19,7 @@ source(here::here("./R/functions_wild_lice_cleaning.R"))
 source(here::here("./R/functions_wild_lice_regression.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
-                            "ggplot2"))
+                            "ggplot2", "betareg"))
 list(
   ####################
   # files

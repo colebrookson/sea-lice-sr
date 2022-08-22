@@ -47,7 +47,7 @@ motile_regression|function|24656aa3fd1f104f|||||||||||||||
 nonlinear_plot|function|b49e61b9d0e00280|||||||||||||||
 nonlinear_prediction|function|3e5d3cc69fbe0131|||||||||||||||
 nonlinear_regression|function|961ad0c1f1f0006b|||||||||||||||
-nonlinear_regression_scenario|function|9b20c854b58a4af1|||||||||||||||
+nonlinear_regression_scenario|function|4a4bf70a6edbacbc|||||||||||||||
 predicted_values_copes|function|cdfb01b2de4be06a|||||||||||||||
 predicted_values_mots|function|86056117e69a3502|||||||||||||||
 prediction_plot_cope|function|7224c445b716e5e9|||||||||||||||
@@ -77,7 +77,7 @@ theme_raw_comp|function|792c6c006c7283ec|||||||||||||||
 theme_small_map|function|2d83776b3178fa9f|||||||||||||||
 trim_clean_dfo_open_data|function|f2dbe44f8e599c68|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
-wild_lice_nonlinear_regression|stem|861cb78a66cb2cbc|f4908d6d0bdaf050|8c4df574a23e4a38|183052523||t19226.2264376453s|e92536e5890953e5|126|rds|local|vector|||5.2||
+wild_lice_nonlinear_regression|stem|dba1fdd90ac2bf28|f4908d6d0bdaf050|152a13b9aa8271e7|183052523||t19226.8121105046s|aaa5182d0103ecdd|13761|rds|local|vector|||7.346||
 write_data_bati|function|bfa517e14148f2ec|||||||||||||||
 write_data_joined_farm|function|785c298ffc35eca8|||||||||||||||
 write_data_marty|function|bfa517e14148f2ec|||||||||||||||

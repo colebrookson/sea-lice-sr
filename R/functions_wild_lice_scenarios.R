@@ -76,7 +76,7 @@ cope_ob = readRDS(here("./outputs/model-outputs/cope-regression/cope_regression_
 names(df)
 
 # get the average predicted proportion in 2001 for motiles
-count_motile_2001_lice = function(df, mot_ob, option) {
+count_motile_2001_lice = function(df, mot_ob) {
   
   #' Use the clean scfs data and the motile logistic regression to set up the 
   #' proportions going into the Bernoulli draw
@@ -91,24 +91,48 @@ count_motile_2001_lice = function(df, mot_ob, option) {
     dplyr::select(year, prop_lep_mot) %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(avg_prop = mean(prop_lep_mot, na.rm = TRUE))
+  # replace the 2001 value with the modeled value
+  yearly_avg$avg_prop[which(yearly_avg$year == 2001)] = 
+    mean(pred_2001$pred_prop)
     
   # join the df to the predicted proportions from the model and then add
   # in the empirical version if there is one 
   df = df %>% 
+    # add in the individual level predictions for 2001 via the model predictions
+    # note that these are all given by the number of all motiles available
     dplyr::left_join(.,
                      # keep only the obs_id and the pred_prop to join
                      mot_ob[[4]] %>% 
                        dplyr::select(obs_id, pred_prop),
                      by = "obs_id") %>% 
+    dplyr::rename(
+      pred_prop_mot_indiv_scen1 = pred_prop
+    ) %>% 
+    # now add in the individual level empirical predictions for >2001 -- these
+    # are the rows that have an empirical prorportion of leps already 
     dplyr::rowwise() %>% 
-    # add in the empirical proportions
     dplyr::mutate(
-      pred_prop = 
-        # if the empirical proportion is not NA, take that value
-        ifelse(!is.na(prop_lep_mot),
-               prop_lep_mot,
-               NA)
-      )
+      pred_prop_mot_indiv_scen1 = 
+        # don't do the 2001 values since they are done above
+        ifelse(year == 2001,
+               # just keep the same value
+               pred_prop_indiv, 
+               # if the empirical proportion is not NA, take that value
+               ifelse(!is.na(prop_lep_mot),
+                      prop_lep_mot,
+                      # otherwise leave the NA for the loop 
+                      NA))) %>% 
+    # now mutate in some other new columns - add in the year default column,
+    # this one just puts the yearly average for each row
+    # left join to the yearly avg to get the yearly option for the prediction
+    dplyr::left_join(.,
+                     yearly_avg, 
+                     by = "year") %>%
+    dplyr::rename(
+      pred_prop_mot_year_scen1 = avg_prop
+    ) %>% 
+    # add in the proportions according to the nonlinear regression model
+    
   
   # there must be a way to vectorize this all in a dplyr::mutate() but
   # I don't know how, so here it is in a big ugly loop ---- fill in the 
@@ -119,9 +143,9 @@ count_motile_2001_lice = function(df, mot_ob, option) {
     if(!is.na(df$pred_prop[row])) {
       next
     }
-    # if not, check the option, if option is defer to individual
-    if(df$unid_adult[row] > 0 & option == "Individual") {
-      
+    # if in 2001 and option is individual, each line gets a prediction
+    if(df$year[row] == 2001 & option == "Individual") {
+
       # get a model prediction
       assign_val = stats::predict(
         # model object
@@ -129,29 +153,67 @@ count_motile_2001_lice = function(df, mot_ob, option) {
         # predicted dataframe
         data.frame(
           all_mot = df$unid_adult[row]))[[1]]
-      
+
+      # if 2001 and the option is year
+      } else if(df$year[row] == 2001 & option == "Year") {
+
+        # use the yearly average
+        assign_val = yearly_avg$avg_prop[which(yearly_avg$year == df$year[row])]
+
+      # if not 2001, check the option, if option is defer to individual
+      } else if(df$unid_adult[row] > 0 & option == "Individual") {
+
+        # get a model prediction
+        assign_val = stats::predict(
+          # model object
+          mot_ob[[2]][[1]],
+          # predicted dataframe
+          data.frame(
+            all_mot = df$unid_adult[row]))[[1]]
+
       # if the option is to defer to the year
       } else if(df$unid_adult[row] > 0 & option == "Year") {
-      
+
         # use the yearly average
         assign_val = yearly_avg$avg_prop[which(yearly_avg$year == df$year[row])]
-      
-      # if the unid_adult is !> 0 
+
+      # if the unid_adult is !> 0
       } else if(df$unid_adult[row] < 1) {
-      
+
         # use the yearly average
         assign_val = yearly_avg$avg_prop[which(yearly_avg$year == df$year[row])]
-      
+
       # if all else fails
       } else {
-        assign_val = NA
+        assign_val = 0
     }
-    
+
     # now actually use the assign_val in the right row
     df$pred_prop[row] = assign_val
+    
+    # at that row, determine how many unid_adults there are, and draw a sample
+    # for each of them, determining if they should be added to the new lep
+    # column 
+    if(df$unid_adult[row] > 0) {
+      for(louse in 1:df$unid_adult[row]) {
+        # draw from sample
+        draw = sample(c(1, 0),
+                 size = 1,
+                 # draw with probability of that line in the dataset for leps
+                 # and 1 - that probability for cals (cals would be 0)
+                 prob = c(
+                   df$pred_prop[row],
+                   1 - (df$pred_prop[row]))
+                 )
+        if(draw == 1) {
+          df$new_lep_adult[row] = df$new_lep_adult[row] + 1
+        } else if(draw == 0) {
+          df$new_cal_adult[row] = df$new_cal_adult[row] + 1
+        }
+      }
+    }
   }
   
- 
 }
 
 
