@@ -221,7 +221,14 @@ lep_regression_mot = function(df, path) {
   # make 2001 prediction
   mot_2001_pred = mot_2001_prediction(df_2001, regression[[1]])
   
-  return(mot_2001_pred)
+  # bind all of these results objects into a list
+  results_list = list(clean_df_list, regression, pred_df, mot_2001_pred)
+  
+  # save that list
+  saveRDS(results_list, paste0(path, 
+                               "motile_regression_full_analysis_object.rds"))
+  
+  return(results_list)
   
 }
 
@@ -435,7 +442,14 @@ lep_regression_cope = function(df, path) {
   # make 2001 prediction
   cope_pred = cope_2002_2004_prediction(df_2002_2004, regression[[1]])
   
-  return(cope_pred)
+  # bind all of these results objects into a list
+  results_list = list(clean_df_list, regression, pred_df, cope_pred)
+  
+  # save list of results
+  saveRDS(results_list, paste0(path, 
+                               "cope_regression_full_analysis_object.rds"))
+  
+  return(results_list)
   
 }
 
