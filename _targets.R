@@ -116,5 +116,3 @@ list(
   )
   
 )
-# tar_make(callr_function = NULL, names = any_of("marty_data"), 
-#          shortcut = TRUE)

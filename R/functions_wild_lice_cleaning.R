@@ -10,6 +10,7 @@
 
 # global functions =============================================================
 options(dplyr.summarise.inform = FALSE)
+options(readr.show_col_types = FALSE)
 
 #############################
 # get_data_scfs() function
@@ -30,7 +31,7 @@ coalesce_data_scfs = function(df) {
   #' match data formats here, then also only keep the columns currently needed
   #' and coalesce the data so that all NA values are understood to be zeros
 
-  df%>% 
+  df %>% 
     # remove bad characters and make names standrdized
     standardize_names() %>% 
     dplyr::rowwise() %>% 
@@ -88,6 +89,8 @@ summary_columns = function(df, path) {
     df, 
     here::here(path)
   )
+  
+  return(df)
 }
 
 #############################
@@ -98,7 +101,11 @@ clean_data_scfs = function(df, path) {
   #' Use helper functions to read in raw data file and clean it, to prepare for 
   #' regression analysis 
   
-  df %>% 
+  df_applied = df %>% 
     coalesce_data_scfs() %>% 
     summary_columns(., path)
+  # add in unique identifier to make life easier later
+  df_applied$obs_id = c(1:nrow(df_applied))
+
+  return(df_applied)
 }

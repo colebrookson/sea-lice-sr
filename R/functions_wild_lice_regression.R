@@ -20,17 +20,14 @@ prep_data_mot = function(df) {
   #' Take in raw dataframe and cut it down to size, making two dataframes, one
   #' with data from 2001 onwards and one with only 2001 for comparison
   
-  df_subset = df %>% 
-    dplyr::select(year, prop_lep_mot, all_mot, lep_mot, unid_adult)
-  
-  df_2002_onwards = df_subset %>% 
+  df_2002_onwards = df %>% 
     dplyr::filter(year > 2001)
   
-  df_2001 = df_subset %>% 
+  df_2001 = df %>% 
     dplyr::filter(year == 2001)
   
   # list up return value 
-  return_list = list(df_2001, df_2002_onwards, df_subset)
+  return_list = list(df_2001, df_2002_onwards, df)
   
   return(return_list)
 }
@@ -180,14 +177,6 @@ mot_2001_prediction = function(df, model) {
       type = "response")
   )
   
-  # make calculation for unknown adults
-  mot_2001_pred$unid_adult_lep = 
-    mot_2001_pred$unid_adult * mot_2001_pred$pred_prop
-  
-  # select only needed columns
-  mot_2001_pred = mot_2001_pred %>% 
-    dplyr::select(year, all_mot, pred_prop, unid_adult_lep)
-  
   return(mot_2001_pred)
 }
 
@@ -241,17 +230,14 @@ prep_data_cope = function(df) {
   
   #' Prep data on copepeodites to model 
   
-  df_subset = df %>% 
-    dplyr::select(year, prop_lep_cope, all_cope, unid_cope)
-  
-  df_2005_onwards = df_subset %>% 
+  df_2005_onwards = df %>% 
     dplyr::filter(year > 2004)
   
-  df_2002_2004 = df_subset %>% 
+  df_2002_2004 = df %>% 
     dplyr::filter(year > 2001 & year < 2005)
   
   # list up the return df's
-  return_list = list(df_2002_2004, df_2005_onwards, df_subset)
+  return_list = list(df_2002_2004, df_2005_onwards, df)
   
   return(return_list)
 }
@@ -400,14 +386,6 @@ cope_2002_2004_prediction = function(df, model) {
       data.frame(all_cope = df$all_cope),
       type = "response")
   )
-  
-  # make calculation for unknown adults
-  cope_2002_2004_pred$unid_cope_lep = 
-    cope_2002_2004_pred$unid_cope * cope_2002_2004_pred$pred_prop
-  
-  # select only needed columns
-  cope_2002_2004_pred = cope_2002_2004_pred %>% 
-    dplyr::select(year, all_cope, pred_prop, unid_cope)
   
   return(cope_2002_2004_pred)
 }

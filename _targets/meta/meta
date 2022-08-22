@@ -5,12 +5,12 @@ bati_data|stem|36b8722e6e4a3ed5|15cf45363a6e2bf3|852e69043e58a4af|499463961||t19
 calculate_missing_averages|function|ff1abd532810b197|||||||||||||||
 clean_data_bati|function|e46a928529838a5c|||||||||||||||
 clean_data_marty|function|4db48a292bbc2337|||||||||||||||
-clean_data_scfs|function|51478c92551ad518|||||||||||||||
+clean_data_scfs|function|b37bed9dada3e1f2|||||||||||||||
 clean_dfo_open_data|function|dd1372a3283cfb39|||||||||||||||
 clean_open_dfo_data|stem|66fe5e72fb17a5c3|fc6dc7fc70cbbf08|61b86088b3d8ba60|1901894046||t19221.6926185839s|a6f002f29bb6a2e4|54017|rds|local|vector|||0.532||
 coalesce_data_scfs|function|aa81aada9f8599b1|||||||||||||||
-cope_2002_2004_prediction|function|f1a3c5a0948a86b8|||||||||||||||
-cope_proportions_logistic_regression|stem|e021e3956fcfacc0|49434ca0f1b3bd11|d5a807b368f8314c|-1067662679||t19226.1706407145s|e0290fa6cfb9e96c|2955895|rds|local|vector|||3.317|noninteger successes in a binomial glm. Removed 35719 rows containing missing values geom_point.|
+cope_2002_2004_prediction|function|d4e3380c0622f038|||||||||||||||
+cope_proportions_logistic_regression|stem|c3568a64ec05a94d|49434ca0f1b3bd11|1b53a97ea2283505|-1067662679||t19226.2265022287s|4c9de99ffa63aa0c|4288781|rds|local|vector|||3.926|noninteger successes in a binomial glm. Removed 35719 rows containing missing values geom_point.|
 cope_regression|function|e958e2af9a18b90e|||||||||||||||
 df|object|de6a0928ab3ebb22|||||||||||||||
 dfo_farm_ref_data|stem|02aa0092b5469095|84f590bceeb6cea2|c3b5fc02cdc369c1|-1486775753|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/farm-name-reference.csv|t19208.5681619444s|54f0cde7a83f527b|7999|file|local|vector|||0.218||
@@ -36,13 +36,13 @@ join_clean_marty|function|f1cdf83979209431|||||||||||||||
 join_clean_missing|function|06454f058c3084a2|||||||||||||||
 join_farm_data|function|18651d26916f5519|||||||||||||||
 lep_mot_regression|function|a62bd526f9c7fc08|||||||||||||||
-lep_regression_cope|function|28bbe0e7371809b3|||||||||||||||
-lep_regression_mot|function|041898c62f5bd5bb|||||||||||||||
+lep_regression_cope|function|0600534e1cca0a25|||||||||||||||
+lep_regression_mot|function|472253dc6715e89c|||||||||||||||
 marty_data|stem|b7e8591d29fdddd8|15c300f56e5a141a|ba992c2f2d1765c2|-2054066338||t19221.6926209913s|23ba7cf05e073bd5|26387|rds|local|vector|||0.189||
 marty_df|object|3a45d93842d4016a|||||||||||||||
 match_inventory_data|function|4099b94337a1fc6f|||||||||||||||
-mot_2001_prediction|function|3af35146024d6b52|||||||||||||||
-motile_proportions_logistic_regression|stem|7853a12cf1de102d|6488863b5ff44390|1519b3e50d3b447d|1991784082||t19226.1706930295s|111de9fc06569b8b|3300011|rds|local|vector|||3.366|noninteger successes in a binomial glm. Removed 36212 rows containing missing values geom_point.|
+mot_2001_prediction|function|edbc7406644ddc67|||||||||||||||
+motile_proportions_logistic_regression|stem|0e5166cdc574ea0e|6488863b5ff44390|b474a04b26bac907|1991784082||t19226.226571951s|1d4edff2c353ac59|4622012|rds|local|vector|||4.241|noninteger successes in a binomial glm. Removed 36212 rows containing missing values geom_point.|
 motile_regression|function|24656aa3fd1f104f|||||||||||||||
 nonlinear_plot|function|b49e61b9d0e00280|||||||||||||||
 nonlinear_prediction|function|3e5d3cc69fbe0131|||||||||||||||
@@ -52,10 +52,10 @@ predicted_values_copes|function|cdfb01b2de4be06a|||||||||||||||
 predicted_values_mots|function|86056117e69a3502|||||||||||||||
 prediction_plot_cope|function|7224c445b716e5e9|||||||||||||||
 prediction_plot_mot|function|3c23dc6aab2cc4fc|||||||||||||||
-prep_data_cope|function|a0d6c7dffcf3adc8|||||||||||||||
-prep_data_mot|function|3fbab430756251d2|||||||||||||||
+prep_data_cope|function|6ff7b769271222da|||||||||||||||
+prep_data_mot|function|2bbe6168ea243ee9|||||||||||||||
 prep_data_nonlinear|function|733818bc9c369b08|||||||||||||||
-prepare_wild_lice_data|stem|0f8363810f45df01|59d90a6809f5aa56|3147862eb7f488d4|-486621467||t19221.715841346s|bf220ee4962a2752|270031|rds|local|vector|||55.972||
+prepare_wild_lice_data|stem|7b0657d7506c5dc4|59d90a6809f5aa56|cff09b06c422ddc1|-486621467||t19226.2263772286s|f02c8814167c81ca|368604|rds|local|vector|||49.591||
 raw_data_file_bati|stem|fbeaf60eb3607aa6|d3eb524fc9913e37|c3b5fc02cdc369c1|1852314142|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/BATI_farm_louse_data_RAW.csv|t19198.7803988078s|c032e46de012d846|215342|file|local|vector|||0.074||
 raw_data_file_marty|stem|42b6c4186aaf3c0a|b5fe940b90e237f5|c3b5fc02cdc369c1|711235436|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/marty-2010-data/marty-data-copied.csv|t19208.5681624537s|75969f2ee2633e1c|207114|file|local|vector|||0.243||
 raw_file|object|6dc53415d1551df7|||||||||||||||
@@ -68,7 +68,7 @@ save_regression_copes|function|9f8608775bc215ac|||||||||||||||
 save_regression_mots|function|cfd99a324b04da31|||||||||||||||
 scfs_raw_data_file|stem|963ebaa46a53f344|bb57621d7fe16c8c|33217b43f1415251|1766984428|/home/cole/Github/sea-lice-sr/./data/wild-lice-data/raw/Sea-lice-database-master/Data/BroughtonSeaLice_fishData.csv|t19208.616545203s|09520c5850fa3143|5495967|file|local|vector|||0.091||
 standardize_names|function|df4fc583e60014a9|||||||||||||||
-summary_columns|function|64cd8a8b762f4272|||||||||||||||
+summary_columns|function|3debb398bf1d1753|||||||||||||||
 temp|object|de6a0928ab3ebb22|||||||||||||||
 theme_area_grouping|function|a2a5588641637457|||||||||||||||
 theme_farm_grouping|function|5d2a4b8b075eb5fb|||||||||||||||
@@ -77,7 +77,7 @@ theme_raw_comp|function|792c6c006c7283ec|||||||||||||||
 theme_small_map|function|2d83776b3178fa9f|||||||||||||||
 trim_clean_dfo_open_data|function|f2dbe44f8e599c68|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
-wild_lice_nonlinear_regression|stem|861cb78a66cb2cbc|f4908d6d0bdaf050|72f31b8407da7279|183052523||t19225.7239758431s|e92536e5890953e5|126|rds|local|vector|||5.569||
+wild_lice_nonlinear_regression|stem|861cb78a66cb2cbc|f4908d6d0bdaf050|8c4df574a23e4a38|183052523||t19226.2264376453s|e92536e5890953e5|126|rds|local|vector|||5.2||
 write_data_bati|function|bfa517e14148f2ec|||||||||||||||
 write_data_joined_farm|function|785c298ffc35eca8|||||||||||||||
 write_data_marty|function|bfa517e14148f2ec|||||||||||||||
