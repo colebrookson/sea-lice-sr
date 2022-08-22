@@ -72,6 +72,7 @@ options(dplyr.summarise.inform = FALSE)
 df = read_csv(here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
 mot_ob = readRDS(here("./outputs/model-outputs/mot-regression/motile_regression_full_analysis_object.rds"))
 cope_ob = readRDS(here("./outputs/model-outputs/cope-regression/cope_regression_full_analysis_object.rds"))
+non_ob = readRDS(here("./outputs/model-outputs/nonlinear-regression/nonlinear_regression_full_analysis_object.rds"))
 
 names(df)
 
@@ -94,6 +95,22 @@ count_motile_2001_lice = function(df, mot_ob) {
   # replace the 2001 value with the modeled value
   yearly_avg$avg_prop[which(yearly_avg$year == 2001)] = 
     mean(pred_2001$pred_prop)
+  
+  # dataframe of the yearly averages from the nonlinear model 
+  yearly_nonlinear_avg = rbind(
+    # the predicted values
+    cbind(
+      year = 2001,
+      prop_lep = stats::predict(
+        # model object
+        non_ob[[2]][[1]],
+        # predicted dataframe
+        data.frame(
+          mean_all = 3.44))),
+    # the model values
+    non_ob[[1]] %>% 
+    dplyr::select(year, prop_lep)
+  )
     
   # join the df to the predicted proportions from the model and then add
   # in the empirical version if there is one 
@@ -132,6 +149,12 @@ count_motile_2001_lice = function(df, mot_ob) {
       pred_prop_mot_year_scen1 = avg_prop
     ) %>% 
     # add in the proportions according to the nonlinear regression model
+    dplyr::left_join(.,
+                     yearly_nonlinear_avg,
+                     by = "year") %>% 
+    dplyr::rename(
+      pred_prop_mot_year_scen2 = prop_lep
+    )
     
   
   # there must be a way to vectorize this all in a dplyr::mutate() but

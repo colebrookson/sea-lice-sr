@@ -645,13 +645,13 @@ nonlinear_regression_scenario = function(df, file) {
 # beta regression option =======================================================
 
 #############################
-# nonlinear_regression() function
+# beta_regression() function
 #############################
-nonlinear_regression = function(df) {
+beta_regression = function(df) {
   
   #' Take prepared dataset and fit using a beta regression 
   
-  beta_reg = betareg::betareg(
+  model = betareg::betareg(
     prop_lep ~ mean_all,
     data = df)
   
@@ -664,5 +664,156 @@ nonlinear_regression = function(df) {
   results_list = list(model, coefs, fitted_vals, model_vals)
   
   return(results_list)
+}
+
+#############################
+# save_beta_regression() function
+#############################
+save_beta_regression = function(results_list, file) {
+  
+  #' take output of the multiple model objects and save them to a useful 
+  #' location for further inspection if needed. The model object is saved as a
+  #' `.rds` file, the rest are saved as text files
+  
+  # save model object
+  saveRDS(
+    results_list[[1]], 
+    here::here(paste0(file, "beta_regress_model_ob.rds"))
+  )
+  # save coefs
+  readr::write_csv(
+    results_list[[2]], 
+    here::here(paste0(file, "beta_regress_coefs.csv"))
+  )
+  # save fitted values 
+  readr::write_csv(
+    results_list[[3]], 
+    here::here(paste0(file, "beta_regress_fitted_vals.csv"))
+  )
+  # save glance object
+  readr::write_csv(
+    results_list[[4]],
+    here::here(paste0(file, "beta_regress_glance_aic.csv"))
+  )
+}
+
+#############################
+# beta_prediction() function
+#############################
+beta_prediction = function(model) {
+  
+  #' Use the model object to predict across new values of all lice to get an 
+  #' estimate for higher numbers of total lice - thus to predict 2001
+  
+  # predict the data back from the model 
+  pred_data_points = data.frame(
+    mean_all = seq(0,4,0.01)
+  )
+  
+  # make prediction
+  pred_prop_beta_quant = stats::predict(
+    model, 
+    pred_data_points,
+    type = "quantile",
+    at = c(0.0225, 0.5, 0.975)
+  )
+  
+  # predicted dataframe
+  predicted_beta_line = 
+    data.frame(
+      cbind(pred_data_points, pred_prop_beta_quant)
+    ) %>% 
+    dplyr::rename(lower = q_0.0225,
+                  median = q_0.5,
+                  upper = q_0.975)
+  
+  return(predicted_beta_line)
+}
+
+#############################
+# beta_plot() function
+#############################
+beta_plot = function(df, predicted_beta_line) {
+  
+  #' Make and save a plot of the non-linear prediction based off the prediction
+  #' for 2001 in this framework
+  
+  # make data for a plot
+  pred_data_all_points = rbind(
+    df %>% 
+      dplyr::mutate(predicted = "Observed") %>% 
+      dplyr::select(-mean_lep),
+    data.frame(
+      year = 2001,
+      mean_all = 3.44,
+      prop_lep = predicted_beta_line[which(
+        predicted_beta_line$mean_all == 3.44), "median"],
+      predicted = "Predicted"
+    )
+  )
+  pred_data_all_points$predicted = as.factor(pred_data_all_points$predicted)
+  
+  # make plot
+  predicted_proportions = ggplot2::ggplot() +
+    geom_line(data = predicted_beta_line,
+              aes(x = mean_all, y = median),
+              colour = "grey65",
+              size = 1.25) + 
+    geom_ribbon(data = predicted_beta_line,
+                aes(x = mean_all, ymin = lower, ymax = upper),
+                fill = "steelblue2", alpha = 0.4) + 
+    geom_point(data = pred_data_all_points, 
+               aes(x = mean_all, y = prop_lep, fill = predicted),
+               shape = 21, size = 2.8) + 
+    geom_text(data = pred_data_all_points, 
+              aes(x = mean_all, y = prop_lep, label = year),
+              hjust = 0, nudge_x = 0.05, size = 3.0) +
+    scale_fill_manual(" ", values = c("purple1", "goldenrod2")) + 
+    theme_bw() + 
+    theme_mod_comp() +
+    labs(x = "Mean number of lice per fish (all louse species)", 
+         y = "Proportion of L. salmonis")
+  
+  # save object
+  ggplot2::ggsave(filename = 
+      here::here("./figs/beta-regression/beta-model-predictions.png"),
+      plot = predicted_proportions,
+      width = 6,
+      height = 5,
+      dpi = 600)
+}
+
+#############################
+# beta_regression_scenario() function
+#############################
+beta_regression_scenario = function(df, file) {
+  
+  #' Use the cleaned SCFS wild lice data to run through a scenario option where
+  #' we predict the number of lice in 2001 via beta regression 
+  
+  # prep the data from the raw df
+  prepped_df = prep_data_nonlinear(df)
+  
+  # run regression 
+  results_list = beta_regression(prepped_df)
+  
+  # save model objects
+  save_beta_regression(results_list, file)
+  
+  # make prediction dataframe 
+  pred_df = beta_prediction(results_list[[1]])
+  
+  # plot results and save the plot
+  beta_plot(prepped_df, pred_df)
+  
+  # bind all of these results objects into a list
+  results_list = list(prepped_df, results_list, pred_df)
+  
+  # save list of results
+  saveRDS(results_list, paste0(file, 
+                               "beta_regression_full_analysis_object.rds"))
+  
+  return(results_list)
+  
 }
 

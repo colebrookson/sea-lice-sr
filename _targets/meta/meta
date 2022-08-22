@@ -2,6 +2,10 @@ name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iterat
 .Random.seed|object|ee2e23219684eccb|||||||||||||||
 %notin%|function|c5de772db35799a7|||||||||||||||
 bati_data|stem|36b8722e6e4a3ed5|15cf45363a6e2bf3|852e69043e58a4af|499463961||t19221.6926231671s|ee53a07d7c10c22b|46930|rds|local|vector|||0.166||
+beta_plot|function|97ea7d83d70eb405|||||||||||||||
+beta_prediction|function|435fd86ecb193fe7|||||||||||||||
+beta_regression|function|1874c05537b8aab1|||||||||||||||
+beta_regression_scenario|function|6188b2873dc7ef83|||||||||||||||
 calculate_missing_averages|function|ff1abd532810b197|||||||||||||||
 clean_data_bati|function|e46a928529838a5c|||||||||||||||
 clean_data_marty|function|4db48a292bbc2337|||||||||||||||
@@ -63,6 +67,7 @@ raw_open_dfo_data|stem|0678236ff26e6aa8|c86d0938fec52830|c3b5fc02cdc369c1|-20265
 read_data_clean_scfs|function|fcc3863c08823970|||||||||||||||
 read_regression_cope|function|13e2eb5b56340168|||||||||||||||
 read_regression_mot|function|13e2eb5b56340168|||||||||||||||
+save_beta_regression|function|c900dc45e3930c0d|||||||||||||||
 save_nonlinear_regression|function|cfe40eb1cd512bb2|||||||||||||||
 save_regression_copes|function|9f8608775bc215ac|||||||||||||||
 save_regression_mots|function|cfd99a324b04da31|||||||||||||||
@@ -77,6 +82,7 @@ theme_raw_comp|function|792c6c006c7283ec|||||||||||||||
 theme_small_map|function|2d83776b3178fa9f|||||||||||||||
 trim_clean_dfo_open_data|function|f2dbe44f8e599c68|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
+wild_lice_beta_regression|stem|9237f597a7d8f9e7|268f418df47eaf68|c717f724dc3101b9|577821677||t19226.9519620549s|69c6e5a69b855989|12865|rds|local|vector|||5.448||
 wild_lice_nonlinear_regression|stem|dba1fdd90ac2bf28|f4908d6d0bdaf050|152a13b9aa8271e7|183052523||t19226.8121105046s|aaa5182d0103ecdd|13761|rds|local|vector|||7.346||
 write_data_bati|function|bfa517e14148f2ec|||||||||||||||
 write_data_joined_farm|function|785c298ffc35eca8|||||||||||||||

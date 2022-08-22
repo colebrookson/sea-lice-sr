@@ -104,15 +104,15 @@ list(
                prepare_wild_lice_data,
                here::here("./outputs/model-outputs/cope-regression/")
              )),
-  ####################
-  # wild lice regressions
-  ####################
   tar_target(wild_lice_nonlinear_regression,
              nonlinear_regression_scenario(
                prepare_wild_lice_data,
                here::here("./outputs/model-outputs/nonlinear-regression/")
-             )
-    
-  )
+             )),
+  tar_target(wild_lice_beta_regression,
+             beta_regression_scenario(
+               prepare_wild_lice_data,
+               here::here("./outputs/model-outputs/nonlinear-regression/")
+             ))
   
 )
