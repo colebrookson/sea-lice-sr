@@ -83,6 +83,8 @@ summary_columns = function(df, path) {
       # proportion of copepodids that are leps
       prop_lep_cope = lep_cope/all_cope
     )
+  # add in unique identifier to make life easier later
+  df$obs_id = c(1:nrow(df))
   
   # save intermediate file
   readr::write_csv(
@@ -101,11 +103,8 @@ clean_data_scfs = function(df, path) {
   #' Use helper functions to read in raw data file and clean it, to prepare for 
   #' regression analysis 
   
-  df_applied = df %>% 
+  df %>% 
     coalesce_data_scfs() %>% 
     summary_columns(., path)
-  # add in unique identifier to make life easier later
-  df_applied$obs_id = c(1:nrow(df_applied))
 
-  return(df_applied)
 }
