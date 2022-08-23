@@ -14,7 +14,7 @@ clean_dfo_open_data|function|dd1372a3283cfb39|||||||||||||||
 clean_open_dfo_data|stem|66fe5e72fb17a5c3|fc6dc7fc70cbbf08|61b86088b3d8ba60|1901894046||t19221.6926185839s|a6f002f29bb6a2e4|54017|rds|local|vector|||0.532||
 coalesce_data_scfs|function|aa81aada9f8599b1|||||||||||||||
 cope_2002_2004_prediction|function|d4e3380c0622f038|||||||||||||||
-cope_proportions_logistic_regression|stem|c3568a64ec05a94d|49434ca0f1b3bd11|c3da11840cfa5e11|-1067662679||t19227.1752395784s|4c9de99ffa63aa0c|4288781|rds|local|vector|||4.809|noninteger successes in a binomial glm. Removed 35719 rows containing missing values geom_point.|
+cope_proportions_logistic_regression|stem|befb60ea476ac60b|49434ca0f1b3bd11|1d19c7c91705bcb3|-1067662679||t19227.2774746357s|aca70617bec40fc4|1360615|rds|local|vector|||2.416|noninteger successes in a binomial glm|
 cope_regression|function|e958e2af9a18b90e|||||||||||||||
 df|object|de6a0928ab3ebb22|||||||||||||||
 dfo_farm_ref_data|stem|02aa0092b5469095|84f590bceeb6cea2|c3b5fc02cdc369c1|-1486775753|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/farm-name-reference.csv|t19208.5681619444s|54f0cde7a83f527b|7999|file|local|vector|||0.218||
@@ -40,13 +40,13 @@ join_clean_marty|function|f1cdf83979209431|||||||||||||||
 join_clean_missing|function|06454f058c3084a2|||||||||||||||
 join_farm_data|function|18651d26916f5519|||||||||||||||
 lep_mot_regression|function|a62bd526f9c7fc08|||||||||||||||
-lep_regression_cope|function|c4490ee3f786082d|||||||||||||||
-lep_regression_mot|function|472253dc6715e89c|||||||||||||||
+lep_regression_cope|function|c1689388c776306a|||||||||||||||
+lep_regression_mot|function|4415c56609f47294|||||||||||||||
 marty_data|stem|b7e8591d29fdddd8|15c300f56e5a141a|ba992c2f2d1765c2|-2054066338||t19221.6926209913s|23ba7cf05e073bd5|26387|rds|local|vector|||0.189||
 marty_df|object|3a45d93842d4016a|||||||||||||||
 match_inventory_data|function|4099b94337a1fc6f|||||||||||||||
 mot_2001_prediction|function|edbc7406644ddc67|||||||||||||||
-motile_proportions_logistic_regression|stem|0e5166cdc574ea0e|6488863b5ff44390|b474a04b26bac907|1991784082||t19226.226571951s|1d4edff2c353ac59|4622012|rds|local|vector|||4.241|noninteger successes in a binomial glm. Removed 36212 rows containing missing values geom_point.|
+motile_proportions_logistic_regression|stem|34b9ac98549e07c9|6488863b5ff44390|c844bed433a9f386|1991784082||t19227.2775109321s|8a122381387547ad|1627029|rds|local|vector|||2.454|noninteger successes in a binomial glm|
 motile_regression|function|24656aa3fd1f104f|||||||||||||||
 nonlinear_plot|function|b49e61b9d0e00280|||||||||||||||
 nonlinear_prediction|function|3e5d3cc69fbe0131|||||||||||||||
@@ -56,8 +56,8 @@ predicted_values_copes|function|cdfb01b2de4be06a|||||||||||||||
 predicted_values_mots|function|86056117e69a3502|||||||||||||||
 prediction_plot_cope|function|a8a9644995cdfca2|||||||||||||||
 prediction_plot_mot|function|3c23dc6aab2cc4fc|||||||||||||||
-prep_data_cope|function|6ff7b769271222da|||||||||||||||
-prep_data_mot|function|2bbe6168ea243ee9|||||||||||||||
+prep_data_cope|function|01884fb2ce8a2509|||||||||||||||
+prep_data_mot|function|15df210b0c93daa7|||||||||||||||
 prep_data_nonlinear|function|733818bc9c369b08|||||||||||||||
 prepare_wild_lice_data|stem|7b0657d7506c5dc4|59d90a6809f5aa56|ef882bbff21a2a77|-486621467||t19226.228478018s|f02c8814167c81ca|368604|rds|local|vector|||48.03||
 raw_data_file_bati|stem|fbeaf60eb3607aa6|d3eb524fc9913e37|c3b5fc02cdc369c1|1852314142|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/BATI_farm_louse_data_RAW.csv|t19198.7803988078s|c032e46de012d846|215342|file|local|vector|||0.074||

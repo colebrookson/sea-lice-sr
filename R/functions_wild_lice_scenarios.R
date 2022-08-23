@@ -78,24 +78,22 @@ beta_ob = readRDS(here("./outputs/model-outputs/beta-regression/beta_regression_
 names(df)
 
 #############################
-# get_all_model_formulations() function
+# make_yearly_mot_averages() function
 #############################
-get_all_motile_formulations = function(df, mot_ob, non_ob, beta_ob) {
+make_yearly_mot_averages = function(df, mot_ob, non_ob, beta_ob) {
   
-  #' Use the clean scfs data and the motile logistic regression to set up the 
-  #' proportions going into the Bernoulli draw
-  
+  #' Get yearly averages for the different models 
   # make a dataframe of yearly averages to reference later on 
-  yearly_avg = df %>% 
+  yearly_avg_scen1 = df %>% 
     dplyr::select(year, prop_lep_mot) %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(avg_prop = mean(prop_lep_mot, na.rm = TRUE))
   # replace the 2001 value with the modeled value
-  yearly_avg$avg_prop[which(yearly_avg$year == 2001)] = 
-    mean(pred_2001$pred_prop)
+  yearly_avg_scen1$avg_prop[which(yearly_avg_scen1$year == 2001)] = 
+    mean(mot_ob[[4]]$pred_prop)
   
   # dataframe of the yearly averages from the nonlinear model 
-  yearly_nonlinear_avg = rbind(
+  yearly_avg_scen2 = rbind(
     # the predicted values
     cbind(
       year = 2001,
@@ -104,15 +102,16 @@ get_all_motile_formulations = function(df, mot_ob, non_ob, beta_ob) {
         non_ob[[2]][[1]],
         # predicted dataframe
         data.frame(
-          mean_all = 3.44))),
+          mean_all = 3.44),
+        type = "response")),
     # the model values
     non_ob[[1]] %>% 
-    dplyr::select(year, prop_lep)  %>% 
-      dplyr::mutate(year = as.integer(as.factor(year)))
+      dplyr::select(year, prop_lep)  %>% 
+      dplyr::mutate(year = as.numeric(as.character(year)))
   )
   
   # dataframe of the yearly averages from the nonlinear model 
-  yearly_beta_avg = rbind(
+  yearly_avg_scen3 = rbind(
     # the predicted values
     cbind(
       year = 2001,
@@ -121,15 +120,34 @@ get_all_motile_formulations = function(df, mot_ob, non_ob, beta_ob) {
         beta_ob[[2]][[1]],
         # predicted dataframe
         data.frame(
-          mean_all = 3.44))),
+          mean_all = 3.44),
+      type = "response")),
     # the model values
     non_ob[[1]] %>% 
       dplyr::select(year, prop_lep) %>% 
-      dplyr::mutate(year = as.integer(as.factor(year)))
+      dplyr::mutate(year = as.numeric(as.character(year)))
   )
-    
-  # join the df to the predicted proportions from the model and then add
-  # in the empirical version if there is one 
+  
+  # make and return results list 
+  yearly_avg_list = list(yearly_avg_scen1, yearly_avg_scen2, yearly_avg_scen3)
+  
+  return(yearly_avg_list)
+
+}
+
+#############################
+# get_all_motile_formulations() function
+#############################
+get_all_motile_formulations = 
+  function(df, mot_ob, non_ob, beta_ob, yearly_avg_list) {
+  
+  #' Use the clean scfs data and the motile logistic regression to set up the 
+  #' proportions going into the Bernoulli draw
+  
+  yearly_avg = yearly_avg_list[[1]]
+  yearly_nonlinear_avg = yearly_avg_list[[2]]
+  yearly_beta_avg = yearly_avg_list[[3]]
+
   df = df %>% 
     # add in the individual level predictions for 2001 via the model predictions
     # note that these are all given by the number of all motiles available
@@ -183,22 +201,37 @@ get_all_motile_formulations = function(df, mot_ob, non_ob, beta_ob) {
 
 }
 
-get_all_cope_formulations = function(df, cope_op) {
+#############################
+# make_yearly_cope_averages() function
+#############################
+make_yearly_cope_averages = function(df, cope_op) {
   
-  #' Take the cope model and add the proprotions for both the year and the 
-  #' individual level assumptions to the dataframe
+  #' Make yearly average dataframe to be used later for model formulations
   
   # re-predict the model across the new all_cope (which now includes the 
   # unidentified copes)
+  yearly_avg_cope_scen1 = df %>% 
+    dplyr::select(year, prop_lep_cope) %>% 
+    dplyr::group_by(year) %>% 
+    dplyr::summarize(avg_prop = mean(prop_lep_cope, na.rm = TRUE))
+  
+  
+  # replace the 2001 value with the modeled value
+  yearly_avg_scen1$avg_prop[which(yearly_avg_scen1$year == 2001)] = 
+    mean(cope_ob[[4]]$pred_prop)
+  
+  
   pred_prop_cope_indiv_scen1_df = cbind(
-    obs_id = cope_ob[[4]]$obs_id,
-    year = cope_ob[[4]]$year,
+    obs_id = df$obs_id,
+    year = df$year,
+    unid_cope = df$unid_cope,
     data.frame(
-    pred_prop_cope_indiv_scen1 = stats::predict(
-      cope_ob[[2]][[1]],
-      data.frame(
-        all_cope = cope_ob[[4]]$unid_cope)
-    )))
+      pred_prop_cope_indiv_scen1 = stats::predict(
+        cope_ob[[2]][[1]],
+        data.frame(
+          all_cope = df$unid_cope),
+        type = "response"
+      )))
   
   # make yearly average
   pred_prop_cope_year_scen1_df = 
@@ -208,7 +241,24 @@ get_all_cope_formulations = function(df, cope_op) {
       pred_prop_cope_year_scen1 = mean(pred_prop_cope_indiv_scen1)
     )
   
-  df %>% 
+  yearly_avg_list_cope = list(pred_prop_cope_indiv_scen1_df, 
+                              pred_prop_cope_year_scen1_df)
+  
+  return(yearly_avg_list_cope)
+}
+
+#############################
+# get_all_cope_formulations() function
+#############################
+get_all_cope_formulations = function(df, cope_op, yearly_avg_list_cope) {
+  
+  #' Take the cope model and add the proprotions for both the year and the 
+  #' individual level assumptions to the dataframe
+  
+  pred_prop_cope_indiv_scen1_df = yearly_avg_list_cope[[1]]
+  pred_prop_cope_year_scen1_df = yearly_avg_list_cope[[2]]
+  
+  df = df %>% 
     # add in the individual level predictions for 2002-2004 via the model 
     # predictions note that these are all given by the number of all copes 
     # available
@@ -221,15 +271,137 @@ get_all_cope_formulations = function(df, cope_op) {
     dplyr::left_join(.,
                      pred_prop_cope_year_scen1_df,
                      by = "year")
+  
+  return(df)
     
+}
+
+#############################
+# add_in_empirical_proportions() function
+#############################
+add_in_empirical_proportions = function(df) {
+  
+  #' Since there are some of the columns that still have NA's because they are
+  #' relying on yearly averages
+  
+  df = df %>% 
+    # first, go through the mot_year_scen1 and replace any modeled observations
+    # with the data observations if there are any 
+    dplyr::mutate(
+      pred_prop_mot_year_scen1 = ifelse(
+        # if there is a value in prop lep mot, use it
+        !is.na(prop_lep_mot),
+        prop_lep_mot,
+        pred_prop_mot_year_scen1
+      ),
+    # now add in any empirical proportions for the copes
+      pred_prop_cope_indiv_scen1 = ifelse(
+        # if there's a value in prop_lep_cope, use it
+        !is.na(prop_lep_cope),
+        prop_lep_cope,
+        pred_prop_cope_indiv_scen1
+      ),
+      pred_prop_cope_year_scen1 = ifelse(
+        # if there's a value in prop_lep_cope, use it
+        !is.na(prop_lep_cope),
+        prop_lep_cope,
+        pred_prop_cope_year_scen1)
+    )
+
+    return(df)
+  
+}
+
+#############################
+# add_in_empirical_proportions() function
+#############################
+finish_prediction_proportions = 
+  function(df, yearly_avg_list_mot, yearly_avg_list_cope, mot_ob) {
+  
+  #' Loop through the dataframe, and for any proportion column that has yet
+  #' to be filled in for a given row, fill it in with the appropriate value,
+  #' either predicting it based on the value or putting in the yearly value
+  
+  # first double check that the yearly columns for motiles in all three 
+  # scenarios have no NA's
+  if(any(is.na(df$pred_prop_mot_year_scen1) | 
+         is.na(df$pred_prop_mot_year_scen2) |
+         is.na(df$pred_prop_mot_year_scen3))) {
+    stop("ERROR - Some NA's Introduced into scenario proportions")
+  }
+  
+  yearly_avg_scen1 = yearly_avg_list_mot[[1]]
+  yearly_avg_scen2 = yearly_avg_list_mot[[2]]
+  yearly_avg_scen3 = yearly_avg_list_mot[[3]]
+  
+  yearly_avg_cope = yearly_avg_list_cope
+  
+  for(row in seq_len(nrow(df))) {
+    
+    # mot_indiv_scen1 
+    if(is.na(df$pred_prop_mot_indiv_scen1[row])) {
+      
+      # if there are unid_mot values, use that to predict the proportion
+      if(df$unid_adult[row] > 0) {
+        
+        # predict with model object 
+        fill_val = stats::predict(
+          mot_ob[[2]][[1]],
+          data.frame(
+            all_mot = df$unid_adult[row]
+          ))
+      # if there's no unid_mot values, use yearly avg
+      } else if(df$unid_adult[row] < 1) {
+        fill_val = yearly_avg_scen1$avg_prop[
+          which(yearly_avg_scen1$year == df$year[row])]
+      }
+    }
+    
+    # cope_indiv_scen1 - don't bother with 2001 or already predicted years
+    if(is.na(df$pred_prop_cope_indiv_scen1[row]) & df$year[row] > 2004) {
+      
+      # if there are unid_cope values, use that to predict the proportion
+      if(df$unid_cope[row] > 0) {
+        
+        # predict with model object 
+        fill_val = stats::predict(
+          cope_ob[[2]][[1]],
+          data.frame(
+            all_cope = df$unid_cope[row]
+          ))
+        # if there's no unid_mot values, use yearly avg
+      } else if(df$unid_cope[row] < 1) {
+        fill_val = yearly_avg_scen1$avg_prop[
+          which(yearly_avg_scen1$year == df$year[row])]
+      }
+      
+    }
+  }
 }
 
 
 
+#############################
+# calculate_new_leps() function
+#############################
 calculate_new_leps = function(df) {
   
   #' Using the proportions from the different model options, make estimates 
-  #' of the new number of leps who are both 
+  #' of the new number of leps for both copes and mots
+  #' 
+  #' Note that for each row, there is:
+  #' 1. mot_indiv_scen1
+  #' 2. mot_year_scen1
+  #' 3. mot_year_scen2
+  #' 4. mot_year_scen3
+  #' 5. cope_indiv_scen1
+  #' 6. cope_year_scen1
+  #' 
+  #' Each of these will be used to draw a value wherever there are unidentified
+  #' adults and/or copes, then the values for cals and leps of each copes 
+  #' and motiles will be added to 
+  
+  
 }
 
 

@@ -21,7 +21,9 @@ prep_data_mot = function(df) {
   #' with data from 2001 onwards and one with only 2001 for comparison
   
   df_2002_onwards = df %>% 
-    dplyr::filter(year > 2001)
+    dplyr::filter(year > 2001) %>% 
+    # make sure no zeros in the fitting data
+    dplyr::filter(all_mot > 0)
   
   df_2001 = df %>% 
     dplyr::filter(year == 2001)
@@ -231,13 +233,17 @@ prep_data_cope = function(df) {
   #' Prep data on copepeodites to model 
   
   df_2005_onwards = df %>% 
-    dplyr::filter(year > 2004)
+    dplyr::filter(year > 2004) %>% 
+    # make sure no zeros in the fitting data
+    dplyr::filter(all_cope > 0)
   
   df_2002_2004 = df %>% 
     dplyr::filter(year > 2001 & year < 2005)
   
+  df = df
+  
   # list up the return df's
-  return_list = list(df_2002_2004, df_2005_onwards, df)
+  return_list = list(df_2002_2004, df_2005_onwards, df) 
   
   return(return_list)
 }
