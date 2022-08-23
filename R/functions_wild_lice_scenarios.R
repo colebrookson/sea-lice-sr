@@ -186,9 +186,41 @@ get_all_motile_formulations = function(df, mot_ob, non_ob, beta_ob) {
 get_all_cope_formulations = function(df, cope_op) {
   
   #' Take the cope model and add the proprotions for both the year and the 
-  #' individual level assumptions to the dataframe 
+  #' individual level assumptions to the dataframe
+  
+  # re-predict the model across the new all_cope (which now includes the 
+  # unidentified copes)
+  pred_prop_cope_indiv_scen1_df = cbind(
+    obs_id = cope_ob[[4]]$obs_id,
+    year = cope_ob[[4]]$year,
+    data.frame(
+    pred_prop_cope_indiv_scen1 = stats::predict(
+      cope_ob[[2]][[1]],
+      data.frame(
+        all_cope = cope_ob[[4]]$unid_cope)
+    )))
+  
+  # make yearly average
+  pred_prop_cope_year_scen1_df = 
+    pred_prop_cope_indiv_scen1_df %>% 
+    dplyr::group_by(year) %>% 
+    summarize(
+      pred_prop_cope_year_scen1 = mean(pred_prop_cope_indiv_scen1)
+    )
   
   df %>% 
+    # add in the individual level predictions for 2002-2004 via the model 
+    # predictions note that these are all given by the number of all copes 
+    # available
+    dplyr::left_join(.,
+                     # keep only the obs_id and the pred_prop to join
+                     pred_prop_cope_indiv_scen1_df %>% 
+                       dplyr::select(-year),
+                     by = "obs_id") %>% 
+    # add in the year level predictions for 2002-2004 via the model predictions
+    dplyr::left_join(.,
+                     pred_prop_cope_year_scen1_df,
+                     by = "year")
     
 }
 
