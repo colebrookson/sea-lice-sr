@@ -361,7 +361,7 @@ prediction_plot_cope = function(df, pred_df) {
                 fill = "grey80") +
     geom_line(data = pred_df, aes(x = all_cope, y = pred_prop)) + 
     theme_base() + 
-    labs(x = "Number of All Motiles", y = "Proportion of L. salmonis") +
+    labs(x = "Number of All Copepodites", y = "Proportion of L. salmonis") +
     scale_size_manual(values = c(3, 1))
   
   ggplot2::ggsave(

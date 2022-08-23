@@ -112,7 +112,7 @@ list(
   tar_target(wild_lice_beta_regression,
              beta_regression_scenario(
                prepare_wild_lice_data,
-               here::here("./outputs/model-outputs/nonlinear-regression/")
+               here::here("./outputs/model-outputs/beta-regression/")
              ))
   
 )
