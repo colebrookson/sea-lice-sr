@@ -22,7 +22,6 @@ prep_data_mot = function(df) {
   
   df_2002_onwards = df %>% 
     dplyr::filter(year > 2001) %>% 
-    # make sure no zeros in the fitting data
     dplyr::filter(all_mot > 0)
   
   df_2001 = df %>% 
@@ -610,7 +609,10 @@ nonlinear_plot = function(df, df_line) {
   
   ggplot2::ggsave(
     here::here("./figs/nonlinear-regression/nonlinear-model-predictions.png"),
-    predicted_proportions
+    predicted_proportions,
+    width = 6,
+    height = 5,
+    dpi = 600
   )
 }
 
@@ -778,7 +780,8 @@ beta_plot = function(df, predicted_beta_line) {
     theme_bw() + 
     theme_mod_comp() +
     labs(x = "Mean number of lice per fish (all louse species)", 
-         y = "Proportion of L. salmonis")
+         y = "Proportion of L. salmonis") +
+    ylim(0,1)
   
   # save object
   ggplot2::ggsave(filename = 

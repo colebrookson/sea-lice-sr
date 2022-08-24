@@ -75,7 +75,12 @@ cope_ob = readRDS(here("./outputs/model-outputs/cope-regression/cope_regression_
 non_ob = readRDS(here("./outputs/model-outputs/nonlinear-regression/nonlinear_regression_full_analysis_object.rds"))
 beta_ob = readRDS(here("./outputs/model-outputs/beta-regression/beta_regression_full_analysis_object.rds"))
 
-names(df)
+yearly_avg_list_mot = make_yearly_mot_averages(df, mot_ob, non_ob, beta_ob)
+df = get_all_motile_formulations(df, mot_ob, non_ob, beta_ob, yearly_avg_list)
+yearly_avg_list_cope = make_yearly_cope_averages(df, cope_op)
+df = get_all_cope_formulations(df, cope_op, yearly_avg_list_cope)
+df = add_in_empirical_proportions(df)
+df = finish_prediction_proportions(df, yearly_avg_list_mot, yearly_avg_list_cope, mot_ob)
 
 #############################
 # make_yearly_mot_averages() function
@@ -110,7 +115,7 @@ make_yearly_mot_averages = function(df, mot_ob, non_ob, beta_ob) {
       dplyr::mutate(year = as.numeric(as.character(year)))
   )
   
-  # dataframe of the yearly averages from the nonlinear model 
+  # dataframe of the yearly averages from the beta model 
   yearly_avg_scen3 = rbind(
     # the predicted values
     cbind(
@@ -129,9 +134,9 @@ make_yearly_mot_averages = function(df, mot_ob, non_ob, beta_ob) {
   )
   
   # make and return results list 
-  yearly_avg_list = list(yearly_avg_scen1, yearly_avg_scen2, yearly_avg_scen3)
+  yearly_avg_list_mot = list(yearly_avg_scen1, yearly_avg_scen2, yearly_avg_scen3)
   
-  return(yearly_avg_list)
+  return(yearly_avg_list_mot)
 
 }
 
@@ -139,14 +144,14 @@ make_yearly_mot_averages = function(df, mot_ob, non_ob, beta_ob) {
 # get_all_motile_formulations() function
 #############################
 get_all_motile_formulations = 
-  function(df, mot_ob, non_ob, beta_ob, yearly_avg_list) {
+  function(df, mot_ob, non_ob, beta_ob, yearly_avg_list_mot) {
   
   #' Use the clean scfs data and the motile logistic regression to set up the 
   #' proportions going into the Bernoulli draw
   
-  yearly_avg = yearly_avg_list[[1]]
-  yearly_nonlinear_avg = yearly_avg_list[[2]]
-  yearly_beta_avg = yearly_avg_list[[3]]
+  yearly_avg = yearly_avg_list_mot[[1]]
+  yearly_nonlinear_avg = yearly_avg_list_mot[[2]]
+  yearly_beta_avg = yearly_avg_list_mot[[3]]
 
   df = df %>% 
     # add in the individual level predictions for 2001 via the model predictions
@@ -208,28 +213,22 @@ make_yearly_cope_averages = function(df, cope_op) {
   
   #' Make yearly average dataframe to be used later for model formulations
   
-  # re-predict the model across the new all_cope (which now includes the 
-  # unidentified copes)
+  # get empirical estimates for the years
   yearly_avg_cope_scen1 = df %>% 
     dplyr::select(year, prop_lep_cope) %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(avg_prop = mean(prop_lep_cope, na.rm = TRUE))
   
-  
-  # replace the 2001 value with the modeled value
-  yearly_avg_scen1$avg_prop[which(yearly_avg_scen1$year == 2001)] = 
-    mean(cope_ob[[4]]$pred_prop)
-  
-  
+  # make individual-level estimates for all observations
   pred_prop_cope_indiv_scen1_df = cbind(
     obs_id = df$obs_id,
     year = df$year,
-    unid_cope = df$unid_cope,
+    all_cope = df$all_cope,
     data.frame(
       pred_prop_cope_indiv_scen1 = stats::predict(
         cope_ob[[2]][[1]],
         data.frame(
-          all_cope = df$unid_cope),
+          all_cope = df$all_cope),
         type = "response"
       )))
   
@@ -237,12 +236,23 @@ make_yearly_cope_averages = function(df, cope_op) {
   pred_prop_cope_year_scen1_df = 
     pred_prop_cope_indiv_scen1_df %>% 
     dplyr::group_by(year) %>% 
-    summarize(
+    dplyr::summarize(
       pred_prop_cope_year_scen1 = mean(pred_prop_cope_indiv_scen1)
     )
   
+  pred_prop_cope_indiv_scen1_df = pred_prop_cope_indiv_scen1_df %>% 
+    dplyr::select(-c(year, all_cope))
+  
+  # add in predicted values for 2001-2004
+  yearly_avg_cope_scen1$avg_prop[
+    which(yearly_avg_cope_scen1$year < 2005)] = 
+    pred_prop_cope_year_scen1_df$pred_prop_cope_year_scen1[
+      which(pred_prop_cope_year_scen1_df$year < 2005)
+    ]
+  
   yearly_avg_list_cope = list(pred_prop_cope_indiv_scen1_df, 
-                              pred_prop_cope_year_scen1_df)
+                              pred_prop_cope_year_scen1_df,
+                              yearly_avg_cope_scen1)
   
   return(yearly_avg_list_cope)
 }
@@ -264,8 +274,7 @@ get_all_cope_formulations = function(df, cope_op, yearly_avg_list_cope) {
     # available
     dplyr::left_join(.,
                      # keep only the obs_id and the pred_prop to join
-                     pred_prop_cope_indiv_scen1_df %>% 
-                       dplyr::select(-year),
+                     pred_prop_cope_indiv_scen1_df,
                      by = "obs_id") %>% 
     # add in the year level predictions for 2002-2004 via the model predictions
     dplyr::left_join(.,
@@ -342,44 +351,64 @@ finish_prediction_proportions =
     if(is.na(df$pred_prop_mot_indiv_scen1[row])) {
       
       # if there are unid_mot values, use that to predict the proportion
-      if(df$unid_adult[row] > 0) {
+      if(df$all_mot[row] > 0) {
         
         # predict with model object 
         fill_val = stats::predict(
           mot_ob[[2]][[1]],
           data.frame(
-            all_mot = df$unid_adult[row]
-          ))
+            all_mot = df$all_mot[row]
+          ))[[1]]
       # if there's no unid_mot values, use yearly avg
-      } else if(df$unid_adult[row] < 1) {
+      } else if(df$all_mot[row] < 1) {
         fill_val = yearly_avg_scen1$avg_prop[
           which(yearly_avg_scen1$year == df$year[row])]
       }
+      
+      # fill in value into the right row
+      df$pred_prop_mot_indiv_scen1[row] = fill_val
     }
+  }
+  
+  # double check there are no NA values 
+  if(any(is.na(df$pred_prop_mot_year_scen1) | 
+         is.na(df$pred_prop_mot_year_scen2) |
+         is.na(df$pred_prop_mot_year_scen3) |
+         is.na(df$pred_prop_mot_indiv_scen1) |
+         is.na(df$pred_prop_cope_indiv_scen1) |
+         is.na(df$pred_prop_cope_year_scen1))) {
+    stop("ERROR - Not all scenario proportions filled!!")
+  }
+  
+  return(df)
+  
+}
+
+#############################
+# draw_for_each_scenario() function
+#############################
+draw_for_each_scenario = function(row, prop_cols, new_lice_cols, df) {
+  
+  #' Go through each of the proportion columns, perform the draw, and assign
+  #' the values in a loop 
+  
+  # loop through the column options
+  for(i in 1:length(prop_cols)) {
+    draw = sample(c(1, 0),
+                  size = 1,
+                  # draw with probability of that line in the dataset for leps
+                  # and 1 - that probability for cals (cals would be 0)
+                  prob = c(
+                    df[row, prop_cols[i]],
+                    1 - (df[row, prop_cols[i]])))
     
-    # cope_indiv_scen1 - don't bother with 2001 or already predicted years
-    if(is.na(df$pred_prop_cope_indiv_scen1[row]) & df$year[row] > 2004) {
-      
-      # if there are unid_cope values, use that to predict the proportion
-      if(df$unid_cope[row] > 0) {
-        
-        # predict with model object 
-        fill_val = stats::predict(
-          cope_ob[[2]][[1]],
-          data.frame(
-            all_cope = df$unid_cope[row]
-          ))
-        # if there's no unid_mot values, use yearly avg
-      } else if(df$unid_cope[row] < 1) {
-        fill_val = yearly_avg_scen1$avg_prop[
-          which(yearly_avg_scen1$year == df$year[row])]
-      }
-      
+    if(draw == 1) {
+      df[row, new_lice_cols[i]] = df[row, new_lice_cols[i]] + 1
+    } else if(draw == 0) {
+      df[row, new_lice_cols[i + 6]] = df[row, new_lice_cols[i + 6]] + 1
     }
   }
 }
-
-
 
 #############################
 # calculate_new_leps() function
@@ -401,90 +430,50 @@ calculate_new_leps = function(df) {
   #' adults and/or copes, then the values for cals and leps of each copes 
   #' and motiles will be added to 
   
+  # make empty columns first
+  df = df %>% 
+    mutate(
+      mot_indiv_scen1_lep = 0,
+      mot_indiv_scen1_cal = 0,
+      mot_year_scen1_lep = 0,
+      mot_year_scen1_cal = 0,
+      mot_year_scen2_lep = 0,
+      mot_year_scen2_cal = 0,
+      mot_year_scen3_lep = 0,
+      mot_year_scen3_cal = 0,
+      cope_indiv_scen1_lep = 0,
+      cope_indiv_scen1_cal = 0,
+      cope_year_scen1_lep = 0,
+      cope_year_scen1_cal = 0
+    )
   
-}
-
-
-
-
-# there must be a way to vectorize this all in a dplyr::mutate() but
-# I don't know how, so here it is in a big ugly loop ---- fill in the 
-# proportions of leps intelligently
-for(row in seq_len(nrow(df))) {
+  # make vectors of the proportion columns and the new lice columns
+  prop_cols = c("pred_prop_mot_indiv_scen1", "pred_prop_mot_year_scen1", 
+                "pred_prop_mot_year_scen2", "pred_prop_mot_year_scen3", 
+                "pred_prop_cope_indiv_scen1", "pred_prop_cope_year_scen1")
+  new_lice_cols = c("mot_indiv_scen1_lep", "mot_year_scen1_lep", 
+                    "mot_year_scen2_lep", "mot_year_scen3_lep", 
+                    "cope_indiv_scen1_lep", "cope_year_scen1_lep", 
+                    "mot_indiv_scen1_cal", "mot_year_scen1_cal",
+                    "mot_year_scen2_cal", "mot_year_scen3_cal", 
+                    "cope_indiv_scen1_cal", "cope_year_scen1_cal" )
   
-  # check if the value already exists
-  if(!is.na(df$pred_prop[row])) {
-    next
-  }
-  # if in 2001 and option is individual, each line gets a prediction
-  if(df$year[row] == 2001 & option == "Individual") {
-    
-    # get a model prediction
-    assign_val = stats::predict(
-      # model object
-      mot_ob[[2]][[1]],
-      # predicted dataframe
-      data.frame(
-        all_mot = df$unid_adult[row]))[[1]]
-    
-    # if 2001 and the option is year
-  } else if(df$year[row] == 2001 & option == "Year") {
-    
-    # use the yearly average
-    assign_val = yearly_avg$avg_prop[which(yearly_avg$year == df$year[row])]
-    
-    # if not 2001, check the option, if option is defer to individual
-  } else if(df$unid_adult[row] > 0 & option == "Individual") {
-    
-    # get a model prediction
-    assign_val = stats::predict(
-      # model object
-      mot_ob[[2]][[1]],
-      # predicted dataframe
-      data.frame(
-        all_mot = df$unid_adult[row]))[[1]]
-    
-    # if the option is to defer to the year
-  } else if(df$unid_adult[row] > 0 & option == "Year") {
-    
-    # use the yearly average
-    assign_val = yearly_avg$avg_prop[which(yearly_avg$year == df$year[row])]
-    
-    # if the unid_adult is !> 0
-  } else if(df$unid_adult[row] < 1) {
-    
-    # use the yearly average
-    assign_val = yearly_avg$avg_prop[which(yearly_avg$year == df$year[row])]
-    
-    # if all else fails
-  } else {
-    assign_val = 0
-  }
+
   
-  # now actually use the assign_val in the right row
-  df$pred_prop[row] = assign_val
-  
-  # at that row, determine how many unid_adults there are, and draw a sample
-  # for each of them, determining if they should be added to the new lep
-  # column 
-  if(df$unid_adult[row] > 0) {
-    for(louse in 1:df$unid_adult[row]) {
-      # draw from sample
-      draw = sample(c(1, 0),
-                    size = 1,
-                    # draw with probability of that line in the dataset for leps
-                    # and 1 - that probability for cals (cals would be 0)
-                    prob = c(
-                      df$pred_prop[row],
-                      1 - (df$pred_prop[row]))
-      )
-      if(draw == 1) {
-        df$new_lep_adult[row] = df$new_lep_adult[row] + 1
-      } else if(draw == 0) {
-        df$new_cal_adult[row] = df$new_cal_adult[row] + 1
+  # loop through each row, make the sample pull and then 
+  for(row in seq_len(nrow(df))) {
+    
+    # check if there are any unidentified mots 
+    if(df$unid_adult[row] > 0) {
+    
+      for(louse in 1:df$unid_adult[row]) {
+
+        # use draw function to make the calculations
+        draw_for_each_scenario(row, prop_cols, new_lice_cols, df)
       }
     }
   }
+  
+  return(df)
 }
-
 
