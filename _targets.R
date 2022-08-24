@@ -17,6 +17,7 @@ source(here::here("./R/functions_farm_data_cleaning.R"))
 source(here::here("./R/functions_general_data_cleaning.R"))
 source(here::here("./R/functions_wild_lice_cleaning.R"))
 source(here::here("./R/functions_wild_lice_regression.R"))
+source(here::here("./R/functions_wild_lice_scenarios.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg"))
@@ -113,6 +114,15 @@ list(
              beta_regression_scenario(
                prepare_wild_lice_data,
                here::here("./outputs/model-outputs/beta-regression/")
+             )),
+  tar_target(counting_unid_lice_scenarios,
+             count_unidentified_lice(
+               prepare_wild_lice_data,
+               motile_proportions_logistic_regression, 
+               cope_proportions_logistic_regression,
+               wild_lice_nonlinear_regression, 
+               wild_lice_beta_regression,
+               here::here(
+                 "./data/wild-lice-data/clean/prepared_unid_counted_lice.csv")
              ))
-  
 )

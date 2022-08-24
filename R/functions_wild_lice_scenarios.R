@@ -69,18 +69,11 @@ options(dplyr.summarise.inform = FALSE)
 #' infection patterns of the fish. 
 # ==============================================================================
 
-df = read_csv(here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
-mot_ob = readRDS(here("./outputs/model-outputs/mot-regression/motile_regression_full_analysis_object.rds"))
-cope_ob = readRDS(here("./outputs/model-outputs/cope-regression/cope_regression_full_analysis_object.rds"))
-non_ob = readRDS(here("./outputs/model-outputs/nonlinear-regression/nonlinear_regression_full_analysis_object.rds"))
-beta_ob = readRDS(here("./outputs/model-outputs/beta-regression/beta_regression_full_analysis_object.rds"))
-
-yearly_avg_list_mot = make_yearly_mot_averages(df, mot_ob, non_ob, beta_ob)
-df = get_all_motile_formulations(df, mot_ob, non_ob, beta_ob, yearly_avg_list)
-yearly_avg_list_cope = make_yearly_cope_averages(df, cope_op)
-df = get_all_cope_formulations(df, cope_op, yearly_avg_list_cope)
-df = add_in_empirical_proportions(df)
-df = finish_prediction_proportions(df, yearly_avg_list_mot, yearly_avg_list_cope, mot_ob)
+# df = read_csv(here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
+# mot_ob = readRDS(here("./outputs/model-outputs/mot-regression/motile_regression_full_analysis_object.rds"))
+# cope_ob = readRDS(here("./outputs/model-outputs/cope-regression/cope_regression_full_analysis_object.rds"))
+# non_ob = readRDS(here("./outputs/model-outputs/nonlinear-regression/nonlinear_regression_full_analysis_object.rds"))
+# beta_ob = readRDS(here("./outputs/model-outputs/beta-regression/beta_regression_full_analysis_object.rds"))
 
 #############################
 # make_yearly_mot_averages() function
@@ -385,32 +378,6 @@ finish_prediction_proportions =
 }
 
 #############################
-# draw_for_each_scenario() function
-#############################
-draw_for_each_scenario = function(row, prop_cols, new_lice_cols, df) {
-  
-  #' Go through each of the proportion columns, perform the draw, and assign
-  #' the values in a loop 
-  
-  # loop through the column options
-  for(i in 1:length(prop_cols)) {
-    draw = sample(c(1, 0),
-                  size = 1,
-                  # draw with probability of that line in the dataset for leps
-                  # and 1 - that probability for cals (cals would be 0)
-                  prob = c(
-                    df[row, prop_cols[i]],
-                    1 - (df[row, prop_cols[i]])))
-    
-    if(draw == 1) {
-      df[row, new_lice_cols[i]] = df[row, new_lice_cols[i]] + 1
-    } else if(draw == 0) {
-      df[row, new_lice_cols[i + 6]] = df[row, new_lice_cols[i + 6]] + 1
-    }
-  }
-}
-
-#############################
 # calculate_new_leps() function
 #############################
 calculate_new_leps = function(df) {
@@ -468,12 +435,79 @@ calculate_new_leps = function(df) {
     
       for(louse in 1:df$unid_adult[row]) {
 
-        # use draw function to make the calculations
-        draw_for_each_scenario(row, prop_cols, new_lice_cols, df)
+        # loop through the column options
+        for(i in 1:length(prop_cols)) {
+          draw = sample(c(1, 0),
+                        size = 1,
+                        # draw with probability of that line in the dataset for leps
+                        # and 1 - that probability for cals (cals would be 0)
+                        prob = c(
+                          df[row, prop_cols[i]],
+                          1 - (df[row, prop_cols[i]])))
+          
+          if(draw == 1) {
+            df[row, new_lice_cols[i]] = df[row, new_lice_cols[i]] + 1
+          } else if(draw == 0) {
+            df[row, new_lice_cols[i + 6]] = df[row, new_lice_cols[i + 6]] + 1
+          }
+        }      
       }
     }
   }
   
   return(df)
 }
+
+#############################
+# write_new_calculated_lice() function
+#############################
+write_new_calculated_lice = function(df, path) {
+  
+  
+  #' Write out the result 
+  
+  readr::write_csv(df, path)
+}
+
+#############################
+# count_unidentified_lice() function
+#############################
+count_unidentified_lice = function(df, mot_ob, cope_ob, non_ob, beta_ob, path) {
+  
+  #' Use all component functions to go through the data set, and given the 
+  #' scenarios mentioned above, compute the number of unknown species
+  #' adults and copes that are present. Currently I have this written as 
+  #' reassigning `df` a number of times, which is bad but makes manual 
+  #' testing easy :)
+  
+  # set up yearly averages for motiles
+  yearly_avg_list_mot = make_yearly_mot_averages(df, mot_ob, non_ob, beta_ob)
+  
+  # formulate the different scenario options for motiles
+  df = get_all_motile_formulations(df, mot_ob, non_ob, 
+                                   beta_ob, yearly_avg_list_mot)
+  
+  # get yearly cope averages
+  yearly_avg_list_cope = make_yearly_cope_averages(df, cope_op)
+  
+  # formulate different scenario options for copes
+  df = get_all_cope_formulations(df, cope_ob, yearly_avg_list_cope)
+  
+  # add the empirical proportions from the dataset
+  df = add_in_empirical_proportions(df)
+  
+  # make the prediction proportios
+  df = finish_prediction_proportions(df, yearly_avg_list_mot, 
+                                     yearly_avg_list_cope, mot_ob)
+  
+  # actually draw for the new leps
+  df = calculate_new_leps(df)
+  
+  # write result out
+  write_new_calculated_lice(df, path)
+  
+  return(df)
+  
+}
+
 
