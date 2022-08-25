@@ -19,7 +19,7 @@ cope_2002_2004_prediction|function|d4e3380c0622f038|||||||||||||||
 cope_proportions_logistic_regression|stem|e82fff41c5121ce2|49434ca0f1b3bd11|047eb57522ffffd0|-1067662679||t19229.1559759899s|1664ba2fcae66cb2|1522714|rds|local|vector|||1.488|noninteger successes in a binomial glm. Removed 171 rows containing missing values geom_point.|
 cope_regression|function|e958e2af9a18b90e|||||||||||||||
 count_unidentified_lice|function|ac3773eadd992217|||||||||||||||
-counting_unid_lice_scenarios|stem|2ca5c10653e92814|a984c78450d97067|7383832a65ee60a3|419626744||t19229.1615555373s|06126bf41f8659a0|445957|rds|local|vector|||17.148||
+counting_unid_lice_scenarios|stem|2ca5c10653e92814|f8145efca34d4b0d|7383832a65ee60a3|419626744||t19229.1649969966s|06126bf41f8659a0|445957|rds|local|vector|||18.766||
 df|object|de6a0928ab3ebb22|||||||||||||||
 dfo_farm_ref_data|stem|02aa0092b5469095|84f590bceeb6cea2|c3b5fc02cdc369c1|-1486775753|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/farm-name-reference.csv|t19205.9599767471s|54f0cde7a83f527b|7999|file|local|vector|||0.218||
 dfo_file|object|a999c69c8fb5fac0|||||||||||||||

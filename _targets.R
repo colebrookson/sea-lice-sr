@@ -123,6 +123,6 @@ list(
                wild_lice_nonlinear_regression, 
                wild_lice_beta_regression,
                here::here(
-                 "./data/wild-lice-data/clean/prepared_unid_counted_lice.csv")
+                 "./data/wild-lice-data/clean/prepared-unid-counted-lice.csv")
              ))
 )
