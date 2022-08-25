@@ -2,7 +2,7 @@ name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iterat
 .Random.seed|object|ee2e23219684eccb|||||||||||||||
 %notin%|function|c5de772db35799a7|||||||||||||||
 add_in_empirical_proportions|function|a420ef2c3a13c047|||||||||||||||
-bati_data|stem|36b8722e6e4a3ed5|15cf45363a6e2bf3|852e69043e58a4af|499463961||t19221.6926231671s|ee53a07d7c10c22b|46930|rds|local|vector|||0.166||
+bati_data|stem|32ad82ed00caff35|15cf45363a6e2bf3|852e69043e58a4af|499463961||t19229.1554265045s|7c32e22f5fe8024c|46929|rds|local|vector|||0.098||
 beta_plot|function|ebcea03278c2e238|||||||||||||||
 beta_prediction|function|435fd86ecb193fe7|||||||||||||||
 beta_regression|function|1874c05537b8aab1|||||||||||||||
@@ -13,26 +13,26 @@ clean_data_bati|function|e46a928529838a5c|||||||||||||||
 clean_data_marty|function|4db48a292bbc2337|||||||||||||||
 clean_data_scfs|function|b4fd2f7d7c9ea026|||||||||||||||
 clean_dfo_open_data|function|dd1372a3283cfb39|||||||||||||||
-clean_open_dfo_data|stem|66fe5e72fb17a5c3|fc6dc7fc70cbbf08|61b86088b3d8ba60|1901894046||t19221.6926185839s|a6f002f29bb6a2e4|54017|rds|local|vector|||0.532||
+clean_open_dfo_data|stem|d72672f7b298adf5|fc6dc7fc70cbbf08|61b86088b3d8ba60|1901894046||t19229.1554223841s|a6f002f29bb6a2e4|54017|rds|local|vector|||0.757||
 coalesce_data_scfs|function|aa81aada9f8599b1|||||||||||||||
 cope_2002_2004_prediction|function|d4e3380c0622f038|||||||||||||||
-cope_proportions_logistic_regression|stem|dc0ec46f893ae456|49434ca0f1b3bd11|a9a8f1e5217328ea|-1067662679||t19227.3022466541s|1664ba2fcae66cb2|1522714|rds|local|vector|||2.648|noninteger successes in a binomial glm. Removed 171 rows containing missing values geom_point.|
+cope_proportions_logistic_regression|stem|e82fff41c5121ce2|49434ca0f1b3bd11|047eb57522ffffd0|-1067662679||t19229.1559759899s|1664ba2fcae66cb2|1522714|rds|local|vector|||1.488|noninteger successes in a binomial glm. Removed 171 rows containing missing values geom_point.|
 cope_regression|function|e958e2af9a18b90e|||||||||||||||
-count_unidentified_lice|function|6a4165f03682b5b8|||||||||||||||
-counting_unid_lice_scenarios|stem||a984c78450d97067|76078546c6aa8e0d|419626744||t19228.2497578841s||0|rds|local|vector|||0.896||object cope_ob not found
+count_unidentified_lice|function|ac3773eadd992217|||||||||||||||
+counting_unid_lice_scenarios|stem|2ca5c10653e92814|a984c78450d97067|7383832a65ee60a3|419626744||t19229.1615555373s|06126bf41f8659a0|445957|rds|local|vector|||17.148||
 df|object|de6a0928ab3ebb22|||||||||||||||
-dfo_farm_ref_data|stem|02aa0092b5469095|84f590bceeb6cea2|c3b5fc02cdc369c1|-1486775753|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/farm-name-reference.csv|t19208.5681619444s|54f0cde7a83f527b|7999|file|local|vector|||0.218||
+dfo_farm_ref_data|stem|02aa0092b5469095|84f590bceeb6cea2|c3b5fc02cdc369c1|-1486775753|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/farm-name-reference.csv|t19205.9599767471s|54f0cde7a83f527b|7999|file|local|vector|||0.218||
 dfo_file|object|a999c69c8fb5fac0|||||||||||||||
 farm_df|object|a999c69c8fb5fac0|||||||||||||||
 farm_names_bati|function|72589cb21f7ae795|||||||||||||||
 farm_names_marty|function|dc64f9017565c4ea|||||||||||||||
 file|object|0806557676f0b67f|||||||||||||||
-fill_in_late_timeseries_inventories|stem|fcd29ec9348df4d4|25c2635942164daa|01ac134d05fb1a94|-951349394||t19221.7158480589s|b6099e1bec5fd49f|419|rds|local|vector|||0.29||
-fill_in_missing_inventories|stem|49a4613d683e547b|459c5f84df37953b|ffa500822f0af6c5|937209866||t19221.7158444941s|973381529c66c0df|296|rds|local|vector|||0.245||
+fill_in_late_timeseries_inventories|stem|e6e191c951a0e6c4|25c2635942164daa|0c83956a3833b032|-951349394||t19229.1559538142s|0dd407bf2b677bc2|418|rds|local|vector|||0.139||
+fill_in_missing_inventories|stem|42d4fb6bcb8cc8b6|459c5f84df37953b|5477cdcd5e9e70ba|937209866||t19229.1559521475s|973381529c66c0df|296|rds|local|vector|||0.147||
 fill_in_missing_inventory_data|function|b61ea21ec0aacd6f|||||||||||||||
 finish_prediction_proportions|function|a6e02f1979099a3f|||||||||||||||
 fix_months|function|ae0b59aeb50159d7|||||||||||||||
-get_all_cope_formulations|function|c1ddcc751765b199|||||||||||||||
+get_all_cope_formulations|function|41b27bb7d9bc9281|||||||||||||||
 get_all_motile_formulations|function|c874476d76c4d6ff|||||||||||||||
 get_data_bati|function|f55fbb93cbb1e4ef|||||||||||||||
 get_data_dfo_open|function|f55fbb93cbb1e4ef|||||||||||||||
@@ -40,7 +40,7 @@ get_data_dfo_ref|function|23997d3025932882|||||||||||||||
 get_data_marty|function|f55fbb93cbb1e4ef|||||||||||||||
 get_data_marty_cleaned|function|f55fbb93cbb1e4ef|||||||||||||||
 get_data_scfs|function|d4b632b9a9bb3f37|||||||||||||||
-join_all_farm_data|stem|0f31dfa095ff017a|28546ad75a920ccb|552b13e3c3a73359|669325057||t19221.7158569478s|e8422d5bf52d1963|40466|rds|local|vector|||0.265||
+join_all_farm_data|stem|b665f181615a71f7|28546ad75a920ccb|fa5fb9f13586715b|669325057||t19229.1560998785s|e8422d5bf52d1963|40466|rds|local|vector|||0.139||
 join_clean_bati|function|fb7142b86211baaa|||||||||||||||
 join_clean_late|function|79ac99623e9f056e|||||||||||||||
 join_clean_marty|function|f1cdf83979209431|||||||||||||||
@@ -49,13 +49,13 @@ join_farm_data|function|18651d26916f5519|||||||||||||||
 lep_mot_regression|function|a62bd526f9c7fc08|||||||||||||||
 lep_regression_cope|function|c1689388c776306a|||||||||||||||
 lep_regression_mot|function|4415c56609f47294|||||||||||||||
-make_yearly_cope_averages|function|a6aeb24347891d3d|||||||||||||||
+make_yearly_cope_averages|function|3cb9a84539cb65aa|||||||||||||||
 make_yearly_mot_averages|function|a73603c3a626a9b4|||||||||||||||
-marty_data|stem|b7e8591d29fdddd8|15c300f56e5a141a|ba992c2f2d1765c2|-2054066338||t19221.6926209913s|23ba7cf05e073bd5|26387|rds|local|vector|||0.189||
+marty_data|stem|c4ab7ec277269254|15c300f56e5a141a|ba992c2f2d1765c2|-2054066338||t19229.1554251156s|23ba7cf05e073bd5|26387|rds|local|vector|||0.22||
 marty_df|object|3a45d93842d4016a|||||||||||||||
 match_inventory_data|function|4099b94337a1fc6f|||||||||||||||
 mot_2001_prediction|function|edbc7406644ddc67|||||||||||||||
-motile_proportions_logistic_regression|stem|93b13b8e60d0ede7|6488863b5ff44390|7a26d489d88c3a50|1991784082||t19227.3022817466s|b915d1823bf411dd|1804832|rds|local|vector|||2.336|noninteger successes in a binomial glm. Removed 15 rows containing missing values geom_point.|
+motile_proportions_logistic_regression|stem|eae51c821ffff226|6488863b5ff44390|669f4c17e94b495d|1991784082||t19229.1560039528s|b915d1823bf411dd|1804832|rds|local|vector|||1.891|noninteger successes in a binomial glm. Removed 15 rows containing missing values geom_point.|
 motile_regression|function|24656aa3fd1f104f|||||||||||||||
 nonlinear_plot|function|1a34f1311274acca|||||||||||||||
 nonlinear_prediction|function|3e5d3cc69fbe0131|||||||||||||||
@@ -68,11 +68,11 @@ prediction_plot_mot|function|3c23dc6aab2cc4fc|||||||||||||||
 prep_data_cope|function|01884fb2ce8a2509|||||||||||||||
 prep_data_mot|function|15df210b0c93daa7|||||||||||||||
 prep_data_nonlinear|function|733818bc9c369b08|||||||||||||||
-prepare_wild_lice_data|stem|efca690732b1cfa5|59d90a6809f5aa56|07d70e796df99f46|-486621467||t19227.3020699876s|646670985d342ef6|386688|rds|local|vector|||58.993||
-raw_data_file_bati|stem|fbeaf60eb3607aa6|d3eb524fc9913e37|c3b5fc02cdc369c1|1852314142|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/BATI_farm_louse_data_RAW.csv|t19198.7803988078s|c032e46de012d846|215342|file|local|vector|||0.074||
-raw_data_file_marty|stem|42b6c4186aaf3c0a|b5fe940b90e237f5|c3b5fc02cdc369c1|711235436|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/marty-2010-data/marty-data-copied.csv|t19208.5681624537s|75969f2ee2633e1c|207114|file|local|vector|||0.243||
+prepare_wild_lice_data|stem|df488f34811d0380|59d90a6809f5aa56|07d70e796df99f46|-486621467||t19229.1559503883s|4fe05e08ab55c9e1|386689|rds|local|vector|||45.088||
+raw_data_file_bati|stem|fbeaf60eb3607aa6|d3eb524fc9913e37|c3b5fc02cdc369c1|1852314142|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/BATI_farm_louse_data_RAW.csv|t19207.1745452795s|c032e46de012d846|215342|file|local|vector|||0.074||
+raw_data_file_marty|stem|42b6c4186aaf3c0a|b5fe940b90e237f5|c3b5fc02cdc369c1|711235436|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/marty-2010-data/marty-data-copied.csv|t19206.2643899503s|75969f2ee2633e1c|207114|file|local|vector|||0.243||
 raw_file|object|6dc53415d1551df7|||||||||||||||
-raw_open_dfo_data|stem|0678236ff26e6aa8|c86d0938fec52830|c3b5fc02cdc369c1|-2026564613|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/gov-open-data/fish-farm-sea-louse-counts-data.csv|t19208.5681624074s|416a24a875ba145b|2394595|file|local|vector|||0.072||
+raw_open_dfo_data|stem|0678236ff26e6aa8|c86d0938fec52830|c3b5fc02cdc369c1|-2026564613|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/gov-open-data/fish-farm-sea-louse-counts-data.csv|t19198.283145907s|416a24a875ba145b|2394595|file|local|vector|||0.072||
 read_data_clean_scfs|function|fcc3863c08823970|||||||||||||||
 read_regression_cope|function|13e2eb5b56340168|||||||||||||||
 read_regression_mot|function|13e2eb5b56340168|||||||||||||||
@@ -80,7 +80,7 @@ save_beta_regression|function|c900dc45e3930c0d|||||||||||||||
 save_nonlinear_regression|function|cfe40eb1cd512bb2|||||||||||||||
 save_regression_copes|function|9f8608775bc215ac|||||||||||||||
 save_regression_mots|function|cfd99a324b04da31|||||||||||||||
-scfs_raw_data_file|stem|963ebaa46a53f344|bb57621d7fe16c8c|33217b43f1415251|1766984428|/home/cole/Github/sea-lice-sr/./data/wild-lice-data/raw/Sea-lice-database-master/Data/BroughtonSeaLice_fishData.csv|t19208.616545203s|09520c5850fa3143|5495967|file|local|vector|||0.091||
+scfs_raw_data_file|stem|963ebaa46a53f344|bb57621d7fe16c8c|33217b43f1415251|1766984428|/home/cole/Github/sea-lice-sr/./data/wild-lice-data/raw/Sea-lice-database-master/Data/BroughtonSeaLice_fishData.csv|t19229.1474266501s|09520c5850fa3143|5495967|file|local|vector|||0.091||
 standardize_names|function|df4fc583e60014a9|||||||||||||||
 summary_columns|function|578d17c11edaec54|||||||||||||||
 temp|object|de6a0928ab3ebb22|||||||||||||||
@@ -91,8 +91,8 @@ theme_raw_comp|function|792c6c006c7283ec|||||||||||||||
 theme_small_map|function|2d83776b3178fa9f|||||||||||||||
 trim_clean_dfo_open_data|function|f2dbe44f8e599c68|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
-wild_lice_beta_regression|stem|9237f597a7d8f9e7|bbc132a8ec09079f|7a60a14c4b864acb|577821677||t19227.3053929475s|69c6e5a69b855989|12865|rds|local|vector|||5.641||
-wild_lice_nonlinear_regression|stem|dba1fdd90ac2bf28|f4908d6d0bdaf050|29f42e16ff335098|183052523||t19227.3053275771s|aaa5182d0103ecdd|13761|rds|local|vector|||6.104||
+wild_lice_beta_regression|stem|6fcbcb2559ac7b97|bbc132a8ec09079f|640f95f1a05dd50d|577821677||t19229.1560502953s|6c5716952e947034|12864|rds|local|vector|||3.998||
+wild_lice_nonlinear_regression|stem|e7c095ecb5990ba8|f4908d6d0bdaf050|a963ee16d8f2251c|183052523||t19229.156098073s|fc7fa338136fe66b|13760|rds|local|vector|||4.121||
 write_data_bati|function|bfa517e14148f2ec|||||||||||||||
 write_data_joined_farm|function|785c298ffc35eca8|||||||||||||||
 write_data_marty|function|bfa517e14148f2ec|||||||||||||||

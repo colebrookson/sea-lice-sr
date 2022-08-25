@@ -202,7 +202,7 @@ get_all_motile_formulations =
 #############################
 # make_yearly_cope_averages() function
 #############################
-make_yearly_cope_averages = function(df, cope_op) {
+make_yearly_cope_averages = function(df, cope_ob) {
   
   #' Make yearly average dataframe to be used later for model formulations
   
@@ -253,7 +253,7 @@ make_yearly_cope_averages = function(df, cope_op) {
 #############################
 # get_all_cope_formulations() function
 #############################
-get_all_cope_formulations = function(df, cope_op, yearly_avg_list_cope) {
+get_all_cope_formulations = function(df, cope_ob, yearly_avg_list_cope) {
   
   #' Take the cope model and add the proprotions for both the year and the 
   #' individual level assumptions to the dataframe
@@ -488,7 +488,7 @@ count_unidentified_lice = function(df, mot_ob, cope_ob, non_ob, beta_ob, path) {
                                    beta_ob, yearly_avg_list_mot)
   
   # get yearly cope averages
-  yearly_avg_list_cope = make_yearly_cope_averages(df, cope_op)
+  yearly_avg_list_cope = make_yearly_cope_averages(df, cope_ob)
   
   # formulate different scenario options for copes
   df = get_all_cope_formulations(df, cope_ob, yearly_avg_list_cope)
