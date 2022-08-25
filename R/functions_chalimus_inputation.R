@@ -11,14 +11,10 @@
 
 options(dplyr.summarise.inform = FALSE)
 
-library(tidyverse)
-library(here)
-df = read_csv(here("./data/wild-lice-data/clean/prepared-unid-counted-lice.csv"))
-
-#' To compare across our different scenarios, we need to generate 
-#' individual-level counts of lice, so this will be done across our four 
-#' scenarios (plus the sub-levels of individual vs. year default approaches) in
-#' some of the scenarios. 
+# To compare across our different scenarios, we need to generate 
+# individual-level counts of lice, so this will be done across our four 
+# scenarios (plus the sub-levels of individual vs. year default approaches) in
+# some of the scenarios. 
 
 #############################
 # get_averaged_proportions() function
@@ -127,7 +123,7 @@ count_chalimus = function(df) {
 #############################
 # save_data_chalimus_drawn() function
 #############################
-save_data_chalimus_drawn(df, path) {
+save_data_chalimus_drawn = function(df, path) {
   
   #' Save the finished dataframe for further use
   
@@ -154,28 +150,3 @@ get_chalimus_counts = function(df, path) {
   return(df)
   
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

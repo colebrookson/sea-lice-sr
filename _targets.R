@@ -18,6 +18,7 @@ source(here::here("./R/functions_general_data_cleaning.R"))
 source(here::here("./R/functions_wild_lice_cleaning.R"))
 source(here::here("./R/functions_wild_lice_regression.R"))
 source(here::here("./R/functions_wild_lice_scenarios.R"))
+source(here::here("./R/functions_chalimus_inputation.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg"))
@@ -124,5 +125,20 @@ list(
                wild_lice_beta_regression,
                here::here(
                  "./data/wild-lice-data/clean/prepared-unid-counted-lice.csv")
+             )),
+  ####################
+  # chalimus inputation
+  ####################
+  tar_target(chalimus_inputation,
+             get_chalimus_counts(
+               counting_unid_lice_scenarios,
+               here::here(
+                 "./data/wild-lice-data/clean/chalimus-counted-lice.csv")
              ))
+  
+  
+  
+  
+  
+  
 )
