@@ -48,6 +48,9 @@ count_chalimus = function(df) {
   #' approach, wherein chalimus are counted by averaging the proportion of 
   #' motile and copepodite expected L. salmonis 
   
+  # set seed
+  set.seed(1234)
+  
   df = df %>% 
     # make the empty columns
     dplyr::mutate(
@@ -115,22 +118,42 @@ count_chalimus = function(df) {
   if(!all(temp$all_checked)) {
     stop("ERROR - Sums not adding up")
   }
-    
+  
+  set.seed(NULL)
   return(df)
 
 }
 
 #############################
-# get_averaged_proportions() function
+# save_data_chalimus_drawn() function
 #############################
-count_leps = function(df) {
+save_data_chalimus_drawn(df, path) {
   
-  #' Now that there are drawn sample columns, count the number of leps 
-  #' according to each of the scenarios
+  #' Save the finished dataframe for further use
   
-  
+  readr::write_csv(df, path)
 }
 
+#############################
+# get_chalimus_counts() function
+#############################
+get_chalimus_counts = function(df, path) {
+  
+  #' Use helper functions to get estimates of the number of chalimus
+  
+  # make average proportions for chalimus based on a mean of the motile and cope
+  # proportions
+  df = get_averaged_proportions(df) 
+  
+  # now actually draw for each of the chalimus fish
+  df = count_chalimus(df)
+  
+  # write out the result
+  save_data_chalimus_drawn(df, path)
+  
+  return(df)
+  
+}
 
 
 
