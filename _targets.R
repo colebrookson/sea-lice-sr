@@ -21,7 +21,7 @@ source(here::here("./R/functions_wild_lice_scenarios.R"))
 source(here::here("./R/functions_chalimus_inputation.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
-                            "ggplot2", "betareg"))
+                            "ggplot2", "betareg", "lubridate"))
 list(
   ####################
   # files
