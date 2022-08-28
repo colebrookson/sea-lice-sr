@@ -131,7 +131,7 @@ list(
   # chalimus inputation
   ####################
   tar_target(chalimus_inputation,
-             get_chalimus_counts(
+             inpute_all_chal_data(
                counting_unid_lice_scenarios,
                here::here(
                  "./data/wild-lice-data/clean/chalimus-counted-lice.csv")
@@ -139,7 +139,41 @@ list(
   ####################
   # lice counting options
   ####################
-  
+  tar_target(scenario_1_indiv_counts,
+             scenario1_indiv(
+               chalimus_inputation,
+               here::here(
+                 "./data/prepped-data/scfs-regression-scen1-indiv.csv"
+               )
+             )),
+  tar_target(scenario_1_year_counts,
+             scenario1_year(
+               chalimus_inputation,
+               here::here(
+                 "./data/prepped-data/scfs-regression-scen1-year.csv"
+               )
+             )),
+  tar_target(scenario_2_counts,
+             scenario2(
+               chalimus_inputation,
+               here::here(
+                 "./data/prepped-data/scfs-regression-scen2.csv"
+               )
+             )),
+  tar_target(scenario_3_counts,
+             scenario3(
+               chalimus_inputation,
+               here::here(
+                 "./data/prepped-data/scfs-regression-scen3.csv"
+               )
+             )),
+  tar_target(scenario_4_counts,
+             scenario4(
+               chalimus_inputation,
+               here::here(
+                 "./data/prepped-data/scfs-regression-scen4.csv"
+               )
+             ))
   
   
   

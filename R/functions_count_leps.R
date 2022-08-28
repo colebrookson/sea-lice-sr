@@ -57,7 +57,10 @@ count_scenarios = function(df) {
    dplyr::select(
      year, month, day, date, all_leps_scen1_indiv, all_leps_scen1_year, 
      all_leps_scen2, all_leps_scen3, all_lice_scen4, check_scen4_scen3
-   )
+   ) %>% 
+    dplyr::mutate(
+      week = lubridate::week(lubridate::ymd(date))
+    )
   
   if(!all(df$check_scen4_scen3)) {
     stop("ERROR - column addition not working as expected")
@@ -72,7 +75,17 @@ count_scenarios = function(df) {
 #############################
 # scenario1_indiv() function
 #############################
-scenario1_indiv = function(df) {
+write_option_dfs = function(df, path) {
+  
+  #' Write out the df when it's ready
+  
+  readr::write_csv(df, path)
+}
+
+#############################
+# scenario1_indiv() function
+#############################
+scenario1_indiv = function(df, path) {
   
   #' Return a version of the dataframe based on the scen1 with default to 
   #' individual-level 
@@ -82,9 +95,11 @@ scenario1_indiv = function(df) {
   
   count_df = count_df %>% 
     dplyr::select(
-      year, month, day, date, all_leps_scen1_indiv
+      year, week, date, all_leps_scen1_indiv
     ) %>% 
     dplyr::rename(all_lep = all_leps_scen1_indiv)
+  
+  write_option_dfs(df, path)
   
   return(count_df)
 }
@@ -92,7 +107,7 @@ scenario1_indiv = function(df) {
 #############################
 # scenario1_year() function
 #############################
-scenario1_year = function(df) {
+scenario1_year = function(df, path) {
   
   #' Return a version of the dataframe based on the scen1 with default to 
   #' year-level 
@@ -102,9 +117,11 @@ scenario1_year = function(df) {
   
   count_df = count_df %>% 
     dplyr::select(
-      year, month, day, date, all_leps_scen1_year
+      year, week, date, all_leps_scen1_year
     ) %>% 
     dplyr::rename(all_lep = all_leps_scen1_year)
+  
+  write_option_dfs(df, path)
   
   return(count_df)
 }
@@ -112,7 +129,7 @@ scenario1_year = function(df) {
 #############################
 # scenario2() function
 #############################
-scenario2 = function(df) {
+scenario2 = function(df, path) {
   
   #' Return a version of the dataframe based on the scenario 2
   
@@ -121,9 +138,11 @@ scenario2 = function(df) {
   
   count_df = count_df  %>% 
     dplyr::select(
-      year, month, day, date, all_leps_scen2
+      year, week, date, all_leps_scen2
     ) %>% 
     dplyr::rename(all_lep = all_leps_scen2)
+  
+  write_option_dfs(df, path)
   
   return(count_df)
 }
@@ -131,7 +150,7 @@ scenario2 = function(df) {
 #############################
 # scenario3() function
 #############################
-scenario3 = function(df) {
+scenario3 = function(df, path) {
   
   #' Return a version of the dataframe based on the scenario 3
   
@@ -140,9 +159,11 @@ scenario3 = function(df) {
   
   count_df = count_df %>% 
     dplyr::select(
-      year, month, day, date, all_leps_scen3
+      year, week, date, all_leps_scen3
     ) %>% 
     dplyr::rename(all_lep = all_leps_scen3)
+  
+  write_option_dfs(df, path)
   
   return(count_df)
 }
@@ -150,7 +171,7 @@ scenario3 = function(df) {
 #############################
 # scenario4() function
 #############################
-scenario4 = function(df) {
+scenario4 = function(df, path) {
   
   #' Return a version of the dataframe based on the scenario 3
   
@@ -159,9 +180,11 @@ scenario4 = function(df) {
   
   count_df = count_df %>% 
     dplyr::select(
-      year, month, day, date, all_lice_scen4
+      year, week, date, all_lice_scen4
     ) %>% 
     dplyr::rename(all_lep = all_lice_scen4)
+  
+  write_option_dfs(df, path)
   
   return(count_df)
 }
