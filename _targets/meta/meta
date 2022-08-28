@@ -9,6 +9,7 @@ beta_regression|function|1874c05537b8aab1|||||||||||||||
 beta_regression_scenario|function|4e7554fac6720101|||||||||||||||
 calculate_missing_averages|function|ff1abd532810b197|||||||||||||||
 calculate_new_leps|function|4fd4fbca3aff77f8|||||||||||||||
+chalimus_inputation|stem|95a4d038ef42881d|5931f0727148950b|f7381b0e93bc0d07|-375093075||t19232.0782997773s|c974558ed0d66939|519974|rds|local|vector|||403.508||
 clean_data_bati|function|e46a928529838a5c|||||||||||||||
 clean_data_marty|function|4db48a292bbc2337|||||||||||||||
 clean_data_scfs|function|b4fd2f7d7c9ea026|||||||||||||||
@@ -18,8 +19,9 @@ coalesce_data_scfs|function|aa81aada9f8599b1|||||||||||||||
 cope_2002_2004_prediction|function|d4e3380c0622f038|||||||||||||||
 cope_proportions_logistic_regression|stem|e82fff41c5121ce2|49434ca0f1b3bd11|047eb57522ffffd0|-1067662679||t19229.1559759899s|1664ba2fcae66cb2|1522714|rds|local|vector|||1.488|noninteger successes in a binomial glm. Removed 171 rows containing missing values geom_point.|
 cope_regression|function|e958e2af9a18b90e|||||||||||||||
+count_chalimus|function|c6365f9c1e9b2cae|||||||||||||||
 count_unidentified_lice|function|ac3773eadd992217|||||||||||||||
-counting_unid_lice_scenarios|stem|2ca5c10653e92814|a984c78450d97067|7383832a65ee60a3|419626744||t19229.1615555373s|06126bf41f8659a0|445957|rds|local|vector|||17.148||
+counting_unid_lice_scenarios|stem|2ca5c10653e92814|f8145efca34d4b0d|7383832a65ee60a3|419626744||t19229.1649969966s|06126bf41f8659a0|445957|rds|local|vector|||18.766||
 df|object|de6a0928ab3ebb22|||||||||||||||
 dfo_farm_ref_data|stem|02aa0092b5469095|84f590bceeb6cea2|c3b5fc02cdc369c1|-1486775753|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/farm-name-reference.csv|t19205.9599767471s|54f0cde7a83f527b|7999|file|local|vector|||0.218||
 dfo_file|object|a999c69c8fb5fac0|||||||||||||||
@@ -34,12 +36,14 @@ finish_prediction_proportions|function|a6e02f1979099a3f|||||||||||||||
 fix_months|function|ae0b59aeb50159d7|||||||||||||||
 get_all_cope_formulations|function|41b27bb7d9bc9281|||||||||||||||
 get_all_motile_formulations|function|c874476d76c4d6ff|||||||||||||||
+get_averaged_proportions|function|c69c33c4e984dff2|||||||||||||||
 get_data_bati|function|f55fbb93cbb1e4ef|||||||||||||||
 get_data_dfo_open|function|f55fbb93cbb1e4ef|||||||||||||||
 get_data_dfo_ref|function|23997d3025932882|||||||||||||||
 get_data_marty|function|f55fbb93cbb1e4ef|||||||||||||||
 get_data_marty_cleaned|function|f55fbb93cbb1e4ef|||||||||||||||
 get_data_scfs|function|d4b632b9a9bb3f37|||||||||||||||
+inpute_all_chal_data|function|2fb5849eccbeabe5|||||||||||||||
 join_all_farm_data|stem|b665f181615a71f7|28546ad75a920ccb|fa5fb9f13586715b|669325057||t19229.1560998785s|e8422d5bf52d1963|40466|rds|local|vector|||0.139||
 join_clean_bati|function|fb7142b86211baaa|||||||||||||||
 join_clean_late|function|79ac99623e9f056e|||||||||||||||
@@ -98,3 +102,4 @@ write_data_joined_farm|function|785c298ffc35eca8|||||||||||||||
 write_data_marty|function|bfa517e14148f2ec|||||||||||||||
 write_dfo_filled_missing_data|function|419d7e6638b72d98|||||||||||||||
 write_new_calculated_lice|function|8388601829929641|||||||||||||||
+write_out_chalimus_inputed_data|function|8388601829929641|||||||||||||||

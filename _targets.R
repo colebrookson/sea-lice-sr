@@ -18,6 +18,7 @@ source(here::here("./R/functions_general_data_cleaning.R"))
 source(here::here("./R/functions_wild_lice_cleaning.R"))
 source(here::here("./R/functions_wild_lice_regression.R"))
 source(here::here("./R/functions_wild_lice_scenarios.R"))
+source(here::here("./R/functions_chalimus_inputation.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg"))
@@ -123,6 +124,15 @@ list(
                wild_lice_nonlinear_regression, 
                wild_lice_beta_regression,
                here::here(
-                 "./data/wild-lice-data/clean/prepared_unid_counted_lice.csv")
+                 "./data/wild-lice-data/clean/prepared-unid-counted-lice.csv")
+             )),
+  ####################
+  # wild lice per fish 
+  ####################
+  tar_target(chalimus_inputation,
+             inpute_all_chal_data(
+               counting_unid_lice_scenarios,
+               here::here(
+                 "./data/wild-lice-data/clean/chal-inputed-data.csv")
              ))
 )
