@@ -12,6 +12,12 @@
 options(dplyr.summarise.inform = FALSE)
 options(readr.show_col_types = FALSE)
 
+# df = read_csv(
+#   here::here(
+#     paste0("./data/wild-lice-data/raw/Sea-lice-database-master/",
+#            "Data/BroughtonSeaLice_fishData.csv"))
+# )
+# table(raw_df$location)
 #############################
 # get_data_scfs() function
 #############################
@@ -35,12 +41,34 @@ coalesce_data_scfs = function(df) {
     # remove bad characters and make names standrdized
     standardize_names() %>% 
     dplyr::rowwise() %>% 
-    dplyr::select(year, day, month,
+    dplyr::select(year, day, month, location,
                   unid_cope, lep_cope, cal_cope, lep_cope, chala, chalb, 
            chal_unid, lep_pamale, lep_male, lep_nongravid, lep_gravid,
            lep_pafemale, cal_mot, cal_gravid, unid_adult, unid_pa) %>% 
+    # temporarily turn location numeric for the coalesce, but change back after
+    dplyr::mutate(
+      location_num = ifelse(
+        location == "Burdwood", 
+        1, 
+        ifelse(
+          location == "Glacier", 
+          2,
+          3
+        )
+      )
+    ) %>% 
+    dplyr::select(-location) %>% 
     # IMPORTANT - make all NA values zeros since they're true zeros 
-    dplyr::mutate_all(., ~coalesce(.,0))
+    dplyr::mutate_all(., ~coalesce(.,0)) %>% 
+    dplyr::mutate(
+      farm_name = ifelse(
+        location_num == 1,
+        "Burdwood",
+        ifelse(location_num == 2,
+               "Glacier", 
+               "Wicklow")
+      )
+    )
     
 }
 
