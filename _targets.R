@@ -21,7 +21,7 @@ source(here::here("./R/functions_wild_lice_scenarios.R"))
 source(here::here("./R/functions_chalimus_inputation.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
-                            "ggplot2", "betareg"))
+                            "ggplot2", "betareg", "lubridate"))
 list(
   ####################
   # files
@@ -127,12 +127,18 @@ list(
                  "./data/wild-lice-data/clean/prepared-unid-counted-lice.csv")
              )),
   ####################
-  # wild lice per fish 
+  # chalimus inputation
   ####################
   tar_target(chalimus_inputation,
-             inpute_all_chal_data(
+             get_chalimus_counts(
                counting_unid_lice_scenarios,
                here::here(
-                 "./data/wild-lice-data/clean/chal-inputed-data.csv")
+                 "./data/wild-lice-data/clean/chalimus-counted-lice.csv")
              ))
+  
+  
+  
+  
+  
+  
 )

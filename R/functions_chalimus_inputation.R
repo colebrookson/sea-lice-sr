@@ -44,6 +44,9 @@ count_chalimus = function(df) {
   #' approach, wherein chalimus are counted by averaging the proportion of 
   #' motile and copepodite expected L. salmonis 
   
+  # set seed
+  set.seed(1234)
+  
   df = df %>% 
     # make the empty columns
     dplyr::mutate(
@@ -111,7 +114,9 @@ count_chalimus = function(df) {
   if(!all(temp$all_checked)) {
     stop("ERROR - Sums not adding up")
   }
-    
+
+  set.seed(NULL)
+
   return(df)
 
 }
@@ -144,4 +149,3 @@ inpute_all_chal_data = function(df, path) {
   
   return(counted_df)
 }
-

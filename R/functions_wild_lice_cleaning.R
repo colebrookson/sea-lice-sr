@@ -35,7 +35,8 @@ coalesce_data_scfs = function(df) {
     # remove bad characters and make names standrdized
     standardize_names() %>% 
     dplyr::rowwise() %>% 
-    dplyr::select(year, unid_cope, lep_cope, cal_cope, lep_cope, chala, chalb, 
+    dplyr::select(year, day, month,
+                  unid_cope, lep_cope, cal_cope, lep_cope, chala, chalb, 
            chal_unid, lep_pamale, lep_male, lep_nongravid, lep_gravid,
            lep_pafemale, cal_mot, cal_gravid, unid_adult, unid_pa) %>% 
     # IMPORTANT - make all NA values zeros since they're true zeros 
