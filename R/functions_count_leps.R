@@ -11,11 +11,10 @@
 
 options(dplyr.summarise.inform = FALSE)
 
-library(tidyverse)
-library(here)
-df = read_csv(here("./data/wild-lice-data/clean/chalimus-counted-lice.csv"))
-
-count_scenario1_indiv = function(df) {
+#############################
+# count_scenarios() function
+#############################
+count_scenarios = function(df) {
   
   #' For scenario 1 (logistic regression approach), count all the leps on each
   #' fish and then prepare that version of the dataset for analysis
@@ -66,4 +65,103 @@ count_scenario1_indiv = function(df) {
   
   df = df %>% 
     dplyr::select(-c(check_scen4_scen3))
+  
+  return(df)
+}
+
+#############################
+# scenario1_indiv() function
+#############################
+scenario1_indiv = function(df) {
+  
+  #' Return a version of the dataframe based on the scen1 with default to 
+  #' individual-level 
+  
+  # start with raw df
+  count_df = count_scenarios(df)
+  
+  count_df = count_df %>% 
+    dplyr::select(
+      year, month, day, date, all_leps_scen1_indiv
+    ) %>% 
+    dplyr::rename(all_lep = all_leps_scen1_indiv)
+  
+  return(count_df)
+}
+
+#############################
+# scenario1_year() function
+#############################
+scenario1_year = function(df) {
+  
+  #' Return a version of the dataframe based on the scen1 with default to 
+  #' year-level 
+  
+  # start with raw df
+  count_df = count_scenarios(df)
+  
+  count_df = count_df %>% 
+    dplyr::select(
+      year, month, day, date, all_leps_scen1_year
+    ) %>% 
+    dplyr::rename(all_lep = all_leps_scen1_year)
+  
+  return(count_df)
+}
+
+#############################
+# scenario2() function
+#############################
+scenario2 = function(df) {
+  
+  #' Return a version of the dataframe based on the scenario 2
+  
+  # start with raw df
+  count_df = count_scenarios(df)
+  
+  count_df = count_df  %>% 
+    dplyr::select(
+      year, month, day, date, all_leps_scen2
+    ) %>% 
+    dplyr::rename(all_lep = all_leps_scen2)
+  
+  return(count_df)
+}
+
+#############################
+# scenario3() function
+#############################
+scenario3 = function(df) {
+  
+  #' Return a version of the dataframe based on the scenario 3
+  
+  # start with raw df
+  count_df = count_scenarios(df)
+  
+  count_df = count_df %>% 
+    dplyr::select(
+      year, month, day, date, all_leps_scen3
+    ) %>% 
+    dplyr::rename(all_lep = all_leps_scen3)
+  
+  return(count_df)
+}
+
+#############################
+# scenario4() function
+#############################
+scenario4 = function(df) {
+  
+  #' Return a version of the dataframe based on the scenario 3
+  
+  # start with raw df
+  count_df = count_scenarios(df)
+  
+  count_df = count_df %>% 
+    dplyr::select(
+      year, month, day, date, all_lice_scen4
+    ) %>% 
+    dplyr::rename(all_lep = all_lice_scen4)
+  
+  return(count_df)
 }

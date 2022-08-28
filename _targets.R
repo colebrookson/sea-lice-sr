@@ -19,6 +19,7 @@ source(here::here("./R/functions_wild_lice_cleaning.R"))
 source(here::here("./R/functions_wild_lice_regression.R"))
 source(here::here("./R/functions_wild_lice_scenarios.R"))
 source(here::here("./R/functions_chalimus_inputation.R"))
+source(here::here("./R/functions_count_leps.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate"))
@@ -134,7 +135,10 @@ list(
                counting_unid_lice_scenarios,
                here::here(
                  "./data/wild-lice-data/clean/chalimus-counted-lice.csv")
-             ))
+             )),
+  ####################
+  # lice counting options
+  ####################
   
   
   
