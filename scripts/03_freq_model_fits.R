@@ -17,6 +17,7 @@ library(DHARMa)
 
 farm_regress = read_csv(
     here::here("./data/farm-data/clean/marty-bati-data-joined-stocked-only.csv"))
+
 scfs_regress = read_csv(
     here::here(
         "./data/prepped-data/scfs-regression-leps-include-chals-data.csv"))
