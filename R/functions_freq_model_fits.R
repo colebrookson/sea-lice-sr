@@ -23,14 +23,131 @@ scfs_df = read_csv(
   )
 )
 
-check_data_form = function(scfs_df, farm_df) {
+#############################
+# check_data_form() function
+#############################
+check_data_form = function(scfs_df) {
   
   #' Check that the form of the important columns are in the type they need to 
   #' be in 
   
   scfs_df$all_lep = as.integer(scfs_df$all_lep)
   scfs_df$year = as.factor(as.character(scfs_df$year))
-  scfs_farm
+  scfs_df$farm_name = as.factor(scfs_df$farm_name)
+  scfs_df$week = as.factor(scfs_df$week)
   
+  return(scfs_df)
   
 }
+
+#############################
+# get_n_cores() function
+#############################
+get_n_cores = function() {
+  
+  #' Simple function to return the number of cores present 
+  
+  n_cores = min(parallel:: detectCores(), 8)
+  
+  return(n_cores)
+
+}
+
+#############################
+# check_data_form() function
+#############################
+nb_poi_zinb_zip = function(df, n_cores, loc_path) {
+  
+  #' Take in the dataframe with the variable at hand and, using AIC, determine
+  #' whether or not a standard or zero-inflated negative-binomial or poisson
+  #' model fits better to the data
+  
+  # negative binomial function
+  nb_mod = glmmTMB::glmmTMB(
+    all_lep ~ year + (1 | week) + (1 | farm_name),
+    data = df,
+    family = nbinom2,
+    control = glmmTMBControl(
+      optimizer = optim,
+      optArgs = list(method = "BFGS"),
+      parallel = n_cores
+    )
+  )
+  # save the model object
+  saveRDS(nb_mod, paste0(loc_path, "negative-bionomial-model.rds"))
+  
+  # zero-inflated negative binomial
+  zinb_mod = glmmTMB::glmmTMB(
+    all_lep ~ year + (1 | week) + (1 | farm_name),
+    data = df,
+    family = nbinom2,
+    ziformula = ~0,
+    control = glmmTMBControl(
+      optimizer = optim,
+      optArgs = list(method = "BFGS"),
+      parallel = n_cores
+    )
+  )
+  # save the model object
+  saveRDS(zinb_mod, paste0(loc_path, 
+                           "zero-inflated-negative-bionomial-model.rds"))
+  
+  # poisson model
+  poi_mod = glmmTMB::glmmTMB(
+    all_lep ~ year + (1 | week) + (1 | farm_name),
+    data = df,
+    family = poisson,
+    control = glmmTMBControl(
+      optimizer = optim,
+      optArgs = list(method = "BFGS"),
+      parallel = n_cores
+    )
+  )
+  # save the model object
+  saveRDS(poi_mod, paste0(loc_path, "poisson-model.rds"))
+  
+  # zero-inflated poisson model 
+  zinb_mod = glmmTMB::glmmTMB(
+    all_lep ~ year + (1 | week) + (1 | farm_name),
+    data = df,
+    family = poisson,
+    ziformula = ~0,
+    control = glmmTMBControl(
+      optimizer = optim,
+      optArgs = list(method = "BFGS"),
+      parallel = n_cores
+    )
+  )
+  # save the model object
+  saveRDS(zinb_mod, paste0(loc_path, "zero-inflatedpoisson-model.rds"))
+  
+  # find the best model (lowest AIC)
+  mod_list = list(nb_mod = nb_mod, zinb_mod = zinb_mod, 
+              poi_mod = poi_mod, zinb_mod = zinb_mod)
+  aic_list = c(nb_mod = AIC(nb_mod), zinb_mod = AIC(zinb_mod), 
+               poi_mod = AIC(poi_mod), zinb_mod = AIC(zinb_mod))
+  
+  best_mod = aic_list[which(aic_list == min(aic_list))]
+  
+  # extract best model object
+  best_mod_ob = mod_list[which(names(mod_list) == names(best_mod))]
+  
+  return(best_mod_ob)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+df = check_data_form(scfs_df)
+
+

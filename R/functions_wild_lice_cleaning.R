@@ -12,12 +12,6 @@
 options(dplyr.summarise.inform = FALSE)
 options(readr.show_col_types = FALSE)
 
-# df = read_csv(
-#   here::here(
-#     paste0("./data/wild-lice-data/raw/Sea-lice-database-master/",
-#            "Data/BroughtonSeaLice_fishData.csv"))
-# )
-# table(raw_df$location)
 #############################
 # get_data_scfs() function
 #############################

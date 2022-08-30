@@ -22,7 +22,8 @@ source(here::here("./R/functions_chalimus_inputation.R"))
 source(here::here("./R/functions_count_leps.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
-                            "ggplot2", "betareg", "lubridate"))
+                            "ggplot2", "betareg", "lubridate", "glmmTMB", 
+                            "DHARMa", "parallel"))
 list(
   ####################
   # files
