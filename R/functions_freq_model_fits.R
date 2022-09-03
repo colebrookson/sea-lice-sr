@@ -47,7 +47,8 @@ get_n_cores = function() {
   
   #' Simple function to return the number of cores present 
   
-  n_cores = min(parallel:: detectCores(), 8)
+  # always leave one free 
+  n_cores = min(parallel:: detectCores(), 8) - 1
   
   return(n_cores)
 
@@ -131,6 +132,8 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
   
   # extract best model object
   best_mod_ob = mod_list[which(names(mod_list) == names(best_mod))]
+
+  names(best_mod_ob) = names(best_mod)
   
   return(best_mod_ob)
 }
@@ -148,6 +151,7 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
 
 
 
+
 df = check_data_form(scfs_df)
 
-
+n_cores = get_n_cores()
