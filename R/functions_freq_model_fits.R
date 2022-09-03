@@ -55,7 +55,7 @@ get_n_cores = function() {
 }
 
 #############################
-# check_data_form() function
+# nb_poi_zinb_zip() function
 #############################
 nb_poi_zinb_zip = function(df, n_cores, loc_path) {
   
@@ -108,7 +108,7 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
   saveRDS(poi_mod, paste0(loc_path, "poisson-model.rds"))
   
   # zero-inflated poisson model 
-  zinb_mod = glmmTMB::glmmTMB(
+  zip_mod = glmmTMB::glmmTMB(
     all_lep ~ year + (1 | week) + (1 | farm_name),
     data = df,
     family = poisson,
@@ -124,21 +124,47 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
   
   # find the best model (lowest AIC)
   mod_list = list(nb_mod = nb_mod, zinb_mod = zinb_mod, 
-              poi_mod = poi_mod, zinb_mod = zinb_mod)
+              poi_mod = poi_mod, zip_mod = zip_mod)
   aic_list = c(nb_mod = AIC(nb_mod), zinb_mod = AIC(zinb_mod), 
-               poi_mod = AIC(poi_mod), zinb_mod = AIC(zinb_mod))
+               poi_mod = AIC(poi_mod), zip_mod = AIC(zip_mod))
   
   best_mod = aic_list[which(aic_list == min(aic_list))]
   
   # extract best model object
-  best_mod_ob = mod_list[which(names(mod_list) == names(best_mod))]
+  best_mod_ob = mod_list[which(names(mod_list) == names(best_mod))][[1]]
 
-  names(best_mod_ob) = names(best_mod)
+  if(names(best_mod) == "nb_mod") {
+    best_mod_name = "Negative Binomial"
+  } else if(names(best_mod) == "zinb_mod") {
+    best_mod_name = "Zero-Inflated Negative Binomial"
+  } else if(names(best_mod) == "poi_mod") {
+    best_mod_name = "Poisson"
+  } else if(names(best_mod) == "zip_mod") {
+    best_mod_name = "Zero-Inflated Poisson"
+  }
   
-  return(best_mod_ob)
+  return(best_mod_ob, best_mod_name)
 }
 
+#############################
+# model_resids() function
+#############################
+model_resids = function(best_mod_ob, path) {
+  
+  #' Take in the best model object and simulate the residuals 
+  
+  # extract residuals
+  res = simulateResiduals(best_mod_ob)
 
+  # save the residuals
+  png(filename = paste0(path, "best-model-residuals.png"))
+  
+  # plot the residuals
+  plot(res)
+  
+  dev.off()
+  
+}
 
 
 
