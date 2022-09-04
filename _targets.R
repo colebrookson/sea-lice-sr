@@ -20,6 +20,7 @@ source(here::here("./R/functions_wild_lice_regression.R"))
 source(here::here("./R/functions_wild_lice_scenarios.R"))
 source(here::here("./R/functions_chalimus_inputation.R"))
 source(here::here("./R/functions_count_leps.R"))
+source(here::here("./R/functions_freq_model_fits.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
@@ -174,10 +175,49 @@ list(
                here::here(
                  "./data/prepped-data/scfs-regression-scen4.csv"
                )
+             )),
+  ####################
+  # scenario-specific models of lice per fish
+  ####################
+  tar_target(scenario_1_indiv_model,
+             execute_scenario_models(
+               scenario_1_indiv_counts,
+               here::here(
+                 paste0("./outputs/model-outputs/lice-per-fish",
+                        "-regression/scenario-1-indiv/")
+               )
+             )),
+  tar_target(scenario_1_year_model,
+             execute_scenario_models(
+               scenario_1_year_counts,
+               here::here(
+                 paste0("./outputs/model-outputs/lice-per-fish",
+                        "-regression/scenario-1-year/")
+                 )
+               )),
+  tar_target(scenario_2_model,
+             execute_scenario_models(
+               scenario_2_counts,
+               here::here(
+                 paste0("./outputs/model-outputs/lice-per-fish",
+                        "-regression/scenario-2/")
+               )
+             )),
+  tar_target(scenario_3_model,
+             execute_scenario_models(
+               scenario_3_counts,
+               here::here(
+                 paste0("./outputs/model-outputs/lice-per-fish",
+                        "-regression/scenario-3/")
+               )
+             )),
+  tar_target(scenario_4_model,
+             execute_scenario_models(
+               scenario_4_counts,
+               here::here(
+                 paste0("./outputs/model-outputs/lice-per-fish",
+                        "-regression/scenario-4/")
+               )
              ))
-  
-  
-  
-  
-  
+
 )

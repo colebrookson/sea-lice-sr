@@ -10,33 +10,20 @@
 
 options(dplyr.summarise.inform = FALSE)
 
-library(tidyverse)
-library(here)
-library(glmmTMB)
-library(DHARMa)
-farm_df = read_csv(
-  here::here("./data/farm-data/clean/all-farms-joined-clean.csv"))
-
-scfs_df = read_csv(
-  here::here(
-    "./data/prepped-data/scfs-regression-scen3.csv"
-  )
-)
-
 #############################
 # check_data_form() function
 #############################
-check_data_form = function(scfs_df) {
+check_data_form = function(df) {
   
   #' Check that the form of the important columns are in the type they need to 
   #' be in 
   
-  scfs_df$all_lep = as.integer(scfs_df$all_lep)
-  scfs_df$year = as.factor(as.character(scfs_df$year))
-  scfs_df$farm_name = as.factor(scfs_df$farm_name)
-  scfs_df$week = as.factor(scfs_df$week)
+  df$all_lep = as.integer(df$all_lep)
+  df$year = as.factor(as.character(df$year))
+  df$farm_name = as.factor(df$farm_name)
+  df$week = as.factor(df$week)
   
-  return(scfs_df)
+  return(df)
   
 }
 
@@ -143,15 +130,21 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
     best_mod_name = "Zero-Inflated Poisson"
   }
   
-  return(best_mod_ob, best_mod_name)
+  # list up the results
+  results_list = list(best_mod_ob, best_mod_name)
+  
+  return(results_list)
 }
 
 #############################
 # model_resids() function
 #############################
-model_resids = function(best_mod_ob, path) {
+model_resids = function(results_list, path) {
   
   #' Take in the best model object and simulate the residuals 
+  
+  # get just the best model object itself
+  best_mod_ob = results_list[[1]]
   
   # extract residuals
   res = simulateResiduals(best_mod_ob)
@@ -166,18 +159,26 @@ model_resids = function(best_mod_ob, path) {
   
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-df = check_data_form(scfs_df)
-
-n_cores = get_n_cores()
+#############################
+# execute_scenario_models() function
+#############################
+execute_scenario_models = function(df, loc_path) {
+  
+  #' Use helper functions to get the best model for the given scenario
+  
+  # make sure the data are all in the right format
+  df = check_data_form(df)
+  
+  # find the number of cores the models can run on
+  n_cores = get_n_cores()
+  
+  # run the actual models 
+  results_list = nb_poi_zinb_zip(df, n_cores, loc_path)
+  
+  # save residuals
+  model_resids(results_list, loc_path)
+  
+  # return the object of the model fit
+  return(results_list[[1]])
+  
+}
