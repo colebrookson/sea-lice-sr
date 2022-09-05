@@ -119,6 +119,8 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
   
   # extract best model object
   best_mod_ob = mod_list[which(names(mod_list) == names(best_mod))][[1]]
+  # also save the best model
+  saveRDS(best_mod_ob, paste0("best-mod", names(best_mod), ".rds"))
 
   if(names(best_mod) == "nb_mod") {
     best_mod_name = "Negative Binomial"
