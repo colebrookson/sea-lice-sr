@@ -30,7 +30,7 @@ counting_unid_lice_scenarios|stem|fbb779d271bac45f|f8145efca34d4b0d|545bb0885f2b
 df|object|289760415385fccd|||||||||||||||
 dfo_farm_ref_data|stem|02aa0092b5469095|84f590bceeb6cea2|c3b5fc02cdc369c1|-1486775753|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/farm-name-reference.csv|t19208.5681619444s|54f0cde7a83f527b|7999|file|local|vector|||0.218||
 dfo_file|object|a999c69c8fb5fac0|||||||||||||||
-execute_scenario_models|function|12d6b39b6037b392|||||||||||||||
+execute_scenario_models|function|7e9cabb34c416f41|||||||||||||||
 farm_df|object|a999c69c8fb5fac0|||||||||||||||
 farm_names_bati|function|72589cb21f7ae795|||||||||||||||
 farm_names_marty|function|dc64f9017565c4ea|||||||||||||||
@@ -70,7 +70,7 @@ model_resids|function|8b5fb9b7dd881971|||||||||||||||
 mot_2001_prediction|function|edbc7406644ddc67|||||||||||||||
 motile_proportions_logistic_regression|stem|53de0ad4bba4c8a2|6488863b5ff44390|d3470d4716ae73fc|1991784082||t19239.794241482s|952d140cdf1da7e1|1841502|rds|local|vector|||2.231|noninteger successes in a binomial glm. Removed 15 rows containing missing values geom_point.|
 motile_regression|function|24656aa3fd1f104f|||||||||||||||
-nb_poi_zinb_zip|function|8a045afe586d1d20|||||||||||||||
+nb_poi_zinb_zip|function|a6c8f38f8ded60a9|||||||||||||||
 nonlinear_plot|function|1a34f1311274acca|||||||||||||||
 nonlinear_prediction|function|3e5d3cc69fbe0131|||||||||||||||
 nonlinear_regression|function|961ad0c1f1f0006b|||||||||||||||
@@ -98,7 +98,7 @@ save_regression_mots|function|cfd99a324b04da31|||||||||||||||
 scenario_1_indiv_counts|stem|84284de88f59bbdc|6f4b0ef1f506b3a6|f7cf3db82988d33f|1209228368||t19239.8038445392s|065dc18f000d7095|140926|rds|local|vector|||93.427||
 scenario_1_indiv_model|stem|044e342a34d4a132|1bec10cd012aa2be|421357cf3a6525d0|1344166708||t19240.1127356593s|7fbae0f6bddd0a0a|3746455|rds|local|vector|||1403.458|the condition has length  1 and only the first element will be used|
 scenario_1_year_counts|stem|4c063b6683aafeb3|1476e8935473f63c|e488228db8dd390c|818193789||t19239.8027622705s|1d360b662f4dc28c|140898|rds|local|vector|||96.461||
-scenario_1_year_model|stem|118ea05999f81cba|ae979a9eae909687|1678fa3221dc8f98|-733124123||t19239.8274522153s|e60220190959d6a8|3751152|rds|local|vector|||1523.357|the condition has length  1 and only the first element will be used|
+scenario_1_year_model|stem|118ea05999f81cba|ae979a9eae909687|5d276d45b30fbcc1|-733124123||t19239.8274522153s||3751152|rds|local|vector|||1691.357|the condition has length  1 and only the first element will be used|invalid description argument
 scenario_2_counts|stem|0ac1dbca9ae51169|bed53bbfe7019ceb|c243d59d46d5c23b|1932165698||t19239.8058384284s|9d6b614b2b65e676|144392|rds|local|vector|||81.907||
 scenario_2_model|stem|1861ff3c3f824019|d246e31f316f4c32|1f83a507d592a0a2|159902143||t19240.1393846698s|57a88d7f187702dc|3821242|rds|local|vector|||1132.815|the condition has length  1 and only the first element will be used|
 scenario_3_counts|stem|df65b54783a88e6b|9c7fac8a41c98a47|0de2231d83e8dbe4|-2131189346||t19239.8048895394s|93a12727c47b183a|144400|rds|local|vector|||90.206||

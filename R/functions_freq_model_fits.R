@@ -61,8 +61,6 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
       parallel = n_cores
     )
   )
-  # save the model object
-  saveRDS(nb_mod, paste0(loc_path, "negative-bionomial-model.rds"))
   
   # zero-inflated negative binomial
   zinb_mod = glmmTMB::glmmTMB(
@@ -76,9 +74,6 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
       parallel = n_cores
     )
   )
-  # save the model object
-  saveRDS(zinb_mod, paste0(loc_path, 
-                           "zero-inflated-negative-bionomial-model.rds"))
   
   # poisson model
   poi_mod = glmmTMB::glmmTMB(
@@ -91,8 +86,6 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
       parallel = n_cores
     )
   )
-  # save the model object
-  saveRDS(poi_mod, paste0(loc_path, "poisson-model.rds"))
   
   # zero-inflated poisson model 
   zip_mod = glmmTMB::glmmTMB(
@@ -106,8 +99,6 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
       parallel = n_cores
     )
   )
-  # save the model object
-  saveRDS(zinb_mod, paste0(loc_path, "zero-inflatedpoisson-model.rds"))
   
   # find the best model (lowest AIC)
   mod_list = list(nb_mod = nb_mod, zinb_mod = zinb_mod, 
@@ -120,16 +111,27 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
   # extract best model object
   best_mod_ob = mod_list[which(names(mod_list) == names(best_mod))][[1]]
   # also save the best model
-  saveRDS(best_mod_ob, paste0("best-mod", names(best_mod), ".rds"))
+  saveRDS(best_mod_ob, paste0("best-mod-", names(best_mod), ".rds"))
 
   if(names(best_mod) == "nb_mod") {
     best_mod_name = "Negative Binomial"
+    # save the model object
+    saveRDS(nb_mod, paste0(loc_path, "best-mod-negative-bionomial-model.rds"))
   } else if(names(best_mod) == "zinb_mod") {
     best_mod_name = "Zero-Inflated Negative Binomial"
+    # save the model object
+    saveRDS(zinb_mod, 
+            paste0(loc_path, 
+                   "best-mod-zero-inflated-negative-binomial-model.rds"))
   } else if(names(best_mod) == "poi_mod") {
     best_mod_name = "Poisson"
+    # save the model object
+    saveRDS(poi_mod, paste0(loc_path, "best-mod-poisson-model.rds"))
   } else if(names(best_mod) == "zip_mod") {
     best_mod_name = "Zero-Inflated Poisson"
+    # save the model object
+    saveRDS(poi_mod, paste0(loc_path,
+                            "best-mod-zero-inflated-poisson-model.rds"))
   }
   
   # list up the results

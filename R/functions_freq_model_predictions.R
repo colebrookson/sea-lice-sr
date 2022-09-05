@@ -52,3 +52,82 @@ check_farm_data_form = function(farm_df) {
   return(farm_df)
   
 }
+
+#############################
+# prepare_scfs_data() function
+#############################
+prepare_scfs_data = function(scfs_df, scenario_name) {
+  
+  #' Take in the data and group by year then get a yearly mean average
+  
+  yearly_scfs_df = scfs_df %>% 
+    dplyr::group_by(year) %>% 
+    dplyr::summarize(mean_lep = mean(all_lep))
+  
+  return(yearly_scfs_df)
+}
+
+make_model_predictions = function(model) {
+  
+  #' Make a model prediction with the models in hand for each yearly level
+  
+  # make the prediction data
+  predict_data = data.frame(
+    year = as.character(c(2001:2021)),
+    week = NA,
+    farm_name = NA
+  )
+  
+  # get the actual prediction and put it in a dataframe
+  all_lep_df = data.frame(
+    stats::predict(
+      model,
+      newdata = predict_data,
+      type = "response",
+      re.form = NA,
+      se.fit = TRUE
+    )
+  )
+  
+  # now add in the values to the predict_data df
+  predict_data = predict_data %>% 
+    dplyr::mutate(
+      fit = all_lep_df$fit,
+      lower = all_lep_df$fit - (1.96 * all_lep_df$se.fit),
+      upper = all_lep_df$fit + (1.96 * all_lep_df$se.fit),
+      # add in which scenario this is
+      scenario = scenario_name
+    )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
