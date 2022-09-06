@@ -40,7 +40,8 @@ get_n_cores = function() {
   return(n_cores)
 
 }
-
+df = read_csv(here("./data/prepped-data/scfs-regression-scen1-indiv.csv"))
+n_cores = 3
 #############################
 # nb_poi_zinb_zip() function
 #############################
@@ -100,6 +101,7 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
     )
   )
   
+ 
   # find the best model (lowest AIC)
   mod_list = list(nb_mod = nb_mod, zinb_mod = zinb_mod, 
               poi_mod = poi_mod, zip_mod = zip_mod)
