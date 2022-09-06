@@ -110,6 +110,20 @@ nb_poi_zinb_zip = function(df, n_cores, loc_path) {
   
   best_mod = aic_list[which(aic_list == min(aic_list))]
   
+  # in the case that there are multiple best models, take the non-zero inflated
+  if(length(best_mod > 1)) {
+    # if there are no differences between the z-i and the non-zi
+    if(length(best_mod) == 2) {
+      if(all(names(best_mod) == c("nb_mod", "zinb_mod"))) {
+        best_mod = best_mod["nb_mod"]
+      } else if(all(names(best_mod) == c("poi_mod", "zip_mod"))) {
+        best_mod = best_mod["poi_mod"]
+      }
+    } else if(length > 2) {
+      stop("ERROR - more than two models of equal ability!")
+    }
+  }
+  
   # extract best model object
   best_mod_ob = mod_list[which(names(mod_list) == names(best_mod))][[1]]
   # also save the best model
