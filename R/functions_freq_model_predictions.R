@@ -1,7 +1,6 @@
 ########## 
 ##########
-# All functions for making predictions of yearly count data based on the 
-# frequentist model fits
+# All functions for fitting frequentist models to the count data
 ##########
 ##########
 # AUTHOR: Cole B. Brookson
@@ -9,97 +8,200 @@
 ##########
 ##########
 
-library(tidyverse)
-library(here)
-library(glmmTMB)
-library(lme4)
-library(PNWColors)
-library(mgcv)
-library(patchwork)
-
-farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
-scfs_df = read_csv(here("./data/wild-lice-data/clean/chalimus-counted-lice.csv"))
-model = readRDS(here("./outputs/model-outputs/lice-per-fish-regression/scenario-1-year/"))
+options(dplyr.summarise.inform = FALSE)
 
 #############################
-# check_scfs_data_form() function
+# check_data_form() function
 #############################
-check_scfs_data_form = function(scfs_df) {
+check_data_form = function(df) {
   
   #' Check that the form of the important columns are in the type they need to 
   #' be in 
   
-  scfs_df$all_lep = as.integer(scfs_df$all_lep)
-  scfs_df$year = as.factor(as.character(scfs_df$year))
-  scfs_df$farm_name = as.factor(scfs_df$farm_name)
-  scfs_df$week = as.factor(scfs_df$week)
+  df$all_lep = as.integer(df$all_lep)
+  df$year = as.factor(as.character(df$year))
+  df$farm_name = as.factor(df$farm_name)
+  df$week = as.factor(df$week)
   
-  return(scfs_df)
-  
-}
-
-#############################
-# check_farm_data_form() function
-#############################
-check_farm_data_form = function(farm_df) {
-  
-  #' Check that the form of the important columns are in the type they need to 
-  #' be in 
-  
-  farm_df$year = as.factor(as.character(farm_df$year))
-  farm_df$farm_name = as.factor(farm_df$farm_name)
-
-  return(farm_df)
+  return(df)
   
 }
 
 #############################
-# prepare_scfs_data() function
+# get_n_cores() function
 #############################
-prepare_scfs_data = function(scfs_df, scenario_name) {
+get_n_cores = function() {
   
-  #' Take in the data and group by year then get a yearly mean average
+  #' Simple function to return the number of cores present 
   
-  yearly_scfs_df = scfs_df %>% 
-    dplyr::group_by(year) %>% 
-    dplyr::summarize(mean_lep = mean(all_lep))
+  # always leave one free 
+  n_cores = min(parallel:: detectCores(), 8) - 1
   
-  return(yearly_scfs_df)
+  return(n_cores)
+  
 }
-
-make_model_predictions = function(model) {
+df = read_csv(here("./data/prepped-data/scfs-regression-scen1-indiv.csv"))
+n_cores = 3
+#############################
+# nb_poi_zinb_zip() function
+#############################
+nb_poi_zinb_zip = function(df, n_cores, loc_path) {
   
-  #' Make a model prediction with the models in hand for each yearly level
+  #' Take in the dataframe with the variable at hand and, using AIC, determine
+  #' whether or not a standard or zero-inflated negative-binomial or poisson
+  #' model fits better to the data
   
-  # make the prediction data
-  predict_data = data.frame(
-    year = as.character(c(2001:2021)),
-    week = NA,
-    farm_name = NA
-  )
-  
-  # get the actual prediction and put it in a dataframe
-  all_lep_df = data.frame(
-    stats::predict(
-      model,
-      newdata = predict_data,
-      type = "response",
-      re.form = NA,
-      se.fit = TRUE
+  # negative binomial function
+  nb_mod = glmmTMB::glmmTMB(
+    all_lep ~ year + (1 | week) + (1 | farm_name),
+    data = df,
+    family = nbinom2,
+    control = glmmTMBControl(
+      optimizer = optim,
+      optArgs = list(method = "BFGS"),
+      parallel = n_cores
     )
   )
   
-  # now add in the values to the predict_data df
-  predict_data = predict_data %>% 
-    dplyr::mutate(
-      fit = all_lep_df$fit,
-      lower = all_lep_df$fit - (1.96 * all_lep_df$se.fit),
-      upper = all_lep_df$fit + (1.96 * all_lep_df$se.fit),
-      # add in which scenario this is
-      scenario = scenario_name
+  # zero-inflated negative binomial
+  zinb_mod = glmmTMB::glmmTMB(
+    all_lep ~ year + (1 | week) + (1 | farm_name),
+    data = df,
+    family = nbinom2,
+    ziformula = ~0,
+    control = glmmTMBControl(
+      optimizer = optim,
+      optArgs = list(method = "BFGS"),
+      parallel = n_cores
     )
+  )
+  
+  # poisson model
+  poi_mod = glmmTMB::glmmTMB(
+    all_lep ~ year + (1 | week) + (1 | farm_name),
+    data = df,
+    family = poisson,
+    control = glmmTMBControl(
+      optimizer = optim,
+      optArgs = list(method = "BFGS"),
+      parallel = n_cores
+    )
+  )
+  
+  # zero-inflated poisson model 
+  zip_mod = glmmTMB::glmmTMB(
+    all_lep ~ year + (1 | week) + (1 | farm_name),
+    data = df,
+    family = poisson,
+    ziformula = ~0,
+    control = glmmTMBControl(
+      optimizer = optim,
+      optArgs = list(method = "BFGS"),
+      parallel = n_cores
+    )
+  )
+  
+  
+  # find the best model (lowest AIC)
+  mod_list = list(nb_mod = nb_mod, zinb_mod = zinb_mod, 
+                  poi_mod = poi_mod, zip_mod = zip_mod)
+  aic_list = c(nb_mod = AIC(nb_mod), zinb_mod = AIC(zinb_mod), 
+               poi_mod = AIC(poi_mod), zip_mod = AIC(zip_mod))
+  
+  best_mod = aic_list[which(aic_list == min(aic_list))]
+  
+  # in the case that there are multiple best models, take the non-zero inflated
+  if(length(best_mod > 1)) {
+    # if there are no differences between the z-i and the non-zi
+    if(length(best_mod) == 2) {
+      if(all(names(best_mod) == c("nb_mod", "zinb_mod"))) {
+        best_mod = best_mod["nb_mod"]
+      } else if(all(names(best_mod) == c("poi_mod", "zip_mod"))) {
+        best_mod = best_mod["poi_mod"]
+      }
+    } else if(length > 2) {
+      stop("ERROR - more than two models of equal ability!")
+    }
+  }
+  
+  # extract best model object
+  best_mod_ob = mod_list[which(names(mod_list) == names(best_mod))][[1]]
+  # also save the best model
+  saveRDS(best_mod_ob, paste0("best-mod-", names(best_mod), ".rds"))
+  
+  if(names(best_mod) == "nb_mod") {
+    best_mod_name = "Negative Binomial"
+    # save the model object
+    saveRDS(nb_mod, paste0(loc_path, "best-mod-negative-bionomial-model.rds"))
+  } else if(names(best_mod) == "zinb_mod") {
+    best_mod_name = "Zero-Inflated Negative Binomial"
+    # save the model object
+    saveRDS(zinb_mod, 
+            paste0(loc_path, 
+                   "best-mod-zero-inflated-negative-binomial-model.rds"))
+  } else if(names(best_mod) == "poi_mod") {
+    best_mod_name = "Poisson"
+    # save the model object
+    saveRDS(poi_mod, paste0(loc_path, "best-mod-poisson-model.rds"))
+  } else if(names(best_mod) == "zip_mod") {
+    best_mod_name = "Zero-Inflated Poisson"
+    # save the model object
+    saveRDS(poi_mod, paste0(loc_path,
+                            "best-mod-zero-inflated-poisson-model.rds"))
+  }
+  
+  # list up the results
+  results_list = list(best_mod_ob, best_mod_name)
+  
+  return(results_list)
 }
 
+#############################
+# model_resids() function
+#############################
+model_resids = function(results_list, path) {
+  
+  #' Take in the best model object and simulate the residuals 
+  
+  # get just the best model object itself
+  best_mod_ob = results_list[[1]]
+  
+  # extract residuals
+  res = simulateResiduals(best_mod_ob)
+  
+  # save the residuals
+  png(filename = paste0(path, "best-model-residuals.png"))
+  
+  # plot the residuals
+  plot(res)
+  
+  dev.off()
+  
+}
+
+#############################
+# execute_scenario_models() function
+#############################
+execute_scenario_models = function(df, loc_path) {
+  
+  #' Use helper functions to get the best model for the given scenario
+  
+  # make sure the data are all in the right format
+  df = check_data_form(df)
+  
+  # find the number of cores the models can run on
+  n_cores = get_n_cores()
+  
+  # run the actual models 
+  results_list = nb_poi_zinb_zip(df, n_cores, loc_path)
+  
+  # save residuals
+  model_resids(results_list, loc_path)
+  
+  # return the object of the model fit
+  return(results_list[[1]])
+  
+}
 
 
 
