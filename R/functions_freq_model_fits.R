@@ -40,8 +40,8 @@ get_n_cores = function() {
   return(n_cores)
 
 }
-df = read_csv(here("./data/prepped-data/scfs-regression-scen1-indiv.csv"))
-n_cores = 3
+# df = read_csv(here("./data/prepped-data/scfs-regression-scen1-indiv.csv"))
+# n_cores = 3
 #############################
 # nb_poi_zinb_zip() function
 #############################
