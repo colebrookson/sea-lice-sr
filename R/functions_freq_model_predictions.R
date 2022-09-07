@@ -18,8 +18,8 @@ library(mgcv)
 library(patchwork)
 
 farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
-scfs_df = read_csv(here("./data/wild-lice-data/clean/chalimus-counted-lice.csv"))
-model = readRDS(here("./outputs/model-outputs/lice-per-fish-regression/scenario-1-year/"))
+scfs_df = read_csv(here("./data/prepped-data/scfs-regression-scen1-indiv.csv"))
+model = readRDS(here("./outputs/model-outputs/lice-per-fish-regression/scenario-1-indiv/best-mod-negative-bionomial-model.rds"))
 
 #############################
 # check_scfs_data_form() function
@@ -56,7 +56,7 @@ check_farm_data_form = function(farm_df) {
 #############################
 # prepare_scfs_data() function
 #############################
-prepare_scfs_data = function(scfs_df, scenario_name) {
+prepare_scfs_data = function(scfs_df) {
   
   #' Take in the data and group by year then get a yearly mean average
   
@@ -67,7 +67,7 @@ prepare_scfs_data = function(scfs_df, scenario_name) {
   return(yearly_scfs_df)
 }
 
-make_model_predictions = function(model) {
+make_model_predictions = function(model, scenario) {
   
   #' Make a model prediction with the models in hand for each yearly level
   
@@ -96,12 +96,16 @@ make_model_predictions = function(model) {
       lower = all_lep_df$fit - (1.96 * all_lep_df$se.fit),
       upper = all_lep_df$fit + (1.96 * all_lep_df$se.fit),
       # add in which scenario this is
-      scenario = scenario_name
+      scenario = scenario
     )
+  
+  return(predict_data)
 }
 
 
-
-
+scfs_df = check_scfs_data_form(scfs_df)
+farm_df = check_farm_data_form(farm_df)
+yearly_scfs_df = prepare_scfs_data(scfs_df)
+predictions = make_model_predictions(model, "scen1_indiv")
 
 
