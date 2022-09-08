@@ -9,17 +9,18 @@
 ##########
 ##########
 
-# library(tidyverse)
-# library(here)
-# library(glmmTMB)
-# library(lme4)
-# library(PNWColors)
-# library(mgcv)
-# library(patchwork)
-# 
-# farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
-# scfs_df = read_csv(here("./data/prepped-data/scfs-regression-scen1-indiv.csv"))
-# model = readRDS(here("./outputs/model-outputs/lice-per-fish-regression/scenario-1-indiv/best-mod-negative-bionomial-model.rds"))
+library(tidyverse)
+library(here)
+library(glmmTMB)
+library(lme4)
+library(PNWColors)
+library(mgcv)
+library(patchwork)
+
+farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
+scfs_df = read_csv(here("./data/prepped-data/scfs-regression-scen1-indiv.csv"))
+model = readRDS(here("./outputs/model-outputs/lice-per-fish-regression/scenario-1-indiv/best-mod-negative-bionomial-model.rds"))
+scenario = "scen3"
 
 #############################
 # check_scfs_data_form() function
@@ -131,10 +132,10 @@ execute_model_predictions = function(scfs_df, farm_df, model, scenario, path) {
   yearly_scfs_df = prepare_scfs_data(scfs_df)
   
   # make the actual predictions
-  predictions = make_model_predictions(model, "scen1_indiv")
+  predictions = make_model_predictions(model, scenario)
   
   # save the output 
-  save_predict_data(predictions, path)
+  save_predict_data(predictions, path, scenario)
   
   # return the predictions df
   return(predictions)
