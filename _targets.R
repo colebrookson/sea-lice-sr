@@ -21,6 +21,7 @@ source(here::here("./R/functions_wild_lice_scenarios.R"))
 source(here::here("./R/functions_chalimus_inputation.R"))
 source(here::here("./R/functions_count_leps.R"))
 source(here::here("./R/functions_freq_model_fits.R"))
+source(here::here("./R/functions_freq_model_predictions.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
@@ -214,6 +215,61 @@ list(
   tar_target(scenario_4_model,
              execute_scenario_models(
                scenario_4_counts,
+               here::here(
+                 paste0("./outputs/model-outputs/lice-per-fish",
+                        "-regression/scenario-4/")
+               )
+             )),
+  tar_target(scenario_1_indiv_prediction,
+             execute_model_predictions(
+               scenario_1_indiv_counts,
+               join_all_farm_data,
+               scenario_1_indiv_model,
+               "scen1-indiv",
+               here::here(
+                 paste0("./outputs/model-outputs/lice-per-fish",
+                        "-regression/scenario-1-indiv/")
+               )
+             )),
+  tar_target(scenario_1_year_prediction,
+             execute_model_predictions(
+               scenario_1_year_counts,
+               join_all_farm_data,
+               scenario_1_year_model,
+               "scen1-year",
+               here::here(
+                 paste0("./outputs/model-outputs/lice-per-fish",
+                        "-regression/scenario-1-year/")
+               )
+             )),
+  tar_target(scenario_2_prediction,
+             execute_model_predictions(
+               scenario_2_counts,
+               join_all_farm_data,
+               scenario_2_model,
+               "scen2",
+               here::here(
+                 paste0("./outputs/model-outputs/lice-per-fish",
+                        "-regression/scenario-2/")
+               )
+             )),
+  tar_target(scenario_3_prediction,
+             execute_model_predictions(
+               scenario_3_counts,
+               join_all_farm_data,
+               scenario_3_model,
+               "scen3",
+               here::here(
+                 paste0("./outputs/model-outputs/lice-per-fish",
+                        "-regression/scenario-3/")
+               )
+             )),
+  tar_target(scenario_4_prediction,
+             execute_model_predictions(
+               scenario_4_counts,
+               join_all_farm_data,
+               scenario_4_model,
+               "scen4",
                here::here(
                  paste0("./outputs/model-outputs/lice-per-fish",
                         "-regression/scenario-4/")

@@ -9,17 +9,17 @@
 ##########
 ##########
 
-library(tidyverse)
-library(here)
-library(glmmTMB)
-library(lme4)
-library(PNWColors)
-library(mgcv)
-library(patchwork)
-
-farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
-scfs_df = read_csv(here("./data/prepped-data/scfs-regression-scen1-indiv.csv"))
-model = readRDS(here("./outputs/model-outputs/lice-per-fish-regression/scenario-1-indiv/best-mod-negative-bionomial-model.rds"))
+# library(tidyverse)
+# library(here)
+# library(glmmTMB)
+# library(lme4)
+# library(PNWColors)
+# library(mgcv)
+# library(patchwork)
+# 
+# farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
+# scfs_df = read_csv(here("./data/prepped-data/scfs-regression-scen1-indiv.csv"))
+# model = readRDS(here("./outputs/model-outputs/lice-per-fish-regression/scenario-1-indiv/best-mod-negative-bionomial-model.rds"))
 
 #############################
 # check_scfs_data_form() function
@@ -67,6 +67,9 @@ prepare_scfs_data = function(scfs_df) {
   return(yearly_scfs_df)
 }
 
+#############################
+# make_model_predictions() function
+#############################
 make_model_predictions = function(model, scenario) {
   
   #' Make a model prediction with the models in hand for each yearly level
@@ -102,10 +105,38 @@ make_model_predictions = function(model, scenario) {
   return(predict_data)
 }
 
+#############################
+# make_model_predictions() function
+#############################
+save_predict_data = function(df, path, scenario) {
+  
+  #' save the predicted data 
+  
+  readr::write_csv(df, paste0(path, scenario, ".csv"))
+}
 
-scfs_df = check_scfs_data_form(scfs_df)
-farm_df = check_farm_data_form(farm_df)
-yearly_scfs_df = prepare_scfs_data(scfs_df)
-predictions = make_model_predictions(model, "scen1_indiv")
-
-
+#############################
+# execute_model_predictions() function
+#############################
+execute_model_predictions = function(scfs_df, farm_df, model, scenario, path) {
+  
+  #' Use the helper functions at hand to take in a fit model and put out a 
+  #' prediction of that model across the viable values 
+  
+  # make sure both datasets are in the right form
+  scfs_df = check_scfs_data_form(scfs_df)
+  farm_df = check_farm_data_form(farm_df)
+  
+  # get a yearly version 
+  yearly_scfs_df = prepare_scfs_data(scfs_df)
+  
+  # make the actual predictions
+  predictions = make_model_predictions(model, "scen1_indiv")
+  
+  # save the output 
+  save_predict_data(predictions, path)
+  
+  # return the predictions df
+  return(predictions)
+  
+}
