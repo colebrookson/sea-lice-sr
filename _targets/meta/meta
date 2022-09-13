@@ -33,7 +33,7 @@ df|object|289760415385fccd|||||||||||||||
 dfo_farm_ref_data|stem|02aa0092b5469095|84f590bceeb6cea2|c3b5fc02cdc369c1|-1486775753|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/farm-name-reference.csv|t19205.9599767471s|54f0cde7a83f527b|7999|file|local|vector|||0.218||
 dfo_file|object|a999c69c8fb5fac0|||||||||||||||
 execute_model_predictions|function|6474624f92e55a84|||||||||||||||
-execute_predictions_plot|function|d20ef9668f629e56|||||||||||||||
+execute_predictions_plot|function|63efd07029bebf63|||||||||||||||
 execute_scenario_models|function|da2348d11cd53bfe|||||||||||||||
 farm_df|object|fa5e874ce4e7f726|||||||||||||||
 farm_names_bati|function|72589cb21f7ae795|||||||||||||||
@@ -57,7 +57,7 @@ get_data_scfs|function|d4b632b9a9bb3f37|||||||||||||||
 get_n_cores|function|ea395c42ff31c894|||||||||||||||
 inpute_all_chal_data|function|04638d77dce063c1|||||||||||||||
 join_all_farm_data|stem|b665f181615a71f7|28546ad75a920ccb|fa5fb9f13586715b|669325057||t19242.6410515046s|e8422d5bf52d1963|40466|rds|local|vector|||0.176||
-join_all_scenario_predictions|stem|beb24e897decf852|402d7cd8a77d1140|6ea0cc23502d9dab|-104754300||t19248.8194878823s|40b3a10246f0095b|83|rds|local|vector|||0.478||
+join_all_scenario_predictions|stem|6568a483c66bf9ec|402d7cd8a77d1140|2f4d806bb0d49351|-104754300||t19248.821817585s|0296590fdecf4135|2800|rds|local|vector|||0.47||
 join_clean_bati|function|fb7142b86211baaa|||||||||||||||
 join_clean_late|function|79ac99623e9f056e|||||||||||||||
 join_clean_marty|function|f1cdf83979209431|||||||||||||||

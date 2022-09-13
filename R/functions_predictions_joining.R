@@ -156,12 +156,16 @@ plot_predictions = function(all_pred_df, path) {
 execute_predictions_plot = function(pred1_in, pred1_yr, pred2, 
                                     pred3, pred4, path) {
   
-  #' use helper functions to plot the different scenario results 
+  #' use helper functions to plot the different scenario results and also 
+  #' return the object created of the bound together scenarios to be used 
+  #' later in the regression against farm fish
   
   # join the various df's together
   all_pred_df = join_prediction_df(pred1_in, pred1_yr, pred2, pred3, pred4)
   
   # plot the predictions (with legend shift helper)
   plot_predictions(all_pred_df, path)
+  
+  return(all_pred_df)
   
 }
