@@ -33,7 +33,7 @@ df|object|289760415385fccd|||||||||||||||
 dfo_farm_ref_data|stem|02aa0092b5469095|84f590bceeb6cea2|c3b5fc02cdc369c1|-1486775753|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/farm-name-reference.csv|t19205.9599767471s|54f0cde7a83f527b|7999|file|local|vector|||0.218||
 dfo_file|object|a999c69c8fb5fac0|||||||||||||||
 execute_model_predictions|function|6474624f92e55a84|||||||||||||||
-execute_predictions_plot|function|63efd07029bebf63|||||||||||||||
+execute_predictions_plot|function|5fa1774366df2da0|||||||||||||||
 execute_scenario_models|function|da2348d11cd53bfe|||||||||||||||
 farm_df|object|fa5e874ce4e7f726|||||||||||||||
 farm_names_bati|function|72589cb21f7ae795|||||||||||||||
@@ -57,7 +57,7 @@ get_data_scfs|function|d4b632b9a9bb3f37|||||||||||||||
 get_n_cores|function|ea395c42ff31c894|||||||||||||||
 inpute_all_chal_data|function|04638d77dce063c1|||||||||||||||
 join_all_farm_data|stem|b665f181615a71f7|28546ad75a920ccb|fa5fb9f13586715b|669325057||t19242.6410515046s|e8422d5bf52d1963|40466|rds|local|vector|||0.176||
-join_all_scenario_predictions|stem|6568a483c66bf9ec|402d7cd8a77d1140|2f4d806bb0d49351|-104754300||t19248.821817585s|0296590fdecf4135|2800|rds|local|vector|||0.47||
+join_all_scenario_predictions|stem|6568a483c66bf9ec|3c98b32848f641c9|9f082e388181f93b|-104754300||t19248.8256521832s|0296590fdecf4135|2800|rds|local|vector|||0.585||
 join_clean_bati|function|fb7142b86211baaa|||||||||||||||
 join_clean_late|function|79ac99623e9f056e|||||||||||||||
 join_clean_marty|function|f1cdf83979209431|||||||||||||||
@@ -142,6 +142,7 @@ trim_clean_dfo_open_data|function|f2dbe44f8e599c68|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
 wild_lice_beta_regression|stem|6fcbcb2559ac7b97|bbc132a8ec09079f|8b892f9cd31c9e76|577821677||t19242.6407393301s|6c5716952e947034|12864|rds|local|vector|||4.243||
 wild_lice_nonlinear_regression|stem|e7c095ecb5990ba8|f4908d6d0bdaf050|e5c90aa6790dda01|183052523||t19242.6408106261s|fc7fa338136fe66b|13760|rds|local|vector|||4.03||
+write_bound_file|function|bad323cbf15ab971|||||||||||||||
 write_data_bati|function|bfa517e14148f2ec|||||||||||||||
 write_data_joined_farm|function|785c298ffc35eca8|||||||||||||||
 write_data_marty|function|bfa517e14148f2ec|||||||||||||||

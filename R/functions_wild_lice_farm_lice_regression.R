@@ -9,3 +9,8 @@
 ##########
 
 options(dplyr.summarise.inform = FALSE)
+
+library(here)
+library(tidyverse)
+
+farm_df = read_csv(here("./data/wild-lice-data/clean/scfs-data-clean.csv"))

@@ -153,8 +153,23 @@ plot_predictions = function(all_pred_df, path) {
 
 }
 
+#############################
+# write_bound_file() function 
+#############################
+write_bound_file = function(df, path) {
+  
+  #' Take the bound df and write it out so a temp file exists
+  
+  readr::write_csv(
+    df, paste0(path, "all-scenario-yearly-lice-per-fish-estimates.csv")
+  )
+}
+
+#############################
+# execute_predictions_plot() function 
+#############################
 execute_predictions_plot = function(pred1_in, pred1_yr, pred2, 
-                                    pred3, pred4, path) {
+                                    pred3, pred4, file_path, fig_path) {
   
   #' use helper functions to plot the different scenario results and also 
   #' return the object created of the bound together scenarios to be used 
@@ -163,8 +178,11 @@ execute_predictions_plot = function(pred1_in, pred1_yr, pred2,
   # join the various df's together
   all_pred_df = join_prediction_df(pred1_in, pred1_yr, pred2, pred3, pred4)
   
+  # write out the file 
+  write_bound_file(all_pred_df, file_path)
+  
   # plot the predictions (with legend shift helper)
-  plot_predictions(all_pred_df, path)
+  plot_predictions(all_pred_df, fig_path)
   
   return(all_pred_df)
   

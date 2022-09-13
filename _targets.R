@@ -284,6 +284,9 @@ list(
                scenario_3_prediction,
                scenario_4_prediction,
                here::here(
+                 "./data/wild-lice-data/clean/"
+               ),
+               here::here(
                  "./figs/yearly-lice-per-fish/"
                )
              ))
