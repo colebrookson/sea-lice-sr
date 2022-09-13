@@ -366,6 +366,7 @@ trim_clean_dfo_open_data = function(dfo_df, marty_df) {
     # rename for consistency
     dplyr::rename(inventory = mean_inventory) %>% 
     # now calculate total caligus and l. salmonis counts 
+    dplyr::rowwise() %>% 
     dplyr::mutate(
       lep_tot = inventory * lep_av,
       cal_tot = inventory * cal_av
@@ -475,6 +476,7 @@ match_inventory_data = function(bati_df, dfo_df, output_path) {
                        dplyr::filter(!is.nan(lep_av)),
                      by = c("month")) %>% 
     # add in other columns that are handy to have in 
+    dplyr::rowwise() %>% 
     dplyr::mutate(
       lep_tot = inventory * lep_av,
     ) %>% 
@@ -521,6 +523,10 @@ join_clean_bati = function(bati_df) {
       # also make unique farm/year/month identifier
       time_place_id = paste(ref, year, month, sep = "_")
     ) %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+      lep_tot = inventory * lep_av
+    ) %>% 
     select(sort(names(.)))
 }
 
@@ -557,7 +563,10 @@ join_clean_marty = function(marty_df) {
                    136, 1586, 1086, 1618)  ~ 1,
         farm_name == "NA_7"               ~ 1,
         TRUE                              ~ 0
-      ),
+      )
+    ) %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
       lep_tot = inventory * lep_av,
       # also make unique farm/year/month identifier
       time_place_id = paste(ref, year, month, sep = "_")
