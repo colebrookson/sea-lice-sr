@@ -33,6 +33,7 @@ df|object|289760415385fccd|||||||||||||||
 dfo_farm_ref_data|stem|02aa0092b5469095|84f590bceeb6cea2|c3b5fc02cdc369c1|-1486775753|/home/cole/Github/sea-lice-sr/./data/farm-data/raw/farm-name-reference.csv|t19205.9599767471s|54f0cde7a83f527b|7999|file|local|vector|||0.218||
 dfo_file|object|a999c69c8fb5fac0|||||||||||||||
 execute_model_predictions|function|6474624f92e55a84|||||||||||||||
+execute_predictions_plot|function|d20ef9668f629e56|||||||||||||||
 execute_scenario_models|function|da2348d11cd53bfe|||||||||||||||
 farm_df|object|fa5e874ce4e7f726|||||||||||||||
 farm_names_bati|function|72589cb21f7ae795|||||||||||||||
@@ -56,11 +57,13 @@ get_data_scfs|function|d4b632b9a9bb3f37|||||||||||||||
 get_n_cores|function|ea395c42ff31c894|||||||||||||||
 inpute_all_chal_data|function|04638d77dce063c1|||||||||||||||
 join_all_farm_data|stem|b665f181615a71f7|28546ad75a920ccb|fa5fb9f13586715b|669325057||t19242.6410515046s|e8422d5bf52d1963|40466|rds|local|vector|||0.176||
+join_all_scenario_predictions|stem|beb24e897decf852|402d7cd8a77d1140|6ea0cc23502d9dab|-104754300||t19248.8194878823s|40b3a10246f0095b|83|rds|local|vector|||0.478||
 join_clean_bati|function|fb7142b86211baaa|||||||||||||||
 join_clean_late|function|79ac99623e9f056e|||||||||||||||
 join_clean_marty|function|f1cdf83979209431|||||||||||||||
 join_clean_missing|function|06454f058c3084a2|||||||||||||||
 join_farm_data|function|18651d26916f5519|||||||||||||||
+join_prediction_df|function|b34a83e6e26d9f1b|||||||||||||||
 lep_mot_regression|function|a62bd526f9c7fc08|||||||||||||||
 lep_regression_cope|function|c1689388c776306a|||||||||||||||
 lep_regression_mot|function|4415c56609f47294|||||||||||||||
@@ -80,6 +83,7 @@ nonlinear_plot|function|1a34f1311274acca|||||||||||||||
 nonlinear_prediction|function|3e5d3cc69fbe0131|||||||||||||||
 nonlinear_regression|function|961ad0c1f1f0006b|||||||||||||||
 nonlinear_regression_scenario|function|0f66489f673cc2c0|||||||||||||||
+plot_predictions|function|4511d5997207f596|||||||||||||||
 predicted_values_copes|function|cdfb01b2de4be06a|||||||||||||||
 predicted_values_mots|function|86056117e69a3502|||||||||||||||
 prediction_plot_cope|function|a8a9644995cdfca2|||||||||||||||
@@ -125,6 +129,7 @@ scenario3|function|2fc7dfb9c1543f76|||||||||||||||
 scenario4|function|5731e600452ecdf0|||||||||||||||
 scfs_df|object|38dbd641d631b775|||||||||||||||
 scfs_raw_data_file|stem|963ebaa46a53f344|bb57621d7fe16c8c|33217b43f1415251|1766984428|/home/cole/Github/sea-lice-sr/./data/wild-lice-data/raw/Sea-lice-database-master/Data/BroughtonSeaLice_fishData.csv|t19229.1474266501s|09520c5850fa3143|5495967|file|local|vector|||0.091||
+shift_legend|function|002eb46cb67816d9|||||||||||||||
 standardize_names|function|df4fc583e60014a9|||||||||||||||
 summary_columns|function|578d17c11edaec54|||||||||||||||
 temp|object|de6a0928ab3ebb22|||||||||||||||

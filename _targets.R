@@ -22,10 +22,11 @@ source(here::here("./R/functions_chalimus_inputation.R"))
 source(here::here("./R/functions_count_leps.R"))
 source(here::here("./R/functions_freq_model_fits.R"))
 source(here::here("./R/functions_freq_model_predictions.R"))
+source(here::here("./R/functions_predictions_joining.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
-                            "DHARMa", "parallel"))
+                            "DHARMa", "parallel", "gtable", "grid", "cowplot"))
 list(
   ####################
   # files
@@ -273,6 +274,17 @@ list(
                here::here(
                  paste0("./outputs/model-outputs/lice-per-fish",
                         "-regression/scenario-4/")
+               )
+             )),
+  tar_target(join_all_scenario_predictions,
+             execute_predictions_plot(
+               scenario_1_indiv_prediction,
+               scenario_1_year_prediction,
+               scenario_2_prediction,
+               scenario_3_prediction,
+               scenario_4_prediction,
+               here::here(
+                 "./figs/yearly-lice-per-fish/"
                )
              ))
 )

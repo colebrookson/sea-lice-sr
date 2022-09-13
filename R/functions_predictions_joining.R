@@ -8,36 +8,13 @@
 ##########
 ##########
 
-library(tidyverse)
-library(here)
-library(ggthemes)
-library(gtable)
-library(grid)
-library(cowplot)
-
-pred1_in = read_csv(here(
-  "./outputs/model-outputs/lice-per-fish-regression/scenario-1-indiv/scen1-indiv.csv"
-))
-pred1_yr = read_csv(here(
-  "./outputs/model-outputs/lice-per-fish-regression/scenario-1-year/scen1-year.csv"
-))
-pred2 = read_csv(here(
-  "./outputs/model-outputs/lice-per-fish-regression/scenario-2/scen2.csv"
-))
-pred3 = read_csv(here(
-  "./outputs/model-outputs/lice-per-fish-regression/scenario-3/scen3.csv"
-))
-pred4 = read_csv(here(
-  "./outputs/model-outputs/lice-per-fish-regression/scenario-4/scen4.csv"
-))
-
 #############################
 # plot_predictions() function 
 #############################
 join_prediction_df = function(pred1_in, pred1_yr, pred2, pred3, pred4) {
   
   #' Take in all four data frames, and join them together so we can compare the 
-  #' different assumptions in the estiamtes
+  #' different assumptions in the estimates
   
   all_pred_df = rbind(
     pred1_in,
