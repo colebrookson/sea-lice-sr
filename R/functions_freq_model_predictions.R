@@ -9,19 +9,6 @@
 ##########
 ##########
 
-library(tidyverse)
-library(here)
-library(glmmTMB)
-library(lme4)
-library(PNWColors)
-library(mgcv)
-library(patchwork)
-
-farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
-scfs_df = read_csv(here("./data/prepped-data/scfs-regression-scen1-indiv.csv"))
-model = readRDS(here("./outputs/model-outputs/lice-per-fish-regression/scenario-1-indiv/best-mod-negative-bionomial-model.rds"))
-scenario = "scen3"
-
 #############################
 # check_scfs_data_form() function
 #############################
