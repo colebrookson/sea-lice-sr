@@ -37,8 +37,37 @@ make_farm_groupings = function(farm_df) {
     dplyr::filter(year > 2000) %>% 
     # keep only months that fish actually migrate through during
     dplyr::filter(month %in% c(3, 4)) %>% 
+    dplyr::filter(ktc == 1) %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarise(
-      all_leps = mean(lep_tot, na.rm = TRUE)
+      ktc_leps = mean(lep_tot, na.rm = TRUE)
     )
+  
+  # make the hsd farms df 
+  hsd_farms = farm_df %>% 
+    dplyr::filter(year > 2000) %>% 
+    # keep only months that fish actually migrate through during
+    dplyr::filter(month %in% c(3, 4)) %>% 
+    dplyr::filter(hump_sarg_doc == 1) %>% 
+    dplyr::group_by(year) %>% 
+    dplyr::summarise(
+      hsd_leps = mean(lep_tot, na.rm = TRUE)
+    )
+  
+  # bind together all farm combos
+  all_group_farms = cbind(
+    all_farms,
+    ktc_farms %>% 
+      dplyr::select(-year),
+    hsd_farms %>% 
+      dplyr::select(-year)
+  )
+  
+  return(all_group_farms)
+  
 }
+
+
+
+all_group_farms = make_farm_groupings(farm_df)
+

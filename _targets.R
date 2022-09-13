@@ -14,6 +14,7 @@ library(here)
 
 source(here::here("./R/functions_plot_themes.R"))
 source(here::here("./R/functions_farm_data_cleaning.R"))
+source(here::here("./R/functions_farm_data_tests.R"))
 source(here::here("./R/functions_general_data_cleaning.R"))
 source(here::here("./R/functions_wild_lice_cleaning.R"))
 source(here::here("./R/functions_wild_lice_regression.R"))
@@ -92,6 +93,10 @@ list(
                fill_in_missing_inventories,
                fill_in_late_timeseries_inventories,
                here::here("./data/farm-data/clean/all-farms-joined-clean.csv")
+             )),
+  tar_target(test_all_farm_data,
+             check_lep_tot_values(
+               join_all_farm_data
              )),
   tar_target(prepare_wild_lice_data,
              clean_data_scfs(

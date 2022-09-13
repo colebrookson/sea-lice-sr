@@ -10,12 +10,6 @@
 
 options(dplyr.summarise.inform = FALSE)
 
-library(here)
-library(tidyverse)
-
-farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
-
-
 #############################
 # plot_predictions() function 
 #############################
@@ -49,4 +43,3 @@ check_lep_tot_values = function(farm_df) {
     }
   }
 }
-check_lep_tot_values(farm_df)
