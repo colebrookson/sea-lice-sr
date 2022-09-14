@@ -231,7 +231,7 @@ list(
                scenario_1_indiv_counts,
                join_all_farm_data,
                scenario_1_indiv_model,
-               "scen1-indiv",
+               "scen1_indiv",
                here::here(
                  paste0("./outputs/model-outputs/lice-per-fish",
                         "-regression/scenario-1-indiv/")
@@ -242,7 +242,7 @@ list(
                scenario_1_year_counts,
                join_all_farm_data,
                scenario_1_year_model,
-               "scen1-year",
+               "scen1_year",
                here::here(
                  paste0("./outputs/model-outputs/lice-per-fish",
                         "-regression/scenario-1-year/")

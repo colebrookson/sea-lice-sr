@@ -30,6 +30,9 @@ make_farm_groupings = function(farm_df) {
     dplyr::group_by(year) %>% 
     dplyr::summarise(
       all_leps = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::mutate(
+      log_all_leps = log(all_leps)
     )
   
   # make ktc farm df
@@ -41,6 +44,9 @@ make_farm_groupings = function(farm_df) {
     dplyr::group_by(year) %>% 
     dplyr::summarise(
       ktc_leps = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::mutate(
+      log_ktc_leps = log(ktc_leps)
     )
   
   # make the hsd farms df 
@@ -52,6 +58,9 @@ make_farm_groupings = function(farm_df) {
     dplyr::group_by(year) %>% 
     dplyr::summarise(
       hsd_leps = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::mutate(
+      log_hds_leps = log(hsd_leps)
     )
   
   # bind together all farm combos
@@ -67,7 +76,22 @@ make_farm_groupings = function(farm_df) {
   
 }
 
+reshape_scenario_lice = function(all_scen_lice) {
+  
+  #' Take the values and put them in wide format for easier regression
+  
+  tidyr::pivot_wider(
+    all_scen_lice %>% 
+      dplyr::select(-c(farm_name, week)) %>% 
+      dplyr::mutate(scenario = as.factor(scenario)),
+    names_from = scenario,
+    values_from = fit
+  )
+}
+
+
 
 
 all_group_farms = make_farm_groupings(farm_df)
+
 
