@@ -80,18 +80,32 @@ reshape_scenario_lice = function(all_scen_lice) {
   
   #' Take the values and put them in wide format for easier regression
   
-  tidyr::pivot_wider(
-    all_scen_lice %>% 
-      dplyr::select(-c(farm_name, week)) %>% 
-      dplyr::mutate(scenario = as.factor(scenario)),
+  # take just the fit value here 
+  fit_lice = all_scen_lice %>% 
+    dplyr::select(-c(farm_name, week, lower, upper)) %>% 
+    dplyr::mutate(scenario = as.factor(scenario)) %>% 
+    # rowwise, add in a log fit value
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+      log_fit = log(fit)
+    )
+  
+  # pivot wider for ease of model use 
+  fit_wide =
+    tidyr::pivot_wider(
+    fit_lice,
     names_from = scenario,
-    values_from = fit
-  )
+    values_from = c(fit, log_fit)
+    )
+  
+  return(fit_wide)
 }
 
 
 
 
 all_group_farms = make_farm_groupings(farm_df)
+
+wide_lice = reshape_scenario_lice(all_scen_lice)
 
 
