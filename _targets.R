@@ -27,7 +27,8 @@ source(here::here("./R/functions_predictions_joining.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
-                            "DHARMa", "parallel", "gtable", "grid", "cowplot"))
+                            "DHARMa", "parallel", "gtable", "grid", "cowplot",
+                            "wesanderson"))
 list(
   ####################
   # files
