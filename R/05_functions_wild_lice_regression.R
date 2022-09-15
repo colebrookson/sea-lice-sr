@@ -11,9 +11,9 @@
 options(dplyr.summarise.inform = FALSE)
 
 # testing
-library(tidyverse)
-library(here)
-df = read_csv(here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
+# library(tidyverse)
+# library(here)
+# df = read_csv(here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
 
 # Motile stage functions =======================================================
 
@@ -26,8 +26,7 @@ prep_data_mot = function(df) {
   #' with data from 2001 onwards and one with only 2001 for comparison
   
   df_2002_onwards = df %>% 
-    dplyr::filter(year > 2001) %>% 
-    dplyr::filter(all_mot > 0)
+    dplyr::filter(year > 2001)
   
   df_2001 = df %>% 
     dplyr::filter(year == 2001)
@@ -41,24 +40,24 @@ prep_data_mot = function(df) {
 #############################
 # motile_regression() function
 #############################
-motile_regression = function(df) {
+motile_regression = function(df_2002_onwards) {
   
   #' Perform logistic regression on motile data, using the proportion as our 
   #' response variable -- here we are regressing the proportion of motile leps 
   #' against the number of all MOTILES, not just all lice. 
   
-  mot_reg = stats::glm(prop_lep_mot ~ all_mot,
+  model = stats::glm(prop_lep_mot ~ all_mot,
                        # binomial family
                        family = binomial(link = "logit"),
-                       data = df)
+                       data = df_2002_onwards)
   
   # save object as nice neat file 
-  coefs = broom::tidy(mot_reg)
-  fitted_vals = broom::augment(mot_reg)
-  model_vals = broom::glance(mot_reg)
+  coefs = broom::tidy(model)
+  fitted_vals = broom::augment(model)
+  model_vals = broom::glance(model)
   
   # list results objects
-  results_list = list(mot_reg, coefs, fitted_vals, model_vals)
+  results_list = list(model, coefs, fitted_vals, model_vals)
   
   return(results_list)
   
@@ -98,13 +97,13 @@ save_regression_mots = function(results_list, file) {
 #############################
 # predicted_values_mots() function
 #############################
-predicted_values_mots = function(model, df) {
+predicted_values_mots = function(model, df_2002_onwards) {
   
   #' Take in the fitted model object and make predictions for the values that 
   #' the model actually covers out to the maximum count of number of motiles
   
   # find the maximum number of motiles
-  max_mot = max(df$all_mot)
+  max_mot = max(df_2002_onwards$all_mot)
   
   # make sequence of values ot predict on
   mot_seq = data.frame(all_mot = seq(0, max_mot, 0.01))
@@ -123,7 +122,7 @@ predicted_values_mots = function(model, df) {
   )
   
   # add 95% CI's
-  pred_mot_ci = pred_mot %>% 
+  pred_df = pred_mot %>% 
     dplyr::rowwise() %>% 
     dplyr::mutate(
       # fitted value
@@ -135,19 +134,20 @@ predicted_values_mots = function(model, df) {
     # keep only columns of use
     dplyr::select(all_mots, pred_prop, lower, upper)
   
-  return(pred_mot_ci)
+  return(pred_df)
 }
 
 #############################
 # prediction_plot_mot() function
 #############################
-prediction_plot_mot = function(df, pred_df) {
+prediction_plot_mot = function(df_2002_onwards, pred_df) {
   
-  #' Make and save the prediction plot from the motiles regression 
+  #' Make and save the prediction plot from the motiles regression using the 
+  #' data from 2002 onwards
   
   mot_plot = 
     ggplot2::ggplot() + 
-    geom_point(data = df, aes(x = all_mot, y = prop_lep_mot), 
+    geom_point(data = df_2002_onwards, aes(x = all_mot, y = prop_lep_mot), 
                shape = 21,
                colour = "black",
                fill = "red2",
@@ -156,7 +156,7 @@ prediction_plot_mot = function(df, pred_df) {
     geom_ribbon(data = pred_df, aes(x = all_mots, ymin = lower, ymax = upper),
                 fill = "grey80") +
     geom_line(data = pred_df, aes(x = all_mots, y = pred_prop)) + 
-    theme_base() + 
+    ggthemes::theme_base() + 
     labs(x = "Number of All Motiles", y = "Proportion of L. salmonis") +
     scale_size_manual(values = c(3, 1))
   
@@ -170,16 +170,16 @@ prediction_plot_mot = function(df, pred_df) {
 #############################
 # mot_2001_prediction() function
 #############################
-mot_2001_prediction = function(df, model) {
+mot_2001_prediction = function(df_2001, model) {
   
   #' Use the model object to make the prediction for the year 2001 
   
   # make prediction for mots
   mot_2001_pred = cbind(
-    df,
+    df_2001,
     pred_prop = stats::predict(
       model, 
-      data.frame(all_mot = df$all_mot),
+      data.frame(all_mot = df_2001$all_mot),
       type = "response")
   )
   
@@ -244,8 +244,6 @@ prep_data_cope = function(df) {
   df_2002_2004 = df %>% 
     dplyr::filter(year > 2001 & year < 2005)
   
-  df = df
-  
   # list up the return df's
   return_list = list(df_2002_2004, df_2005_onwards, df) 
   
@@ -261,18 +259,18 @@ cope_regression = function(df) {
   #' response variable -- here we are regressing the proportion of motile leps 
   #' against the number of all MOTILES, not just all lice. 
   
-  cope_reg = glm(prop_lep_cope ~ all_cope,
+  model = glm(prop_lep_cope ~ all_cope,
                  # binomial family
                  family = binomial(link = "logit"),
-                 data = df)
+                 data = df_2005_onwards)
   
   # save object as nice neat file 
-  coefs = broom::tidy(cope_reg)
-  fitted_vals = broom::augment(cope_reg)
-  model_vals = broom::glance(cope_reg)
+  coefs = broom::tidy(model)
+  fitted_vals = broom::augment(model)
+  model_vals = broom::glance(model)
   
   # list results objects
-  results_list = list(cope_reg, coefs, fitted_vals, model_vals)
+  results_list = list(model, coefs, fitted_vals, model_vals)
   
   return(results_list)
   
@@ -318,7 +316,7 @@ predicted_values_copes = function(model, df) {
   #' the model actually covers out to the maximum count of number of copepodites
   
   # find the maximum number of copepodites
-  max_cope = max(df$all_cope)
+  max_cope = max(df_2005_onwards$all_cope)
   
   # make sequence of values ot predict on
   cope_seq = data.frame(all_cope = seq(0, max_cope, 0.01))
@@ -337,7 +335,7 @@ predicted_values_copes = function(model, df) {
   )
   
   # add 95% CI's
-  pred_cope_ci = pred_cope %>% 
+  pred_df = pred_cope %>% 
     dplyr::rowwise() %>% 
     dplyr::mutate(
       # fitted value
@@ -355,13 +353,13 @@ predicted_values_copes = function(model, df) {
 #############################
 # prediction_plot_cope() function
 #############################
-prediction_plot_cope = function(df, pred_df) {
+prediction_plot_cope = function(df_2005_onwards, pred_df) {
   
   #' Make and save the prediction plot from the motiles regression 
   
   cope_plot = 
     ggplot2::ggplot() + 
-    geom_point(data = df, aes(x = all_cope, y = prop_lep_cope), 
+    geom_point(data = df_2005_onwards, aes(x = all_cope, y = prop_lep_cope), 
                shape = 21,
                colour = "black",
                fill = "blue2",
@@ -370,7 +368,7 @@ prediction_plot_cope = function(df, pred_df) {
     geom_ribbon(data = pred_df, aes(x = all_cope, ymin = lower, ymax = upper),
                 fill = "grey80") +
     geom_line(data = pred_df, aes(x = all_cope, y = pred_prop)) + 
-    theme_base() + 
+    ggthemes::theme_base() + 
     labs(x = "Number of All Copepodites", y = "Proportion of L. salmonis") +
     scale_size_manual(values = c(3, 1))
   
@@ -383,17 +381,17 @@ prediction_plot_cope = function(df, pred_df) {
 #############################
 # cope_2002_2004_prediction() function
 #############################
-cope_2002_2004_prediction = function(df, model) {
+cope_2002_2004_prediction = function(df_2005_onwards, model) {
   
   #' Use the model object to make the prediction for the years 2002-2004
   
   # copes model prediction
   cope_2002_2004_pred = data.frame(
-    df,
+    df_2005_onwards,
     # predicted column
     pred_prop = stats::predict(
       model,
-      data.frame(all_cope = df$all_cope),
+      data.frame(all_cope = df_2005_onwards$all_cope),
       type = "response")
   )
   
@@ -450,7 +448,7 @@ prep_data_nonlinear = function(df) {
   
   #' Use the raw dataset, and clean it to prepare for the non-linear regression
   
-  df %>% 
+  df_non = df %>% 
     dplyr::rowwise() %>% 
     dplyr::mutate( # make columns that divide the lice into species 
       all_lep = sum(lep_pamale, lep_pafemale, lep_male, 
@@ -479,12 +477,14 @@ prep_data_nonlinear = function(df) {
       dplyr::mutate( # find the proportion of all the lice that are leps
         prop_lep = mean_lep / mean_all
       )
+  
+  return(df_non)
 }
 
 #############################
 # nonlinear_regression() function
 #############################
-nonlinear_regression = function(df) {
+nonlinear_regression = function(df_non) {
   
   #' Take prepared dataset and fit the non-linear model from Bateman et al. 
   #' (2016) - CJFAS
@@ -496,7 +496,7 @@ nonlinear_regression = function(df) {
   model = stats::nls(
     formula = prop_lep ~ 1.0 - (1.0 - 0.0) * exp(- c * mean_all), 
     start = list(c = 2), 
-    data = df)
+    data = df_non)
   
   # save object as nice neat file 
   coefs = broom::tidy(model)
@@ -543,7 +543,7 @@ save_nonlinear_regression = function(results_list, file) {
 #############################
 # nonlinear_prediction() function
 #############################
-nonlinear_prediction = function(df, model) {
+nonlinear_prediction = function(model) {
   
   #' Use the model object to predict across new values of all lice to get an 
   #' estimate for higher numbers of total lice - thus to predict 2001
@@ -574,7 +574,7 @@ nonlinear_prediction = function(df, model) {
 #############################
 # nonlinear_plot() function
 #############################
-nonlinear_plot = function(df, df_line) {
+nonlinear_plot = function(df_non, df_line) {
   
   #' Make and save a plot of the non-linear prediction based off the prediction
   #' for 2001 in this framework
@@ -586,9 +586,9 @@ nonlinear_plot = function(df, df_line) {
                # get the predicted value for the missing
                prop_lep = 
                  df_line[which(
-                   df_line$mean_all == 3.44), "prop_lep"]
+                   df_line$mean_all ==3.44), "prop_lep"]
     ),
-    data.frame(df %>% 
+    data.frame(df_non %>% 
                  dplyr::select(-c(mean_lep)) 
     )
   ) %>% 
@@ -608,7 +608,7 @@ nonlinear_plot = function(df, df_line) {
               linetype = "dashed", colour = "grey50") + 
     scale_fill_manual(" ", values = c("purple1", "goldenrod2")) + 
     theme_bw() + 
-    theme_mod_comp() +
+    ggthemes::theme_base() +
     labs(x = "Mean number of lice per fish (all louse species)", 
          y = "Proportion of L. salmonis")
   

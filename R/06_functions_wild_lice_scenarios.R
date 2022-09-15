@@ -93,7 +93,7 @@ make_yearly_mot_averages = function(df, mot_ob, non_ob, beta_ob) {
   # dataframe of the yearly averages from the nonlinear model 
   yearly_avg_scen2 = rbind(
     # the predicted values
-    cbind(
+    as_tibble(cbind(
       year = 2001,
       prop_lep = stats::predict(
         # model object
@@ -101,7 +101,7 @@ make_yearly_mot_averages = function(df, mot_ob, non_ob, beta_ob) {
         # predicted dataframe
         data.frame(
           mean_all = 3.44),
-        type = "response")),
+        type = "response"))),
     # the model values
     non_ob[[1]] %>% 
       dplyr::select(year, prop_lep)  %>% 
@@ -111,7 +111,7 @@ make_yearly_mot_averages = function(df, mot_ob, non_ob, beta_ob) {
   # dataframe of the yearly averages from the beta model 
   yearly_avg_scen3 = rbind(
     # the predicted values
-    cbind(
+    as_tibble(cbind(
       year = 2001,
       prop_lep = stats::predict(
         # model object
@@ -119,7 +119,7 @@ make_yearly_mot_averages = function(df, mot_ob, non_ob, beta_ob) {
         # predicted dataframe
         data.frame(
           mean_all = 3.44),
-      type = "response")),
+      type = "response"))),
     # the model values
     non_ob[[1]] %>% 
       dplyr::select(year, prop_lep) %>% 
@@ -315,7 +315,7 @@ add_in_empirical_proportions = function(df) {
 }
 
 #############################
-# add_in_empirical_proportions() function
+# finish_prediction_proportions() function
 #############################
 finish_prediction_proportions = 
   function(df, yearly_avg_list_mot, yearly_avg_list_cope, mot_ob) {
@@ -430,27 +430,105 @@ calculate_new_leps = function(df) {
   # loop through each row, make the sample pull and then 
   for(row in seq_len(nrow(df))) {
     
-    # check if there are any unidentified mots 
-    if(df$unid_adult[row] > 0) {
+    # SCENARIO 1 - INDIVIDUAL 
     
+    # mots
+    if(df$unid_adult[row] > 0) {
+      # loop through each louse 
       for(louse in 1:df$unid_adult[row]) {
-
-        # loop through the column options
-        for(i in 1:length(prop_cols)) {
-          draw = sample(c(1, 0),
-                        size = 1,
-                        # draw with probability of that line in the dataset for leps
-                        # and 1 - that probability for cals (cals would be 0)
-                        prob = c(
-                          df[row, prop_cols[i]],
-                          1 - (df[row, prop_cols[i]])))
-          
-          if(draw == 1) {
-            df[row, new_lice_cols[i]] = df[row, new_lice_cols[i]] + 1
-          } else if(draw == 0) {
-            df[row, new_lice_cols[i + 6]] = df[row, new_lice_cols[i + 6]] + 1
-          }
-        }      
+        draw = sample(c(1, 0),
+                      size = 1,
+                      # draw with probability of line in the dataset for leps
+                      # and 1 - that probability for cals (cals would be 0)
+                      prob = c(
+                        df[row, "pred_prop_mot_indiv_scen1"],
+                        1 - (df[row, "pred_prop_mot_indiv_scen1"])))
+        
+        ifelse(draw == 1,
+          df[row, "mot_indiv_scen1_lep"] <- df[row, "mot_indiv_scen1_lep"] + 1,
+          df[row, "mot_indiv_scen1_cal"] <- df[row, "mot_indiv_scen1_cal"] + 1
+          )
+      } 
+    }
+    # copes
+    if(df$unid_cope[row] > 0) {
+      # loop through each louse 
+      for(louse in 1:df$unid_cope[row]) {
+        draw = sample(c(1, 0),
+                      size = 1,
+                      prob = c(
+                        df[row, "pred_prop_cope_indiv_scen1"],
+                        1 - (df[row, "pred_prop_cope_indiv_scen1"])))
+        
+        ifelse(draw == 1,
+        df[row, "cope_indiv_scen1_lep"] <- df[row, "cope_indiv_scen1_lep"] + 1,
+        df[row, "cope_indiv_scen1_cal"] <- df[row, "cope_indiv_scen1_cal"] + 1
+        )
+      } 
+    }
+    
+    # SCENARIO 1 - YEAR
+    
+    # mots
+    if(df$unid_adult[row] > 0) {
+      for(louse in 1:df$unid_adult[row]) {
+        draw = sample(c(1, 0),
+                      size = 1,
+                      prob = c(
+                        df[row, "pred_prop_mot_year_scen1"],
+                        1 - (df[row, "pred_prop_mot_year_scen1"])))
+        
+        ifelse(draw == 1,
+          df[row, "mot_year_scen1_lep"] <- df[row, "mot_year_scen1_lep"] + 1,
+          df[row, "mot_year_scen1_cal"] <- df[row, "mot_year_scen1_cal"] + 1
+        )
+      } 
+    }
+    # copes
+    if(df$unid_cope[row] > 0) {
+      # loop through each louse 
+      for(louse in 1:df$unid_cope[row]) {
+        draw = sample(c(1, 0),
+                      size = 1,
+                      prob = c(
+                        df[row, "pred_prop_cope_year_scen1"],
+                        1 - (df[row, "pred_prop_cope_year_scen1"])))
+        
+        ifelse(draw == 1,
+        df[row, "cope_year_scen1_lep"] <- df[row, "cope_year_scen1_lep"] + 1,
+        df[row, "cope_year_scen1_cal"] <- df[row, "cope_year_scen1_cal"] + 1
+        )
+      } 
+    }
+    
+    ##### BEGIN NOTE ################################
+    # For scenario 2 & 3, to stay consistent with previous years, all of the 
+    # chalimus and the copepodite columns were drawn from the same motile 
+    # proportions as well as the unid_adults
+    ##### END NOTE ################################
+    unid_lice = c("chala", "chalb", "unid_cope", "chal_unid", "unid_adult")
+    
+    for (col in unid_lice) { # go through each column of interest
+      if (is.na(df[row, col]) | df[row, col] < 1)
+        next 
+      for (louse in 1:data.frame(df[row, col])[1,1]) {
+        # draw for scenario 2 and scenario 3
+        draw_scen2 = sample(c(1, 0),
+                      size = 1, 
+                      prob = c(df[row, "pred_prop_mot_year_scen2"], 
+                              (1 - scfs_data[row, "pred_prop_mot_year_scen2"])))
+        draw_scen3 = sample(c(1, 0),
+                      size = 1, 
+                      prob = c(df[row, "pred_prop_mot_year_scen3"], 
+                              (1 - scfs_data[row, "pred_prop_mot_year_scen3"])))
+        ifelse (draw_scen2 == 1, 
+            df[row, "mot_year_scen2_lep"] <- df[row, "mot_year_scen2_lep"] + 1,
+            df[row, "mot_year_scen2_cal"] <- df[row, "mot_year_scen2_cal"] + 1
+        )
+        ifelse (draw_scen3 == 1, 
+            df[row, "mot_year_scen3_lep"] <- df[row, "mot_year_scen3_lep"] + 1,
+            df[row, "mot_year_scen3_cal"] <- df[row, "mot_year_scen3_cal"] + 1
+        )
       }
     }
   }
@@ -509,5 +587,3 @@ count_unidentified_lice = function(df, mot_ob, cope_ob, non_ob, beta_ob, path) {
   return(df)
   
 }
-
-

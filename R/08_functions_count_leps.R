@@ -11,6 +11,9 @@
 
 options(dplyr.summarise.inform = FALSE)
 
+# testing
+#chal_in = read_csv(here("./data/wild-lice-data/clean/chalimus-counted-lice.csv"))
+
 #############################
 # count_scenarios() function
 #############################
@@ -35,13 +38,11 @@ count_scenarios = function(df) {
       ), 
       all_leps_scen2 = sum(
         lep_cope, lep_pamale, lep_pafemale, lep_male, unid_pa,
-        lep_nongravid, lep_gravid, unid_cope, chala, chalb, 
-        chal_unid, mot_year_scen2_lep
+        lep_nongravid, lep_gravid, mot_year_scen2_lep
       ),
       all_leps_scen3 = sum(
         lep_cope, lep_pamale, lep_pafemale, lep_male, unid_pa,
-        lep_nongravid, lep_gravid, unid_cope, chala, chalb, 
-        chal_unid, mot_year_scen3_lep
+        lep_nongravid, lep_gravid, mot_year_scen3_lep
       ),
       all_lice_scen4 = sum(unid_cope, lep_cope, cal_cope, chala, chalb, 
                            chal_unid, lep_pamale, lep_male, lep_nongravid,

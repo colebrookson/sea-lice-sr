@@ -62,29 +62,25 @@ count_chalimus = function(df) {
                "chal_scen1_indiv_cal", "chal_scen1_year_cal")
   scen_cols = c("avg_pred_prop_indiv_scen1", "avg_pred_prop_year_scen1")
   
+  
+  
+  
   for(row in seq_len(nrow(df))) {
     for(col in 1:length(use_cols)) {
       
       # check if there are lice to count
       if(df[row, use_cols[col]] > 0) {
-        # go through each of the two scenarios
         for(scen in 1:length(scen_cols)) {
-          # for each louse make a draw
           for(louse in 1:max(df[row, use_cols[col]][1])) {
             draw = sample(c(1, 0),
                           size = 1,
-                          # draw with probability of that line for leps
-                          # and 1 - that probability for cals (cals would be 0)
                           prob = c(
                             df[row, scen_cols[scen]],
                             1 - (df[row, scen_cols[scen]])))
-            if(draw == 1) {
-              # these are the leps columns
-              df[row, new_cols[scen]] = df[row, new_cols[scen]] + 1
-            } else if(draw == 0) {
-              # these are the cals columns
-              df[row, new_cols[scen + 2]] = df[row, new_cols[scen + 2]] + 1
-            }
+            ifelse(draw == 1,
+              df[row, new_cols[scen]] <- df[row, new_cols[scen]] + 1,
+              df[row, new_cols[scen + 2]] <- df[row, new_cols[scen + 2]] + 1
+            )
           }
         }
       }
