@@ -10,6 +10,11 @@
 
 options(dplyr.summarise.inform = FALSE)
 
+# testing
+library(tidyverse)
+library(here)
+df = read_csv(here("./data/wild-lice-data/clean/scfs-data-clean.csv"))
+
 # Motile stage functions =======================================================
 
 #############################

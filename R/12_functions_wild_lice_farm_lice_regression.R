@@ -34,7 +34,7 @@ make_farm_groupings = function(farm_df) {
       all_leps = mean(lep_tot, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
-      log_all_farm_leps = log(all_leps)
+      log_all_farm_leps = log10(all_leps)
     ) %>% 
     dplyr::select(-all_leps)
   
@@ -49,7 +49,7 @@ make_farm_groupings = function(farm_df) {
       ktc_leps = mean(lep_tot, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
-      log_ktc_leps = log(ktc_leps)
+      log_ktc_leps = log10(ktc_leps)
     ) %>% 
     dplyr::select(-ktc_leps)
   
@@ -64,7 +64,7 @@ make_farm_groupings = function(farm_df) {
       hsd_leps = mean(lep_tot, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
-      log_hsd_leps = log(hsd_leps)
+      log_hsd_leps = log10(hsd_leps)
     ) %>% 
     dplyr::select(-hsd_leps)
   
@@ -92,7 +92,7 @@ reshape_scenario_lice = function(all_scen_lice) {
     # rowwise, add in a log fit value
     dplyr::rowwise() %>% 
     dplyr::mutate(
-      log_fit = log(fit)
+      log_fit = log10(fit)
     ) %>% 
     dplyr::select(-fit)
   
@@ -147,7 +147,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
   plot_obs = vector(mode = "list", 
                     length = length(farm_cols) * length(wild_cols))
   df_obs = vector(mode = "list",
-                  legnth = length(farm_cols) * length(wild_cols))
+                  length = length(farm_cols) * length(wild_cols))
   
   # loop through each option in the farm_cols and in the wild_cols 
   list_loc = 1
@@ -157,6 +157,9 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       # first put the two columns beside each other 
       mod_df = data.frame(all_group_farms[ ,i], wide_lice[, j])
       names(mod_df) = c("farm", "wild")
+      
+      # save df ob
+      df_obs[[list_loc]] = mod_df
       
       # now fit the model
       mod = stats::lm(
@@ -182,17 +185,20 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       #                  paste0(mod_path, "glance_aic_", i, "_", j, ".csv"))
       
       # set shape for the farm options, fill for the scenario options
-      shape = farm_cols_matching$num[which(farm_cols_matching$variable == i)]
+      shape_val = farm_cols_matching$num[which(farm_cols_matching$variable == i)]
       palette = wesanderson::wes_palette("Royal2")
-      fill = palette[
+      fill_val = palette[
         wild_cols_matching$num[which(wild_cols_matching$variable == j)]
       ]
+      
+      # extract adjusted r-squared to put on plot pane
+      rsq = model_vals$adj.r.squared
       
       # make plot for this particular model 
       plot = ggplot(data = mod_df, aes(x = farm, y = wild)) + 
         geom_point(
           # use the shape and colour to denote which are which
-          aes(fill = fill), shape = shape,
+          fill = fill_val, shape = shape_val,
           colour = "black", size = 5) +
         stat_smooth(method = stats::lm, formula = y ~ x,
                     colour = "black", alpha = 0.2) +
@@ -207,13 +213,21 @@ wild_farm_regression = function(all_group_farms, wide_lice,
                        wild_cols_matching$variable == j
                      )])
         ) + 
+        annotate(geom = "text", 
+                 x = min(mod_df$farm, na.rm = TRUE), 
+                 y = max(mod_df$wild, na.rm = TRUE), 
+                 label = paste("R^2 ==", round(rsq, 2)),
+                 size = 5,
+                 parse = TRUE,
+                 hjust = 0.3) + 
         theme(
-          legend.position = "none"
+          legend.position = "none",
+          axis.title = element_text(size = 14)
         )
       
       # # save plot
       # ggsave(paste0(
-      #   fig_path, i, "_", j, ".png"), 
+      #   fig_path, i, "_", j, ".png"),
       #   plot,
       #   dpi = 600)
       
@@ -227,8 +241,16 @@ wild_farm_regression = function(all_group_farms, wide_lice,
   # once loop is done, take all plot objects and stich them together
   all_plots = 
     (plot_obs[[1]] | plot_obs[[2]] | plot_obs[[3]] | plot_obs[[4]] | 
-       plot_obs[[5]])
+       plot_obs[[5]]) /
+    (plot_obs[[6]] | plot_obs[[7]] | plot_obs[[8]] | plot_obs[[9]] | 
+       plot_obs[[10]]) /
+    (plot_obs[[11]] | plot_obs[[12]] | plot_obs[[13]] | plot_obs[[14]] | 
+       plot_obs[[15]]) 
   
+  # ggsave(paste0(
+  #   fig_path, "all_scenario_farm_regression_plots.png"),
+  #   all_plots,
+  #   dpi = 600)
 
 }
 
