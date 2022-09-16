@@ -253,7 +253,7 @@ prep_data_cope = function(df) {
 #############################
 # cope_regression() function
 #############################
-cope_regression = function(df) {
+cope_regression = function(df_2005_onwards) {
   
   #' Perform logistic regression on motile data, using the proportion as our 
   #' response variable -- here we are regressing the proportion of motile leps 
@@ -310,7 +310,7 @@ save_regression_copes = function(results_list, file) {
 #############################
 # predicted_values_copes() function
 #############################
-predicted_values_copes = function(model, df) {
+predicted_values_copes = function(model, df_2005_onwards) {
   
   #' Take in the fitted model object and make predictions for the values that 
   #' the model actually covers out to the maximum count of number of copepodites
@@ -347,7 +347,7 @@ predicted_values_copes = function(model, df) {
     # keep only columns of use
     dplyr::select(all_cope, pred_prop, lower, upper)
   
-  return(pred_cope_ci)
+  return(pred_df)
 }
 
 #############################
@@ -639,7 +639,7 @@ nonlinear_regression_scenario = function(df, file) {
   save_nonlinear_regression(results_list, file)
   
   # make prediction dataframe 
-  pred_df = nonlinear_prediction(prepped_df, results_list[[1]])
+  pred_df = nonlinear_prediction(results_list[[1]])
   
   # plot results and save the plot
   nonlinear_plot(prepped_df, pred_df)

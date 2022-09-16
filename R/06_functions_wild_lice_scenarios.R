@@ -516,11 +516,11 @@ calculate_new_leps = function(df) {
         draw_scen2 = sample(c(1, 0),
                       size = 1, 
                       prob = c(df[row, "pred_prop_mot_year_scen2"], 
-                              (1 - scfs_data[row, "pred_prop_mot_year_scen2"])))
+                              (1 - df[row, "pred_prop_mot_year_scen2"])))
         draw_scen3 = sample(c(1, 0),
                       size = 1, 
                       prob = c(df[row, "pred_prop_mot_year_scen3"], 
-                              (1 - scfs_data[row, "pred_prop_mot_year_scen3"])))
+                              (1 - df[row, "pred_prop_mot_year_scen3"])))
         ifelse (draw_scen2 == 1, 
             df[row, "mot_year_scen2_lep"] <- df[row, "mot_year_scen2_lep"] + 1,
             df[row, "mot_year_scen2_cal"] <- df[row, "mot_year_scen2_cal"] + 1
