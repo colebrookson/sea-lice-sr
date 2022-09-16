@@ -19,6 +19,9 @@ farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
 all_scen_lice = read_csv(here("./data/wild-lice-data/clean/all-scenario-yearly-lice-per-fish-estimates.csv"))
 df = read_csv(here("./data/prepped-data/scfs-regression-scen2.csv"))
 
+#############################
+# make_farm_groupings() function
+#############################
 make_farm_groupings = function(farm_df) {
   
   #' Make three groupings of the farms - all the farms, the KTC farms, 
@@ -81,6 +84,9 @@ make_farm_groupings = function(farm_df) {
   
 }
 
+#############################
+# reshape_scenario_lice() function
+#############################
 reshape_scenario_lice = function(all_scen_lice) {
   
   #' Take the values and put them in wide format for easier regression
@@ -107,13 +113,9 @@ reshape_scenario_lice = function(all_scen_lice) {
   return(fit_wide)
 }
 
-
-
-
-all_group_farms = make_farm_groupings(farm_df)
-
-wide_lice = reshape_scenario_lice(all_scen_lice)
-
+#############################
+# wild_farm_regression() function
+#############################
 wild_farm_regression = function(all_group_farms, wide_lice, 
                                 mod_path, fig_path) {
   
@@ -174,15 +176,15 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       fitted_vals = broom::augment(mod)
       model_vals = broom::glance(mod)
       
-      # # save all objects
-      # saveRDS(mod, 
-      #         paste0(mod_path, "model_object_", i, "_", j, ".rds"))
-      # readr::write_csv(coefs, 
-      #         paste0(mod_path, "coeffs_", i, "_", j, ".csv"))
-      # readr::write_csv(fitted_vals, 
-      #                  paste0(mod_path, "fiited_vals_", i, "_", j, ".csv"))
-      # readr::write_csv(model_vals, 
-      #                  paste0(mod_path, "glance_aic_", i, "_", j, ".csv"))
+      # save all objects
+      saveRDS(mod,
+              paste0(mod_path, "model_object_", i, "_", j, ".rds"))
+      readr::write_csv(coefs,
+              paste0(mod_path, "coeffs_", i, "_", j, ".csv"))
+      readr::write_csv(fitted_vals,
+                       paste0(mod_path, "fiited_vals_", i, "_", j, ".csv"))
+      readr::write_csv(model_vals,
+                       paste0(mod_path, "glance_aic_", i, "_", j, ".csv"))
       
       # set shape for the farm options, fill for the scenario options
       shape_val = farm_cols_matching$num[which(farm_cols_matching$variable == i)]
@@ -219,17 +221,18 @@ wild_farm_regression = function(all_group_farms, wide_lice,
                  label = paste("R^2 ==", round(rsq, 2)),
                  size = 5,
                  parse = TRUE,
-                 hjust = 0.3) + 
+                 hjust = -0.5) + 
         theme(
           legend.position = "none",
           axis.title = element_text(size = 14)
-        )
+        ) +
+        ylim(c(-1.5, 1.2))
       
-      # # save plot
-      # ggsave(paste0(
-      #   fig_path, i, "_", j, ".png"),
-      #   plot,
-      #   dpi = 600)
+      # save plot
+      ggsave(paste0(
+        fig_path, i, "_", j, ".png"),
+        plot,
+        dpi = 600)
       
       # keep the plot object in the list 
       plot_obs[[list_loc]] = plot
@@ -238,7 +241,60 @@ wild_farm_regression = function(all_group_farms, wide_lice,
     }
   }
   
+  grid::grid.draw(shift_legend(test))
+  
   # once loop is done, take all plot objects and stich them together
+  all_farms_plot = plot_obs[[1]] | plot_obs[[2]] | plot_obs[[3]] | plot_obs[[4]] | 
+    plot_obs[[5]]
+  ggsave(paste0(
+    fig_path, "all_farm_scenario_comparison_regression_plots.png"),
+    all_farms_plot,
+    dpi = 600)
+  
+  ktc_farms_plot = plot_obs[[6]] | plot_obs[[7]] | plot_obs[[8]] | plot_obs[[9]] | 
+    plot_obs[[10]]
+  ggsave(paste0(
+    fig_path, "ktc_farm_scenario_comparison_regression_plots.png"),
+    ktc_farms_plot,
+    dpi = 600)
+  
+  hsd_farms_plot = plot_obs[[11]] | plot_obs[[12]] | plot_obs[[13]] | plot_obs[[14]] | 
+    plot_obs[[15]]
+  ggsave(paste0(
+    fig_path, "hsd_farm_scenario_comparison_regression_plots.png"),
+    hsd_farms_plot,
+    dpi = 600)
+  
+  scen1ind_plot = plot_obs[[1]] | plot_obs[[6]] | plot_obs[[11]]
+  ggsave(paste0(
+    fig_path, "scen_1ind_comparison_regression_plots.png"),
+    scen1ind_plot,
+    dpi = 600)
+  
+  scen1yr_plot = plot_obs[[2]] | plot_obs[[7]] | plot_obs[[12]]
+  ggsave(paste0(
+    fig_path, "scen_1yr_comparison_regression_plots.png"),
+    scen1yr_plot,
+    dpi = 600)
+  
+  scen2_plot = plot_obs[[3]] | plot_obs[[8]] | plot_obs[[13]]
+  ggsave(paste0(
+    fig_path, "scen_2_comparison_regression_plots.png"),
+    scen2_plot,
+    dpi = 600)
+  
+  scen3_plot = plot_obs[[4]] | plot_obs[[9]] | plot_obs[[14]]
+  ggsave(paste0(
+    fig_path, "scen_3_comparison_regression_plots.png"),
+    scen3_plot,
+    dpi = 600)
+  
+  scen4_plot = plot_obs[[5]] | plot_obs[[10]] | plot_obs[[15]]
+  ggsave(paste0(
+    fig_path, "scen_4_comparison_regression_plots.png"),
+    scen4_plot,
+    dpi = 600)
+  
   all_plots = 
     (plot_obs[[1]] | plot_obs[[2]] | plot_obs[[3]] | plot_obs[[4]] | 
        plot_obs[[5]]) /
@@ -246,12 +302,30 @@ wild_farm_regression = function(all_group_farms, wide_lice,
        plot_obs[[10]]) /
     (plot_obs[[11]] | plot_obs[[12]] | plot_obs[[13]] | plot_obs[[14]] | 
        plot_obs[[15]]) 
-  
-  # ggsave(paste0(
-  #   fig_path, "all_scenario_farm_regression_plots.png"),
-  #   all_plots,
-  #   dpi = 600)
+  ggsave(paste0(
+    fig_path, "all_scenario_farm_regression_plots.png"),
+    all_plots,
+    dpi = 600)
 
 }
 
-
+#############################
+# execute_wild_farm_regressions() function
+#############################
+execute_wild_farm_regressions = function(farm_df, all_scen_df,
+                                         mod_path, fig_path) {
+  
+  #' Use defined helper functions to go through the different combinations 
+  #' regress them all against each other, then plot all the results
+  
+  # take the farm dataframe and make the groupings necessary for the regression
+  all_group_farms = make_farm_groupings(farm_df)
+  
+  # take the lice df and reshape it for easier use
+  wide_lice = reshape_scenario_lice(all_scen_lice)
+  
+  # make & save the regressions, then save the plots
+  wild_farm_regression(all_group_farms, wide_lice, 
+                       mod_path, fig_path)
+  
+}
