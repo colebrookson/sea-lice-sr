@@ -17,7 +17,7 @@ library(patchwork)
 
 farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
 all_scen_lice = read_csv(here("./data/wild-lice-data/clean/all-scenario-yearly-lice-per-fish-estimates.csv"))
-
+df = read_csv(here("./data/prepped-data/scfs-regression-scen2.csv"))
 
 make_farm_groupings = function(farm_df) {
   
@@ -38,7 +38,7 @@ make_farm_groupings = function(farm_df) {
     ) %>% 
     dplyr::select(-all_leps)
   
-  # make ktc farm df
+  # make ktc farm df 
   ktc_farms = farm_df %>% 
     dplyr::filter(year > 2000) %>% 
     # keep only months that fish actually migrate through during

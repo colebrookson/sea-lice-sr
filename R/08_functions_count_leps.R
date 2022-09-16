@@ -37,11 +37,11 @@ count_scenarios = function(df) {
         mot_year_scen1_lep
       ), 
       all_leps_scen2 = sum(
-        lep_cope, lep_pamale, lep_pafemale, lep_male,
+        lep_cope, lep_pamale, lep_pafemale, lep_male, unid_pa,
         lep_nongravid, lep_gravid, mot_year_scen2_lep
       ),
       all_leps_scen3 = sum(
-        lep_cope, lep_pamale, lep_pafemale, lep_male,
+        lep_cope, lep_pamale, lep_pafemale, lep_male, unid_pa,
         lep_nongravid, lep_gravid, mot_year_scen3_lep
       ),
       all_lice_scen4 = sum(unid_cope, lep_cope, cal_cope, chala, chalb, 
@@ -55,13 +55,11 @@ count_scenarios = function(df) {
         FALSE),
       date = lubridate::make_date(year, month, day)
     ) %>% 
-   dplyr::select(
-     year, month, day, date, farm_name, all_leps_scen1_indiv, 
-     all_leps_scen1_year, all_leps_scen2, all_leps_scen3, all_lice_scen4, 
-     check_scen4_scen3
-   ) %>% 
     dplyr::mutate(
       week = lubridate::week(lubridate::ymd(date))
+    ) %>% 
+    dplyr::filter(
+      week %notin% c(9, 28, 33)
     )
   
   if(!all(df$check_scen4_scen3)) {
@@ -96,9 +94,9 @@ scenario1_indiv = function(df, path) {
   count_df = count_scenarios(df)
   
   count_df = count_df %>% 
-    dplyr::select(
-      year, week, date, farm_name, all_leps_scen1_indiv
-    ) %>% 
+    # dplyr::select(
+    #   year, week, date, farm_name, all_leps_scen1_indiv
+    # ) %>% 
     dplyr::rename(all_lep = all_leps_scen1_indiv)
   
   write_option_dfs(count_df, path)
@@ -118,9 +116,9 @@ scenario1_year = function(df, path) {
   count_df = count_scenarios(df)
   
   count_df = count_df %>% 
-    dplyr::select(
-      year, week, date, farm_name, all_leps_scen1_year
-    ) %>% 
+    # dplyr::select(
+    #   year, week, date, farm_name, all_leps_scen1_indiv
+    # ) %>% 
     dplyr::rename(all_lep = all_leps_scen1_year)
   
   write_option_dfs(count_df, path)
@@ -139,9 +137,9 @@ scenario2 = function(df, path) {
   count_df = count_scenarios(df)
   
   count_df = count_df  %>% 
-    dplyr::select(
-      year, week, date, farm_name, all_leps_scen2
-    ) %>% 
+    # dplyr::select(
+    #   year, week, date, farm_name, all_leps_scen1_indiv
+    # ) %>% 
     dplyr::rename(all_lep = all_leps_scen2)
   
   write_option_dfs(count_df, path)
@@ -160,9 +158,9 @@ scenario3 = function(df, path) {
   count_df = count_scenarios(df)
   
   count_df = count_df %>% 
-    dplyr::select(
-      year, week, date, farm_name, all_leps_scen3
-    ) %>% 
+    # dplyr::select(
+    #   year, week, date, farm_name, all_leps_scen1_indiv
+    # ) %>% 
     dplyr::rename(all_lep = all_leps_scen3)
   
   write_option_dfs(count_df, path)
@@ -181,9 +179,9 @@ scenario4 = function(df, path) {
   count_df = count_scenarios(df)
   
   count_df = count_df %>% 
-    dplyr::select(
-      year, week, date, farm_name, all_lice_scen4
-    ) %>% 
+    # dplyr::select(
+    #   year, week, date, farm_name, all_leps_scen1_indiv
+    # ) %>% 
     dplyr::rename(all_lep = all_lice_scen4)
   
   write_option_dfs(count_df, path)

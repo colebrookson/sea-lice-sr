@@ -308,7 +308,7 @@ mot_data = scfs_data %>%
 # fit with Y = a - (a - b) * exp(-c * X) 
 # note that the value for a is fixed at 1.0 since it's an actual hard 
 # asymptote
-model = stats::nls(
+modela = stats::nls(
     formula = prop_lep ~ 1.0 - (1.0 - 0.0) * exp(- c * mean_all), 
     start = list(c = 2), 
     data = mot_data)
@@ -317,7 +317,7 @@ model = stats::nls(
 pred_data_points = data.frame(
     mean_all = seq(0,4,0.01)
 )
-pred_prop = stats::predict(model, 
+pred_prop = stats::predict(modela, 
     pred_data_points,
     type = "response")
 predicted_line = data.frame(cbind(pred_data_points, pred_prop)) %>% 
@@ -398,7 +398,7 @@ predicted_proportions = ggplot() +
         linetype = "dashed", colour = "grey50") + 
     scale_fill_manual(" ", values = c("purple1", "goldenrod2")) + 
     theme_bw() + 
-    theme_mod_comp() +
+    #theme_mod_comp() +
     labs(x = "Mean number of lice per fish (all louse species)", 
         y = "Proportion of L. salmonis")
 ggsave(filename = here::here("./figs/predicted-lep-proportions.png"),
@@ -473,7 +473,7 @@ hist(unid_check$check)
 scfs_data_chal_inc = scfs_data %>% 
     dplyr::rowwise() %>%
     dplyr::mutate(all_lep = sum(lep_cope, lep_pamale, lep_pafemale, lep_male, 
-                            lep_nongravid, lep_gravid,
+                            lep_nongravid, lep_gravid, unid_pa,
                             # vars that got the correction factor included here
                             new_lep,
                             na.rm = TRUE),
@@ -505,10 +505,10 @@ scfs_data_chal_exc = scfs_data %>%
 # scfs data
 scfs_regress_chal_inc = data.frame(scfs_data_chal_inc %>% 
     dplyr::select(all_lice, all_lep, all_cal, 
-                    month, year, day, date, farm)) %>% 
+                    month, year, day, date, farm_name)) %>% 
     # rename farm to farm_name to stay consistent
     dplyr::rename(
-        farm_name = farm
+        farm_name = farm_name
     )
 
 # need to make a column for week 
