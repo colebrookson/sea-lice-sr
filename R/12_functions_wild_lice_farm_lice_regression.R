@@ -117,7 +117,7 @@ reshape_scenario_lice = function(all_scen_lice) {
 # wild_farm_regression() function
 #############################
 wild_farm_regression = function(all_group_farms, wide_lice, 
-                                mod_path, fig_path) {
+                                mod_path, fig_path, data_path) {
   
   #' Perform regression between all 5 options of logged lice on farms, and 
   #' all three log versions of the farm lice
@@ -151,7 +151,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
                     length = (length(farm_cols) * length(wild_cols)))
   df_obs = vector(mode = "list",
                   length = (length(farm_cols) * length(wild_cols)))
-  
+
   # loop through each option in the farm_cols and in the wild_cols 
   list_loc = 1L
   for(i in seq_len(length(farm_cols))) {
@@ -161,6 +161,8 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       # first put the two columns beside each other 
       mod_df = data.frame(all_group_farms[ ,farm], wide_lice[, wild])
       names(mod_df) = c("farm", "wild")
+      mod_df$wild_scenario = wild
+      mod_df$farm_group = farm
       
       # save df ob
       df_obs[[list_loc]] <- mod_df
@@ -308,13 +310,23 @@ wild_farm_regression = function(all_group_farms, wide_lice,
     all_plots,
     dpi = 600)
 
+  # join all the prediction df's together and write it out
+  df = df_obs[[1]]
+  for(i in 2:length(df_obs)) {
+    df = rbind(df, df_obs[[i]])
+  }
+  
+  readr::write_csv(df, data_path)
+  
+  # return the prediction data for use in the stock-recruit part
+  return(df)
 }
 
 #############################
 # execute_wild_farm_regressions() function
 #############################
 execute_wild_farm_regressions = function(farm_df, all_scen_lice,
-                                         mod_path, fig_path) {
+                                         mod_path, fig_path, data_path) {
   
   #' Use defined helper functions to go through the different combinations 
   #' regress them all against each other, then plot all the results
@@ -326,9 +338,10 @@ execute_wild_farm_regressions = function(farm_df, all_scen_lice,
   wide_lice = reshape_scenario_lice(all_scen_lice)
 
   # make & save the regressions, then save the plots
-  wild_farm_regression(all_group_farms, wide_lice,
-                       mod_path, fig_path)
+  df = wild_farm_regression(all_group_farms, wide_lice,
+                       mod_path, fig_path, data_path)
 
+  return(df)
 }
 # mod_path = here::here(
 #   "./outputs/model-outputs/wild-farm-regressions/"

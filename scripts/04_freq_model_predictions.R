@@ -77,7 +77,7 @@ just_wild_timeline = ggplot(data = predict_data) +
         colours = rev(PNWColors::pnw_palette("Sunset2",
                                         type = "continuous"))) +
     #scale_x_discrete(breaks = c(2005, 2010, 2015, 2020)) +
-    theme_raw_comp() +
+    #theme_raw_comp() +
   theme(
     axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
   )

@@ -53,6 +53,22 @@ list(
                paste0("./data/wild-lice-data/raw/Sea-lice-database-master/",
                       "Data/BroughtonSeaLice_fishData.csv")),
              format = "file"),
+  tar_target(nuseds_raw,
+             here::here(
+               "./data/sr-data/NuSEDS/NuSEDS_20220309.csv"),
+             format = "file"),
+  tar_target(pink_exp,
+             here::here(
+               "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"
+             ), format = "file"),
+  tar_target(pink_recon,
+             here::here(
+               "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"
+             ), format = "file"),
+  tar_target(pink_helper,
+             here::here(
+               "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"
+             ), format = "file"),
   ####################
   # cleaning data
   ####################
@@ -311,6 +327,9 @@ list(
                ),
                here::here(
                  "./figs/wild-farm-regressions/"
+               ),
+               here::here(
+                 "./data/prepped-data/predicted-lice-abundance.csv"
                )
              ))
 )
