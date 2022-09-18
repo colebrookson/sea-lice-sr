@@ -640,16 +640,19 @@ join_farm_data = function(bati_df, marty_df, missing_df, late_df, output_path) {
   #' any inventory data for at all. Note that I will default to BATI data, 
   #' then Marty, then the other two can just get joined at the end
   
-  rbind(
+  df = data.frame(rbind(
     join_clean_bati(bati_df),
     # this is the deferment step
     join_clean_marty(marty_df) %>% 
       filter(time_place_id %notin% join_clean_bati(bati_df)$time_place_id),
     join_clean_missing(missing_df),
     join_clean_late(late_df)
-    ) %>% 
-    write_data_joined_farm(., output_path)
-
+    ))
+  
+  # write out the data 
+  write_data_joined_farm(df, output_path)
+  
+  return(df)
     
   
 }

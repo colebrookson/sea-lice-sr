@@ -24,11 +24,12 @@ source(here::here("./R/08_functions_count_leps.R"))
 source(here::here("./R/09_functions_freq_model_fits.R"))
 source(here::here("./R/10_functions_freq_model_predictions.R"))
 source(here::here("./R/11_functions_predictions_joining.R"))
+source(here::here("./R/12_functions_wild_lice_farm_lice_regression.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
                             "DHARMa", "parallel", "gtable", "grid", "cowplot",
-                            "wesanderson"))
+                            "wesanderson", "patchwork"))
 list(
   ####################
   # files
@@ -294,6 +295,22 @@ list(
                ),
                here::here(
                  "./figs/yearly-lice-per-fish/"
+               )
+             )),
+  ####################
+  # wild lice vs. farm lice regressions & results plots
+  ####################
+  # tar_target(make_all_farm_groupings,
+  #            make_farm_groupings(join_all_farm_data))
+  tar_target(model_all_farm_combos_and_scenarios,
+             execute_wild_farm_regressions(
+               join_all_farm_data,
+               join_all_scenario_predictions,
+               here::here(
+                 "./outputs/model-outputs/wild-farm-regressions/"
+               ),
+               here::here(
+                 "./figs/wild-farm-regressions/"
                )
              ))
 )
