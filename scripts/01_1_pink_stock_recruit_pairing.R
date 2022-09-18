@@ -175,7 +175,7 @@ pink_area12 = pink_recon_rate %>%
 # do it in an ugly loop so it's readable
 
 esc_df_short = esc_df %>% 
-  filter(year <= 2016)
+  dplyr::filter(year <= 2016)
 esc_df_short$exp = NA
 for(row in seq_len(nrow(esc_df_short))){
   
