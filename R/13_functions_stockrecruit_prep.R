@@ -8,25 +8,31 @@
 ##########
 ##########
 
-# library(here)
-# library(tidyverse)
+library(here)
+library(tidyverse)
+
+nuseds_raw = read_csv(here::here(
+  "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"),
+  guess_max = 1000000)
+pink_exp = read_csv(here::here(
+  "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"))
+pink_recon = read_csv(here::here(
+  "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"))
+pink_helper = read_csv(here::here(
+  "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
+`%notin%` = negate(`%in%`)
 # 
-# nuseds_raw = read_csv(here::here(
-#   "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"),
-#   guess_max = 1000000)
-# pink_exp = read_csv(here::here(
-#   "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"))
-# pink_recon = read_csv(here::here(
-#   "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"))
-# pink_helper = read_csv(here::here(
-#   "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
-# 
-# nuseds = trim_nuseds(nuseds_raw)
-# esc_df = pull_escapment_values(nuseds)
-# rivers_helper_df = make_rivers_helper(pink_helper)
-# pink_area12 = set_up_catch_data(pink_exp, pink_recon, pink_helper)
-# esc_df_short = add_exploitation_rates(esc_df, pink_exp, pink_area12, rivers_helper_df)
-# new_esc_df = set_up_full_sr_database(esc_df_short)
+nuseds = trim_nuseds(nuseds_raw)
+esc_df = pull_escapment_values(nuseds)
+rivers_helper_df = make_rivers_helper(pink_helper)
+pink_exp_fixed = make_exp_vals_numeric(pink_exp)
+pink_area12 = set_up_catch_data(pink_recon, pink_helper)
+esc_df_short = add_exploitation_rates(esc_df, pink_exp_fixed, pink_area12, rivers_helper_df)
+esc_df_short_test = read_csv(here(
+  "./data/prepped-data/stock-recruit-data-frames/escapement-database.csv"
+))
+new_esc_df = set_up_full_sr_database(esc_df_short)
+new_esc_df_test = set_up_full_sr_database(esc_df_short_test)
 
 #############################
 # get_data_nuseds_raw() function
@@ -226,17 +232,37 @@ make_rivers_helper = function(pink_helper) {
 }
 
 #############################
-# set_up_catch_data() function
+# make_exp_vals_numeric() function
 #############################
-set_up_catch_data = function(pink_exp, pink_recon, pink_helper) {
+make_exp_vals_numeric = function(pink_exp) {
   
-  #' get catch data for pink salmon 
+  #' Take in the percentage values and make them numeric 
   
   # get a rate not percentage from English data
-  pink_exp$exp_rate = as.numeric(substr(pink_exp$exp_rate,
-                                        1,
-                                        nchar(pink_exp$exp_rate)-4))/100
+  pink_exp_fixed = pink_exp %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+      pink_exp = ifelse(is.na(exp_rate), 
+                        NA, 
+                        as.numeric(base::substr(
+                          exp_rate,
+                          1,
+                          base::nchar(exp_rate)-4))/100
+      )
+    ) %>% 
+    dplyr::select(-exp_rate) %>% 
+    dplyr::rename(exp_rate = pink_exp)
   
+  return(pink_exp_fixed)
+}
+
+#############################
+# set_up_catch_data() function
+#############################
+set_up_catch_data = function(pink_recon, pink_helper) {
+  
+  #' get catch data for pink salmon 
+
   # get catch rate for the pink data from Pieter
   pink_recon_rate = pink_recon %>% 
     dplyr::rowwise() %>% 
@@ -246,7 +272,7 @@ set_up_catch_data = function(pink_exp, pink_recon, pink_helper) {
     dplyr::select(
       conservation_unit, year, exp_rate, total_stock, apportioned_catch)
   
-  # now add in area 12 data to the pink_exp 
+  # now add in area 12 data
   area12_cus = c("Southern Fjords (even)", "Southern Fjords (odd)",
                  "Homathko-Klinaklini (odd)", "Nahwitti", 
                  "East Vancouver Island (odd)")
@@ -259,8 +285,8 @@ set_up_catch_data = function(pink_exp, pink_recon, pink_helper) {
 #############################
 # add_exploitation_rates() function
 #############################
-add_exploitation_rates = function(esc_df, pink_exp, 
-                                  pink_area12, rivers_helper_df) {
+add_exploitation_rates = function(esc_df, pink_exp_fixed, 
+                                  pink_area12, rivers_helper_df, file_path) {
   
   #' Add in the exploitation rates from the other data source 
   
@@ -297,8 +323,8 @@ add_exploitation_rates = function(esc_df, pink_exp,
     # if the area is 7-10 it's easy just take the one value
     if(cur_area %in% c(7:10)) {
       esc_df_short[row, "exp"] = 
-        pink_exp[which(pink_exp$year == cur_year & 
-                         pink_exp$area == cur_area), "exp_rate"]
+        pink_exp_fixed[which(pink_exp_fixed$year == cur_year & 
+                               pink_exp_fixed$area == cur_area), "exp_rate"]
     } else if(cur_area == 12) { # if it's area 12 then it's a bit harder
       
       # first check to see if the specific river is in the helper df
@@ -393,6 +419,11 @@ add_exploitation_rates = function(esc_df, pink_exp,
     # print(row)
   }
   
+  readr::write_csv(
+    esc_df_short,
+    paste0(file_path, "escapement-database.csv")
+  )
+  
   return(esc_df_short)
 }
 
@@ -400,7 +431,7 @@ add_exploitation_rates = function(esc_df, pink_exp,
 # execute_sr_data_prep() function
 #############################
 execute_sr_data_prep = function(raw_nuseds_raw, raw_pink_exp, 
-                                raw_pink_recon, raw_pink_helper) {
+                                raw_pink_recon, raw_pink_helper, file_path) {
   
   #' prepare the stock-recruit data before actually constructing the database
   
@@ -420,11 +451,14 @@ execute_sr_data_prep = function(raw_nuseds_raw, raw_pink_exp,
   rivers_helper_df = make_rivers_helper(pink_helper_df)
   
   # separate out area 12 data 
-  pink_area12 = set_up_catch_data(pink_exp_df, pink_recon_df, pink_helper_df)
+  pink_area12 = set_up_catch_data(pink_recon_df, pink_helper_df)
+  
+  # fix the percentages
+  pink_exp_fixed = make_exp_vals_numeric(pink_exp_df)
   
   # add exploitation rates 
-  esc_df_short = add_exploitation_rates(esc_df, pink_exp_df, pink_area12, 
-                                        rivers_helper_df)
+  esc_df_short = add_exploitation_rates(esc_df, pink_exp_fixed, pink_area12, 
+                                        rivers_helper_df, file_path)
   
   return(esc_df_short)
 }
@@ -516,7 +550,7 @@ set_up_full_sr_database = function(esc_df_short) {
       "odd"
     ))
 
-  return(new_esc_df)
+  return(data.frame(new_esc_df))
 }
 
 #############################
@@ -592,15 +626,31 @@ define_min_pairs = function(new_esc_df, min_pop, file_path) {
       !is.na(survival)
     )
   
-  cat("Assuming ", min_pop, " stock-recruit pairs per population, in the 
+  readr::write_csv(final_rivers_df, paste0(file_path,
+                                           "stock-recruit-df-no-lice-",
+                                           min_pop, "-pairs.csv"))
+  
+  print_info = 
+  paste0("Assuming ", min_pop, " stock-recruit pairs per population, in the 
       Final dataset: \n Total number of populations (even/odd): ", 
       length(unique(final_rivers_df$pop)), "\n Total number of S-R pairs: ", 
       dim(final_rivers_df)[1], "\n Total number of rivers: ", 
       length(unique(final_rivers_df$river)))
   
-  readr::write_csv(final_rivers_df, paste0(file_path,
-                                           "stock-recruit-df-no-lice-",
-                                           min_pop, "-pairs.csv"))
+  readr::write_tsv(
+    print_info,
+    paste0(file_path,
+           "info-stock-recruit-df-no-lice-",
+           min_pop, "-pairs.txt")
+  )
+  
+  
+  
+  writeLines(print_info, paste0(file_path,
+                                "info-stock-recruit-df-no-lice-",
+                                min_pop, "-pairs.txt"))
+  
+
   
   return(final_rivers_df)
 
@@ -771,4 +821,3 @@ execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions,
   plot_df(final_rivers_plot_df, fig_path)
 
 }
-

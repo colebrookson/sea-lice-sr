@@ -30,7 +30,7 @@ source(here::here("./R/13_functions_stockrecruit_prep.R"))
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
                             "DHARMa", "parallel", "gtable", "grid", "cowplot",
-                            "wesanderson", "patchwork"))
+                            "wesanderson", "patchwork", "stringr"))
 list(
   ####################
   # files
@@ -340,18 +340,33 @@ list(
                raw_nuseds_raw, 
                raw_pink_exp,
                raw_pink_recon,
-               raw_pink_helper
+               raw_pink_helper,
+               here::here(
+                 "./data/prepped-data/stock-recruit-data-frames/"
+               )
              )),
-  tar_target(make_stock_recruit_data_3_pairs,
-             execute_sr_database(
-               nuseds_prep,
+  tar_target(full_sr_database,
+             set_up_full_sr_database(
+               nuseds_prep
+             )),
+  tar_target(set_minimum_number_of_pairs,
+             define_min_pairs(
+               full_sr_database,
                3,
-               join_all_scenario_predictions,
                here::here(
-                 "./data/prepped-data/"
-               ),
-               here::here(
-                 "./figs/stock-recruit-data/"
+                 "./data/prepped-data/stock-recruit-data-frames/"
                )
              ))
+  # tar_target(make_stock_recruit_data_3_pairs,
+  #            execute_sr_database(
+  #              nuseds_prep,
+  #              3,
+  #              join_all_scenario_predictions,
+  #              here::here(
+  #                "./data/prepped-data/"
+  #              ),
+  #              here::here(
+  #                "./figs/stock-recruit-data/"
+  #              )
+  #            ))
 )
