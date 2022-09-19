@@ -156,12 +156,12 @@ plot_predictions = function(all_pred_df, path) {
 #############################
 # write_bound_file() function 
 #############################
-write_bound_file = function(df, path) {
+write_bound_file = function(df, file_path) {
   
   #' Take the bound df and write it out so a temp file exists
   
   readr::write_csv(
-    df, paste0(path, "all-scenario-yearly-lice-per-fish-estimates.csv")
+    df, file_path
   )
 }
 

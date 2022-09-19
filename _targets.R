@@ -308,7 +308,8 @@ list(
                scenario_3_prediction,
                scenario_4_prediction,
                here::here(
-                 "./data/wild-lice-data/clean/"
+                 paste0("./data/wild-lice-data/clean/",
+                 "all-scenario-yearly-lice-per-fish-estimates.csv")
                ),
                here::here(
                  "./figs/yearly-lice-per-fish/"
@@ -340,5 +341,17 @@ list(
                raw_pink_exp,
                raw_pink_recon,
                raw_pink_helper
+             )),
+  tar_target(make_stock_recruit_data_3_pairs,
+             execute_sr_database(
+               nuseds_prep,
+               3,
+               join_all_scenario_predictions,
+               here::here(
+                 "./data/prepped-data/"
+               ),
+               here::here(
+                 "./figs/stock-recruit-data/"
+               )
              ))
 )

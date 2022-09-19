@@ -22,9 +22,9 @@
 #   "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
 # 
 # nuseds = trim_nuseds(nuseds_raw)
-# #esc_df = pull_escapment_values(nuseds)
+# esc_df = pull_escapment_values(nuseds)
 # rivers_helper_df = make_rivers_helper(pink_helper)
-# pink_area12 = set_up_catch_data(pink_exp, pink_helper)
+# pink_area12 = set_up_catch_data(pink_exp, pink_recon, pink_helper)
 # esc_df_short = add_exploitation_rates(esc_df, pink_exp, pink_area12, rivers_helper_df)
 # new_esc_df = set_up_full_sr_database(esc_df_short)
 
@@ -442,8 +442,8 @@ set_up_full_sr_database = function(esc_df_short) {
   
   # Recruitment estimates R = N/(1-u)
   esc_df_short = esc_df_short %>% 
-    rowwise() %>% 
-    mutate(R = esc/(1-exp))
+    dplyr::rowwise() %>% 
+    dplyr::mutate(R = (esc/(1-as.numeric(exp))))
   
   esc_df_short$S = NA
   esc_df_short$survival = NA
@@ -607,6 +607,21 @@ define_min_pairs = function(new_esc_df, min_pop) {
 }
 
 #############################
+# determine_lice_scenario() function
+#############################
+determine_lice_scenario = function(lice_pred, scenario) {
+  
+  #' cut dataframe to size to look at just the lice values that are 
+  #' the ones to be focused on at hand 
+  
+  lice_pred_filtered = lice_pred %>% 
+    dplyr::filter(scenario == scenario)
+  
+  return(lice_pred_filtered)
+  
+}
+
+#############################
 # add_louse_covariate() function
 #############################
 add_louse_covariate = function(final_rivers_df, lice_pred, file_path, min_pop) {
@@ -627,16 +642,16 @@ add_louse_covariate = function(final_rivers_df, lice_pred, file_path, min_pop) {
     final_rivers_df[which(final_rivers_df$area == 12 & 
                             final_rivers_df$year == yr), "lice"] = 
       # find the value from the other dataset
-      lice_pred[which(lice_pred$year == yr-1), "all_lep"]
+      lice_pred[which(lice_pred$year == yr-1), "fit"]
     ## NOTE ###
     # the -1 in line above is supposed to be there, to pair the year of the lice
     # infection with the return year
     ## END NOTE ##
   }
   
-  readr::write_csv(final_rivers_df, past0(file_path, 
-                                          "stock-recruit-data-lice-included-",
-                                          min_pop, "-pairs.csv"))
+  # readr::write_csv(final_rivers_df, past0(file_path, 
+  #                                         "stock-recruit-data-lice-included-",
+  #                                         min_pop, "-pairs.csv"))
   
   return(final_rivers_df)
 }
@@ -727,3 +742,30 @@ plot_df = function(final_rivers_plot_df) {
     final_rivers_plot,
     height = 6, width = 10)
 }
+
+#############################
+# execute_sr_database() function
+#############################
+execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions, 
+                               scenario, file_path, fig_path) {
+  
+  #' Take in the values from the nuseds prep and make the full database 
+  
+  # set up the database as a structure 
+  new_esc_df = set_up_full_sr_database(esc_df_short)
+  
+  # trim down to the number of pairs per river we want
+  final_rivers_df = define_min_pairs(new_esc_df, min_pop, file_path)
+  
+  # figure out which scenario to highlight
+  lice_pred = determine_lice_scenario(all_lice_predictions, scenario)
+
+  # add in the louse covariate
+  final_rivers_df = add_louse_covariate(final_rivers_df, lice_pred, 
+                                        file_path, min_pop)
+  
+  # make plot
+  plot_df(final_rivers_df, fig_path)
+
+}
+
