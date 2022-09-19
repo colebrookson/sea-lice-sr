@@ -522,7 +522,7 @@ set_up_full_sr_database = function(esc_df_short) {
 #############################
 # define_min_pairs() function
 #############################
-define_min_pairs = function(new_esc_df, min_pop) {
+define_min_pairs = function(new_esc_df, min_pop, file_path) {
   
   #' Take the user-defined number of populations and return a dataframe with 
   #' that number of spawner-recruit pairs per population
@@ -764,8 +764,11 @@ execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions,
   final_rivers_df = add_louse_covariate(final_rivers_df, lice_pred, 
                                         file_path, min_pop)
   
+  # add in content for the plot
+  final_rivers_plot_df = make_plot_df(final_rivers_df)
+  
   # make plot
-  plot_df(final_rivers_df, fig_path)
+  plot_df(final_rivers_plot_df, fig_path)
 
 }
 
