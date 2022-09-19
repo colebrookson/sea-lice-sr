@@ -335,7 +335,7 @@ list(
   ####################
   # prepare nuseds data 
   ####################
-  tar_target(nuseds_prep,
+  tar_target(exploitation_rate_data_prep,
              execute_sr_data_prep(
                raw_nuseds_raw, 
                raw_pink_exp,
@@ -345,28 +345,32 @@ list(
                  "./data/prepped-data/stock-recruit-data-frames/"
                )
              )),
-  tar_target(full_sr_database,
-             set_up_full_sr_database(
-               nuseds_prep
-             )),
-  tar_target(set_minimum_number_of_pairs,
-             define_min_pairs(
-               full_sr_database,
-               3,
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               )
-             ))
-  # tar_target(make_stock_recruit_data_3_pairs,
-  #            execute_sr_database(
-  #              nuseds_prep,
+  # tar_target(full_sr_database,
+  #            set_up_full_sr_database(
+  #              exploitation_rate_data_prep,
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              )
+  #            )),
+  # tar_target(set_minimum_number_of_pairs,
+  #            define_min_pairs(
+  #              full_sr_database,
   #              3,
-  #              join_all_scenario_predictions,
   #              here::here(
-  #                "./data/prepped-data/"
-  #              ),
-  #              here::here(
-  #                "./figs/stock-recruit-data/"
+  #                "./data/prepped-data/stock-recruit-data-frames/"
   #              )
   #            ))
+  tar_target(make_stock_recruit_data_3_pairs,
+             execute_sr_database(
+               exploitation_rate_data_prep,
+               3,
+               join_all_scenario_predictions,
+               "scen1_indiv",
+               here::here(
+                 "./data/prepped-data/stock-recruit-data-frames/"
+               ),
+               here::here(
+                 "./figs/stock-recruit-data/"
+               )
+             ))
 )

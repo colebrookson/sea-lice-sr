@@ -8,31 +8,33 @@
 ##########
 ##########
 
-library(here)
-library(tidyverse)
-
-nuseds_raw = read_csv(here::here(
-  "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"),
-  guess_max = 1000000)
-pink_exp = read_csv(here::here(
-  "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"))
-pink_recon = read_csv(here::here(
-  "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"))
-pink_helper = read_csv(here::here(
-  "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
-`%notin%` = negate(`%in%`)
+# library(here)
+# library(tidyverse)
 # 
-nuseds = trim_nuseds(nuseds_raw)
-esc_df = pull_escapment_values(nuseds)
-rivers_helper_df = make_rivers_helper(pink_helper)
-pink_exp_fixed = make_exp_vals_numeric(pink_exp)
-pink_area12 = set_up_catch_data(pink_recon, pink_helper)
-esc_df_short = add_exploitation_rates(esc_df, pink_exp_fixed, pink_area12, rivers_helper_df)
-esc_df_short_test = read_csv(here(
-  "./data/prepped-data/stock-recruit-data-frames/escapement-database.csv"
-))
-new_esc_df = set_up_full_sr_database(esc_df_short)
-new_esc_df_test = set_up_full_sr_database(esc_df_short_test)
+# nuseds_raw = read_csv(here::here(
+#   "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"),
+#   guess_max = 1000000)
+# pink_exp = read_csv(here::here(
+#   "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"))
+# pink_recon = read_csv(here::here(
+#   "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"))
+# pink_helper = read_csv(here::here(
+#   "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
+# `%notin%` = negate(`%in%`)
+# #
+# nuseds = trim_nuseds(nuseds_raw)
+# esc_df = pull_escapment_values(nuseds)
+# rivers_helper_df = make_rivers_helper(pink_helper)
+# pink_exp_fixed = make_exp_vals_numeric(pink_exp)
+# pink_area12 = set_up_catch_data(pink_recon, pink_helper)
+# esc_df_short = add_exploitation_rates(esc_df, pink_exp_fixed, pink_area12, rivers_helper_df)
+# new_esc_df = read_csv(here(
+#   "./data/prepped-data/stock-recruit-data-frames/escapement-database.csv"
+# ))
+# new_esc_df = set_up_full_sr_database(esc_df_short)
+# new_esc_df_test = read_csv(here(
+#   "./data/prepped-data/stock-recruit-data-frames/escapement-database-with-exploitation.csv"
+# ))
 
 #############################
 # get_data_nuseds_raw() function
@@ -421,7 +423,7 @@ add_exploitation_rates = function(esc_df, pink_exp_fixed,
   
   readr::write_csv(
     esc_df_short,
-    paste0(file_path, "escapement-database.csv")
+    paste0(file_path, "exploitation-rates.csv")
   )
   
   return(esc_df_short)
@@ -466,7 +468,7 @@ execute_sr_data_prep = function(raw_nuseds_raw, raw_pink_exp,
 #############################
 # set_up_full_sr_database() function
 #############################
-set_up_full_sr_database = function(esc_df_short) {
+set_up_full_sr_database = function(esc_df_short, file_path) {
   
   #' With all the information prepped, set up the full database
   
@@ -504,7 +506,7 @@ set_up_full_sr_database = function(esc_df_short) {
         # now assign survival 
         esc_df_short[which(esc_df_short$river == river & 
                              esc_df_short$year == year), "survival"] =
-          #log(R(t)/S(t-2))
+          # log(R(t)/S(t-2))
           (esc_df_short[which(esc_df_short$river == river & 
                                 esc_df_short$year == year),"R"]) / 
           (esc_df_short[which(esc_df_short$river == river &
@@ -549,8 +551,12 @@ set_up_full_sr_database = function(esc_df_short) {
       (year %% 2) == 0, "even",
       "odd"
     ))
+  
+  readr::write_csv(new_esc_df, 
+                   paste0(file_path, 
+                          "escapement-database-with-exploitation.csv"))
 
-  return(data.frame(new_esc_df))
+  return(new_esc_df)
 }
 
 #############################
@@ -587,7 +593,7 @@ define_min_pairs = function(new_esc_df, min_pop, file_path) {
   # loop through and figure out how many pairs there are in each populations
   populations = sort(unique(new_esc_df$pop))
   counts = numeric(length(unique(new_esc_df$pop)))
-  for(curr_pop in 1:length(unique(new_esc_df$pop))) {
+  for(curr_pop in seq_len(length(unique(new_esc_df$pop)))) {
     
     # grab the current df of the population we want 
     temp = new_esc_df[which(new_esc_df$pop == curr_pop),]
@@ -637,20 +643,12 @@ define_min_pairs = function(new_esc_df, min_pop, file_path) {
       dim(final_rivers_df)[1], "\n Total number of rivers: ", 
       length(unique(final_rivers_df$river)))
   
-  readr::write_tsv(
+  readr::write_lines(
     print_info,
     paste0(file_path,
            "info-stock-recruit-df-no-lice-",
            min_pop, "-pairs.txt")
   )
-  
-  
-  
-  writeLines(print_info, paste0(file_path,
-                                "info-stock-recruit-df-no-lice-",
-                                min_pop, "-pairs.txt"))
-  
-
   
   return(final_rivers_df)
 
@@ -802,7 +800,7 @@ execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions,
   #' Take in the values from the nuseds prep and make the full database 
   
   # set up the database as a structure 
-  new_esc_df = set_up_full_sr_database(esc_df_short)
+  new_esc_df = set_up_full_sr_database(esc_df_short, file_path)
   
   # trim down to the number of pairs per river we want
   final_rivers_df = define_min_pairs(new_esc_df, min_pop, file_path)
@@ -811,13 +809,13 @@ execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions,
   lice_pred = determine_lice_scenario(all_lice_predictions, scenario)
 
   # add in the louse covariate
-  final_rivers_df = add_louse_covariate(final_rivers_df, lice_pred, 
-                                        file_path, min_pop)
+  #final_rivers_df = add_louse_covariate(final_rivers_df, lice_pred, 
+  #                                      file_path, min_pop)
   
   # add in content for the plot
-  final_rivers_plot_df = make_plot_df(final_rivers_df)
+  #final_rivers_plot_df = make_plot_df(final_rivers_df)
   
   # make plot
-  plot_df(final_rivers_plot_df, fig_path)
+  #plot_df(final_rivers_plot_df, fig_path)
 
 }

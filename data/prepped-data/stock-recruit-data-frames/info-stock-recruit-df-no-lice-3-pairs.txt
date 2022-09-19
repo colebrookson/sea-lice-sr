@@ -1,5 +1,5 @@
 Assuming 3 stock-recruit pairs per population, in the 
       Final dataset: 
- Total number of populations (even/odd): 16
- Total number of S-R pairs: 439
- Total number of rivers: 8
+ Total number of populations (even/odd): 149
+ Total number of S-R pairs: 2744
+ Total number of rivers: 78
