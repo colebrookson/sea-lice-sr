@@ -8,39 +8,61 @@
 ##########
 ##########
 
-library(here)
-library(tidyverse)
+# library(here)
+# library(tidyverse)
+# 
+# nuseds_raw = read_csv(here::here(
+#   "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"),
+#   guess_max = 1000000)
+# pink_exp = read_csv(here::here(
+#   "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"))
+# pink_recon = read_csv(here::here(
+#   "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"))
+# pink_helper = read_csv(here::here(
+#   "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
+# 
+# nuseds = trim_nuseds(nuseds_raw)
+# #esc_df = pull_escapment_values(nuseds)
+# rivers_helper_df = make_rivers_helper(pink_helper)
+# pink_area12 = set_up_catch_data(pink_exp, pink_helper)
+# esc_df_short = add_exploitation_rates(esc_df, pink_exp, pink_area12, rivers_helper_df)
+# new_esc_df = set_up_full_sr_database(esc_df_short)
 
-nuseds_raw = read_csv(here::here(
-  "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"),
-  guess_max = 1000000)
-pink_exp = read_csv(here::here(
-  "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"))
-pink_recon = read_csv(here::here(
-  "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"))
-pink_helper = read_csv(here::here(
-  "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
+#############################
+# get_data_nuseds_raw() function
+#############################
+get_data_nuseds_ref = function(file) {
+  
+  #' Read in .csv file with DFO farm reference numbers
+  
+  readr::read_csv(file, show_col_types = FALSE,
+                  guess_max = 1000000)
+}
 
-nuseds = trim_nuseds(nuseds_raw)
-#esc_df = pull_escapment_values(nuseds)
-rivers_helper_df = make_rivers_helper(pink_helper)
-pink_area12 = set_up_catch_data(pink_exp, pink_helper)
-esc_df_short = add_exploitation_rates(esc_df, pink_exp, pink_area12, rivers_helper_df)
-new_esc_df = set_up_full_sr_database(esc_df_short)
+#############################
+# get_pink_df() function
+#############################
+get_pink_df = function(file) {
+  
+  #' Read in .csv file with DFO farm reference numbers
+  
+  readr::read_csv(file, show_col_types = FALSE)
+}
 
 #############################
 # trim_nuseds() function
 #############################
-trim_nuseds = function(nuseds_raw) {
+trim_nuseds = function(nuseds_raw_df) {
   
   #' Take in raw file and pass out a smaller version 
   
-  names_keep = c("AREA", "WATERBODY", "POPULATION", "RUN_TYPE", "WATERSHED_CDE",
-                 "SPECIES", "ANALYSIS_YR", "MAX_ESTIMATE", "ADULT_PRESENCE")
-  nuseds = nuseds_raw %>% 
-    select(all_of(names_keep)) %>% 
-    filter(SPECIES == "Pink") %>% 
-    filter(AREA %in% c("7", "8", "9", "10", "12"))
+  nuseds = data.frame(nuseds_raw_df) %>% 
+    dplyr::select(
+      AREA, WATERBODY, POPULATION, RUN_TYPE, WATERSHED_CDE,
+        SPECIES, ANALYSIS_YR, MAX_ESTIMATE, ADULT_PRESENCE
+    ) %>% 
+    dplyr::filter(SPECIES == "Pink") %>% 
+    dplyr::filter(AREA %in% c("7", "8", "9", "10", "12"))
   
   return(nuseds)
 }
@@ -206,7 +228,7 @@ make_rivers_helper = function(pink_helper) {
 #############################
 # set_up_catch_data() function
 #############################
-set_up_catch_data = function(pink_exp, pink_helper) {
+set_up_catch_data = function(pink_exp, pink_recon, pink_helper) {
   
   #' get catch data for pink salmon 
   
@@ -224,7 +246,7 @@ set_up_catch_data = function(pink_exp, pink_helper) {
     dplyr::select(
       conservation_unit, year, exp_rate, total_stock, apportioned_catch)
   
-  # now add in area 12 data to the pink_exp df
+  # now add in area 12 data to the pink_exp 
   area12_cus = c("Southern Fjords (even)", "Southern Fjords (odd)",
                  "Homathko-Klinaklini (odd)", "Nahwitti", 
                  "East Vancouver Island (odd)")
@@ -370,6 +392,39 @@ add_exploitation_rates = function(esc_df, pink_exp,
     }
     # print(row)
   }
+  
+  return(esc_df_short)
+}
+
+#############################
+# execute_sr_data_prep() function
+#############################
+execute_sr_data_prep = function(raw_nuseds_raw, raw_pink_exp, 
+                                raw_pink_recon, raw_pink_helper) {
+  
+  #' prepare the stock-recruit data before actually constructing the database
+  
+  # read in the data
+  nuseds_raw_df = get_data_nuseds_ref(raw_nuseds_raw)
+  pink_exp_df = get_pink_df(raw_pink_exp)
+  pink_recon_df = get_pink_df(raw_pink_recon)
+  pink_helper_df = get_pink_df(raw_pink_helper)
+  
+  # trim nuseds to size 
+  nuseds = trim_nuseds(nuseds_raw_df)
+  
+  # pull escapement values 
+  esc_df = pull_escapment_values(nuseds)
+  
+  # make helper dataframe 
+  rivers_helper_df = make_rivers_helper(pink_helper_df)
+  
+  # separate out area 12 data 
+  pink_area12 = set_up_catch_data(pink_exp_df, pink_recon_df, pink_helper_df)
+  
+  # add exploitation rates 
+  esc_df_short = add_exploitation_rates(esc_df, pink_exp_df, pink_area12, 
+                                        rivers_helper_df)
   
   return(esc_df_short)
 }
@@ -664,8 +719,11 @@ plot_df = function(final_rivers_plot_df) {
     theme(
       legend.position = "none"
     )
+  
+  # save plot
   ggplot2::ggsave(
-    here::here("./figs/rivers-surveyed-through-time-20-pair-cutoff.png"),
+    paste0(fig_path, 
+           "rivers-surveyed-through-time-", min_pop, "-pair-cutoff.png"),
     final_rivers_plot,
     height = 6, width = 10)
 }

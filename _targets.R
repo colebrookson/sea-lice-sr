@@ -25,6 +25,7 @@ source(here::here("./R/09_functions_freq_model_fits.R"))
 source(here::here("./R/10_functions_freq_model_predictions.R"))
 source(here::here("./R/11_functions_predictions_joining.R"))
 source(here::here("./R/12_functions_wild_lice_farm_lice_regression.R"))
+source(here::here("./R/13_functions_stockrecruit_prep.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
@@ -53,19 +54,19 @@ list(
                paste0("./data/wild-lice-data/raw/Sea-lice-database-master/",
                       "Data/BroughtonSeaLice_fishData.csv")),
              format = "file"),
-  tar_target(nuseds_raw,
+  tar_target(raw_nuseds_raw,
              here::here(
-               "./data/sr-data/NuSEDS/NuSEDS_20220309.csv"),
+               "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"),
              format = "file"),
-  tar_target(pink_exp,
+  tar_target(raw_pink_exp,
              here::here(
                "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"
              ), format = "file"),
-  tar_target(pink_recon,
+  tar_target(raw_pink_recon,
              here::here(
                "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"
              ), format = "file"),
-  tar_target(pink_helper,
+  tar_target(raw_pink_helper,
              here::here(
                "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"
              ), format = "file"),
@@ -316,8 +317,6 @@ list(
   ####################
   # wild lice vs. farm lice regressions & results plots
   ####################
-  # tar_target(make_all_farm_groupings,
-  #            make_farm_groupings(join_all_farm_data))
   tar_target(model_all_farm_combos_and_scenarios,
              execute_wild_farm_regressions(
                join_all_farm_data,
@@ -331,5 +330,15 @@ list(
                here::here(
                  "./data/prepped-data/predicted-lice-abundance.csv"
                )
+             )),
+  ####################
+  # prepare nuseds data 
+  ####################
+  tar_target(nuseds_prep,
+             execute_sr_data_prep(
+               raw_nuseds_raw, 
+               raw_pink_exp,
+               raw_pink_recon,
+               raw_pink_helper
              ))
 )
