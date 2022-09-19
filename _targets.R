@@ -345,27 +345,134 @@ list(
                  "./data/prepped-data/stock-recruit-data-frames/"
                )
              )),
-  # tar_target(full_sr_database,
-  #            set_up_full_sr_database(
-  #              exploitation_rate_data_prep,
-  #              here::here(
-  #                "./data/prepped-data/stock-recruit-data-frames/"
-  #              )
-  #            )),
-  # tar_target(set_minimum_number_of_pairs,
-  #            define_min_pairs(
-  #              full_sr_database,
-  #              3,
-  #              here::here(
-  #                "./data/prepped-data/stock-recruit-data-frames/"
-  #              )
-  #            ))
-  tar_target(make_stock_recruit_data_3_pairs,
+  # scenario 1 - indiv
+  tar_target(sr_3_pairs_scen1_indiv,
              execute_sr_database(
                exploitation_rate_data_prep,
                3,
                join_all_scenario_predictions,
                "scen1_indiv",
+               here::here(
+                 "./data/prepped-data/stock-recruit-data-frames/"
+               ),
+               here::here(
+                 "./figs/stock-recruit-data/"
+               )
+             )),
+  tar_target(sr_20_pairs_scen1_indiv,
+             execute_sr_database(
+               exploitation_rate_data_prep,
+               20,
+               join_all_scenario_predictions,
+               "scen1_indiv",
+               here::here(
+                 "./data/prepped-data/stock-recruit-data-frames/"
+               ),
+               here::here(
+                 "./figs/stock-recruit-data/"
+               )
+             )),
+  # scenario 1 - year 
+  tar_target(sr_3_pairs_scen1_year,
+             execute_sr_database(
+               exploitation_rate_data_prep,
+               3,
+               join_all_scenario_predictions,
+               "scen1_year",
+               here::here(
+                 "./data/prepped-data/stock-recruit-data-frames/"
+               ),
+               here::here(
+                 "./figs/stock-recruit-data/"
+               )
+             )),
+  tar_target(sr_20_pairs_scen1_year,
+             execute_sr_database(
+               exploitation_rate_data_prep,
+               20,
+               join_all_scenario_predictions,
+               "scen1_year",
+               here::here(
+                 "./data/prepped-data/stock-recruit-data-frames/"
+               ),
+               here::here(
+                 "./figs/stock-recruit-data/"
+               )
+             )),
+  # scenario 2 
+  tar_target(sr_3_pairs_scen2,
+             execute_sr_database(
+               exploitation_rate_data_prep,
+               3,
+               join_all_scenario_predictions,
+               "scen2",
+               here::here(
+                 "./data/prepped-data/stock-recruit-data-frames/"
+               ),
+               here::here(
+                 "./figs/stock-recruit-data/"
+               )
+             )),
+  tar_target(sr_20_pairs_scen2,
+             execute_sr_database(
+               exploitation_rate_data_prep,
+               20,
+               join_all_scenario_predictions,
+               "scen2",
+               here::here(
+                 "./data/prepped-data/stock-recruit-data-frames/"
+               ),
+               here::here(
+                 "./figs/stock-recruit-data/"
+               )
+             )),
+  # scenario 3
+  tar_target(sr_3_pairs_scen3,
+             execute_sr_database(
+               exploitation_rate_data_prep,
+               3,
+               join_all_scenario_predictions,
+               "scen3",
+               here::here(
+                 "./data/prepped-data/stock-recruit-data-frames/"
+               ),
+               here::here(
+                 "./figs/stock-recruit-data/"
+               )
+             )),
+  tar_target(sr_20_pairs_scen3,
+             execute_sr_database(
+               exploitation_rate_data_prep,
+               20,
+               join_all_scenario_predictions,
+               "scen3",
+               here::here(
+                 "./data/prepped-data/stock-recruit-data-frames/"
+               ),
+               here::here(
+                 "./figs/stock-recruit-data/"
+               )
+             )),
+  # scenario 4
+  tar_target(sr_3_pairs_scen4,
+             execute_sr_database(
+               exploitation_rate_data_prep,
+               3,
+               join_all_scenario_predictions,
+               "scen4",
+               here::here(
+                 "./data/prepped-data/stock-recruit-data-frames/"
+               ),
+               here::here(
+                 "./figs/stock-recruit-data/"
+               )
+             )),
+  tar_target(sr_20_pairs_scen4,
+             execute_sr_database(
+               exploitation_rate_data_prep,
+               20,
+               join_all_scenario_predictions,
+               "scen4",
                here::here(
                  "./data/prepped-data/stock-recruit-data-frames/"
                ),
