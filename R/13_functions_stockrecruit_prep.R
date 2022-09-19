@@ -374,7 +374,7 @@ add_exploitation_rates = function(esc_df, pink_exp,
 }
 
 #############################
-# add_exploitation_rates() function
+# set_up_full_sr_database() function
 #############################
 set_up_full_sr_database = function(esc_df_short) {
   
