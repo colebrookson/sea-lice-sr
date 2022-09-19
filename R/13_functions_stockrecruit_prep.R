@@ -26,6 +26,7 @@ nuseds = trim_nuseds(nuseds_raw)
 rivers_helper_df = make_rivers_helper(pink_helper)
 pink_area12 = set_up_catch_data(pink_exp, pink_helper)
 esc_df_short = add_exploitation_rates(esc_df, pink_exp, pink_area12, rivers_helper_df)
+new_esc_df = set_up_full_sr_database(esc_df_short)
 
 #############################
 # trim_nuseds() function
@@ -367,7 +368,7 @@ add_exploitation_rates = function(esc_df, pink_exp,
                na.rm = TRUE)
       }
     }
-    print(row)
+    # print(row)
   }
   
   return(esc_df_short)
@@ -463,74 +464,208 @@ set_up_full_sr_database = function(esc_df_short) {
   return(new_esc_df)
 }
 
+#############################
+# define_min_pairs() function
+#############################
 define_min_pairs = function(new_esc_df, min_pop) {
   
   #' Take the user-defined number of populations and return a dataframe with 
   #' that number of spawner-recruit pairs per population
   
+  # first define populations as even/odd in the same river 
+  new_esc_df$pop = NA
+  num_rivers = unique(new_esc_df$river)
   
-}
-# first define populations as even/odd in the same river 
-new_esc_df$pop = NA
-num_rivers = unique(new_esc_df$river)
-
-# iterate through rivers 
-n_pops = 1
-for(river in num_rivers) {
+  # iterate through rivers 
+  n_pops = 1
+  for(river in num_rivers) {
+    
+    # assign population the value for odd years
+    new_esc_df$pop[which(new_esc_df$river == river 
+                         & new_esc_df$even_odd == "odd")] = n_pops
+    # iterate
+    n_pops = n_pops + 1
+    # now check even years 
+    new_esc_df$pop[which(new_esc_df$river == river 
+                         & new_esc_df$even_odd == "even")] = n_pops
+    # iterate
+    n_pops = n_pops + 1
+  }
   
-  # assign population the value for odd years
-  new_esc_df$pop[which(new_esc_df$river == river 
-                       & new_esc_df$even_odd == "odd")] = n_pops
-  # iterate
-  n_pops = n_pops + 1
-  # now check even years 
-  new_esc_df$pop[which(new_esc_df$river == river 
-                       & new_esc_df$even_odd == "even")] = n_pops
-  # iterate
-  n_pops = n_pops + 1
-}
-
-# make this into a factor 
-new_esc_df$pop = as.factor(new_esc_df$pop)
-
-# loop through and figure out how many pairs there are in each populations
-populations = sort(unique(new_esc_df$pop))
-counts = numeric(length(unique(new_esc_df$pop)))
-for(curr_pop in 1:length(unique(new_esc_df$pop))) {
+  # make this into a factor 
+  new_esc_df$pop = as.factor(new_esc_df$pop)
   
-  # grab the current df of the population we want 
-  temp = new_esc_df[which(new_esc_df$pop == curr_pop),]
+  # loop through and figure out how many pairs there are in each populations
+  populations = sort(unique(new_esc_df$pop))
+  counts = numeric(length(unique(new_esc_df$pop)))
+  for(curr_pop in 1:length(unique(new_esc_df$pop))) {
+    
+    # grab the current df of the population we want 
+    temp = new_esc_df[which(new_esc_df$pop == curr_pop),]
+    
+    # if there are enough mon-NA's then keep it
+    # (I know this is ugly and slow i just wanted to make 100% sure i was doing
+    # it out properly)
+    n_rows = nrow(temp)
+    n_NAs = nrow(temp[which(is.na(temp$survival)),])
+    counts[curr_pop] = n_rows - n_NAs
+    
+  }
   
-  # if there are enough mon-NA's then keep it
-  # (I know this is ugly and slow i just wanted to make 100% sure i was doing
-  # it out properly)
-  n_rows = nrow(temp)
-  n_NAs = nrow(temp[which(is.na(temp$survival)),])
-  counts[curr_pop] = n_rows - n_NAs
-  
-}
-
-pop_count_df = data.frame(
-  population = populations,
-  count = counts
-)
-
-# set the minimum number of populations 
-enough_obs_df = pop_count_df[which(pop_count_df$count > min_pop),]
-
-# keep only the pop's with that number
-final_rivers_df = new_esc_df[which(new_esc_df$pop %in% 
-                                     enough_obs_df$population),]
-
-# name the populations
-final_rivers_df$population_name = paste(
-  stringr::str_to_lower(gsub(" ", "_", final_rivers_df$river)),
-  final_rivers_df$even_odd,
-  sep = "_"
-)
-
-# remove NA observations of survival
-final_rivers_df_20 = final_rivers_df_20 %>% 
-  dplyr::filter(
-    !is.na(survival)
+  pop_count_df = data.frame(
+    population = populations,
+    count = counts
   )
+  
+  # set the minimum number of populations 
+  enough_obs_df = pop_count_df[which(pop_count_df$count > min_pop),]
+  
+  # keep only the pop's with that number
+  final_rivers_df = new_esc_df[which(new_esc_df$pop %in% 
+                                       enough_obs_df$population),]
+  
+  # name the populations
+  final_rivers_df$population_name = paste(
+    stringr::str_to_lower(gsub(" ", "_", final_rivers_df$river)),
+    final_rivers_df$even_odd,
+    sep = "_"
+  )
+  
+  # remove NA observations of survival
+  final_rivers_df = final_rivers_df %>% 
+    dplyr::filter(
+      !is.na(survival)
+    )
+  
+  cat("Assuming ", min_pop, " stock-recruit pairs per population, in the 
+      Final dataset: \n Total number of populations (even/odd): ", 
+      length(unique(final_rivers_df$pop)), "\n Total number of S-R pairs: ", 
+      dim(final_rivers_df)[1], "\n Total number of rivers: ", 
+      length(unique(final_rivers_df$river)))
+  
+  readr::write_csv(final_rivers_df, paste0(file_path,
+                                           "stock-recruit-df-no-lice-",
+                                           min_pop, "-pairs.csv"))
+  
+  return(final_rivers_df)
+
+}
+
+#############################
+# add_louse_covariate() function
+#############################
+add_louse_covariate = function(final_rivers_df, lice_pred, file_path, min_pop) {
+  
+  #' add in the covariate of the wild lice to this focal dataframe 
+  
+  final_rivers_df$lice = NA
+  
+  # deal with all zero values first - non-area 12, and pre-2001
+  final_rivers_df[which(final_rivers_df$area != 12), "lice"] = 0
+  final_rivers_df[which(final_rivers_df$area == 12 & 
+                          final_rivers_df$year < 2002), "lice"] = 0
+  
+  # now do the area 12 that we can
+  for(yr in 2002:2017) {
+    
+    # get the subset 
+    final_rivers_df[which(final_rivers_df$area == 12 & 
+                            final_rivers_df$year == yr), "lice"] = 
+      # find the value from the other dataset
+      lice_pred[which(lice_pred$year == yr-1), "all_lep"]
+    ## NOTE ###
+    # the -1 in line above is supposed to be there, to pair the year of the lice
+    # infection with the return year
+    ## END NOTE ##
+  }
+  
+  readr::write_csv(final_rivers_df, past0(file_path, 
+                                          "stock-recruit-data-lice-included-",
+                                          min_pop, "-pairs.csv"))
+  
+  return(final_rivers_df)
+}
+
+#############################
+# make_plot_df() function
+#############################
+make_plot_df = function(final_rivers_df) {
+  
+  #' Take dataframe and make a dataframe to plot with 
+  
+  # make dataframe of number of rivers sampled per year/year through time
+  final_rivers_plot_df = data.frame(
+    table(final_rivers_df[,c("year", "area")])
+  )
+  final_rivers_plot_df$year_num = 
+    as.numeric(as.character(final_rivers_plot_df$year))
+  final_rivers_plot_df = final_rivers_plot_df %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(`Even/Odd Year` = 
+                    ifelse(year_num %% 2 == 0, "even", "odd")) %>% 
+    rename(Area = area)
+  # check the length is correct
+  if(
+    nrow(final_rivers_plot_df) != length(unique(final_rivers_df$year)) * 
+    length(unique(final_rivers_df$area))
+  ) {
+    stop("ERROR - table of incorect length")
+  }
+  
+  return(final_rivers_plot_df)
+}
+
+#############################
+# plot_df() function
+#############################
+plot_df = function(final_rivers_plot_df) {
+  
+  #' Make and return plot of the option with this many of spawner-recruit pairs
+
+  # 20 cutoff plot
+  final_rivers_plot = ggplot2::ggplot(data = final_rivers_plot_df) +
+    geom_line(aes(x = year_num, y = Freq, colour = Area,
+                  linetype = `Even/Odd Year`, alpha = `Even/Odd Year`), 
+              size = 1.5) + 
+    geom_point(aes(x = year_num, y = Freq, fill = Area,
+                   shape = `Even/Odd Year`), size = 3) +
+    scale_alpha_manual(values = c(0.5, 0.4)) +
+    scale_shape_manual(values = c(21,22)) +
+    ggthemes::theme_base() +
+    theme(
+      legend.key.width = unit(1.5, "cm")
+    ) +
+    labs(
+      x = "Year", y = "Number of Rivers Surveyed"
+    ) +
+    scale_colour_manual(
+      "Area",
+      values = col_vals,
+      labels = c(7, 8, 9, 10, 12)
+    ) +
+    scale_fill_manual(
+      "Area",
+      values = col_vals,
+      labels = c(7, 8, 9, 10, 12)
+    ) +
+    annotate(
+      geom = "text", x = 1998, y = 32, label = "Cutoff >= 20 S-R pairs", size = 6
+    ) + 
+    ylim(c(0,35)) +
+    scale_x_continuous(
+      labels = c(1960, 1970, 1980, 1990, 2000, 2010, 2020),
+      breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)
+    ) +
+    guides(
+      fill = guide_legend(override.aes = list(shape = 21)),
+      shape = guide_legend(override.aes = list(fill = "grey20"))
+    ) +
+    coord_fixed(2) +
+    theme(
+      legend.position = "none"
+    )
+  ggplot2::ggsave(
+    here::here("./figs/rivers-surveyed-through-time-20-pair-cutoff.png"),
+    final_rivers_plot,
+    height = 6, width = 10)
+}
