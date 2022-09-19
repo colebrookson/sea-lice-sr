@@ -233,6 +233,9 @@ set_up_catch_data = function(pink_exp, pink_helper) {
   return(pink_area12)
 }
 
+#############################
+# add_exploitation_rates() function
+#############################
 add_exploitation_rates = function(esc_df, pink_exp, 
                                   pink_area12, rivers_helper_df) {
   
@@ -370,4 +373,164 @@ add_exploitation_rates = function(esc_df, pink_exp,
   return(esc_df_short)
 }
 
+#############################
+# add_exploitation_rates() function
+#############################
+set_up_full_sr_database = function(esc_df_short) {
+  
+  #' With all the information prepped, set up the full database
+  
+  # first check structure 
+  esc_df_short$esc = as.numeric(esc_df_short$esc)
+  esc_df_short[which(esc_df_short$esc == 0),"esc"] = NA
+  
+  # Recruitment estimates R = N/(1-u)
+  esc_df_short = esc_df_short %>% 
+    rowwise() %>% 
+    mutate(R = esc/(1-exp))
+  
+  esc_df_short$S = NA
+  esc_df_short$survival = NA
+  
+  # Spawner estimates to pair with recruitment (S(t-2) corresponds to R(t))
+  esc_df_short$year = as.numeric(esc_df_short$year)
+  for(river in unique(esc_df_short$river)) {
+    for(year in 1954:2016) {
+      
+      # check if the previous year is even there 
+      if(nrow(esc_df_short[which(esc_df_short$river == river &
+                                 esc_df_short$year == (year - 2)),]) == 0){
+        esc_df_short[which(esc_df_short$river == river & 
+                             esc_df_short$year == year), "S"] = NA
+        esc_df_short[which(esc_df_short$river == river & 
+                             esc_df_short$year == year), "survival"] = NA
+      } else {
+        
+        # assign the spawners
+        esc_df_short[which(esc_df_short$river == river & 
+                             esc_df_short$year == year), "S"] =
+          esc_df_short[which(esc_df_short$river == river &
+                               esc_df_short$year == (year - 2)), "esc"]
+        # now assign survival 
+        esc_df_short[which(esc_df_short$river == river & 
+                             esc_df_short$year == year), "survival"] =
+          #log(R(t)/S(t-2))
+          (esc_df_short[which(esc_df_short$river == river & 
+                                esc_df_short$year == year),"R"]) / 
+          (esc_df_short[which(esc_df_short$river == river &
+                                esc_df_short$year == year), "S"]) 
+      }
+    }
+  }
+  
+  # add log survival 
+  esc_df_short$log_survival = log(esc_df_short$survival)
+  
+  # get the rivers to be included -- these come from Steph's work
+  area12_rivers = c("AHNUHATI RIVER", "AHTA RIVER", "GLENDALE CREEK", 
+                    "KAKWEIKEN RIVER", "KINGCOME RIVER", "LULL CREEK", 
+                    "VINER SOUND CREEK", "WAKEMAN RIVER")
+  area07_rivers = c("PINE RIVER", "NEEKAS CREEK", "TANKEEAH RIVER", 
+                    "KWAKUSDIS RIVER", "BULLOCK CHANNEL CREEKS", "QUARTCHA CREEK", 
+                    "LEE CREEK", "ROSCOE CREEK", "CLATSE CREEK", 
+                    "WALKER LAKE CREEK", "GOAT BUSHU CREEK", 
+                    "DEER PASS LAGOON CREEKS", "KUNSOOT RIVER", "KADJUSDIS RIVER", 
+                    "MCLOUGHLIN CREEK", "COOPER INLET CREEKS")
+  
+  # subset the dataframes 
+  area_12_df = esc_df_short[which(esc_df_short$area == 12),]
+  area_07_df = esc_df_short[which(esc_df_short$area == 7),]
+  
+  # all other areas 
+  other_areas_df = esc_df_short[which(esc_df_short$area %notin% c(12, 7)),]
+  
+  # filter to only the desired areas 
+  area_12_df = area_12_df %>% 
+    dplyr::filter(river %in% area12_rivers)
+  area_07_df = area_07_df %>% 
+    dplyr::filter(river %in% area07_rivers)
+  
+  # bind all other areas and the filtered ones
+  new_esc_df = rbind(area_07_df, area_12_df, other_areas_df)
+  
+  new_esc_df = new_esc_df %>% 
+    rowwise() %>% 
+    dplyr::mutate(even_odd = ifelse(
+      (year %% 2) == 0, "even",
+      "odd"
+    ))
 
+  return(new_esc_df)
+}
+
+define_min_pairs = function(new_esc_df, min_pop) {
+  
+  #' Take the user-defined number of populations and return a dataframe with 
+  #' that number of spawner-recruit pairs per population
+  
+  
+}
+# first define populations as even/odd in the same river 
+new_esc_df$pop = NA
+num_rivers = unique(new_esc_df$river)
+
+# iterate through rivers 
+n_pops = 1
+for(river in num_rivers) {
+  
+  # assign population the value for odd years
+  new_esc_df$pop[which(new_esc_df$river == river 
+                       & new_esc_df$even_odd == "odd")] = n_pops
+  # iterate
+  n_pops = n_pops + 1
+  # now check even years 
+  new_esc_df$pop[which(new_esc_df$river == river 
+                       & new_esc_df$even_odd == "even")] = n_pops
+  # iterate
+  n_pops = n_pops + 1
+}
+
+# make this into a factor 
+new_esc_df$pop = as.factor(new_esc_df$pop)
+
+# loop through and figure out how many pairs there are in each populations
+populations = sort(unique(new_esc_df$pop))
+counts = numeric(length(unique(new_esc_df$pop)))
+for(curr_pop in 1:length(unique(new_esc_df$pop))) {
+  
+  # grab the current df of the population we want 
+  temp = new_esc_df[which(new_esc_df$pop == curr_pop),]
+  
+  # if there are enough mon-NA's then keep it
+  # (I know this is ugly and slow i just wanted to make 100% sure i was doing
+  # it out properly)
+  n_rows = nrow(temp)
+  n_NAs = nrow(temp[which(is.na(temp$survival)),])
+  counts[curr_pop] = n_rows - n_NAs
+  
+}
+
+pop_count_df = data.frame(
+  population = populations,
+  count = counts
+)
+
+# set the minimum number of populations 
+enough_obs_df = pop_count_df[which(pop_count_df$count > min_pop),]
+
+# keep only the pop's with that number
+final_rivers_df = new_esc_df[which(new_esc_df$pop %in% 
+                                     enough_obs_df$population),]
+
+# name the populations
+final_rivers_df$population_name = paste(
+  stringr::str_to_lower(gsub(" ", "_", final_rivers_df$river)),
+  final_rivers_df$even_odd,
+  sep = "_"
+)
+
+# remove NA observations of survival
+final_rivers_df_20 = final_rivers_df_20 %>% 
+  dplyr::filter(
+    !is.na(survival)
+  )
