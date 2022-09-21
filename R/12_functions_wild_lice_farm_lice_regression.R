@@ -159,8 +159,9 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       
       farm = farm_cols[i]; wild = wild_cols[j]
       # first put the two columns beside each other 
-      mod_df = data.frame(all_group_farms[ ,farm], wide_lice[, wild])
-      names(mod_df) = c("farm", "wild")
+      mod_df = cbind(
+        all_group_farms[ ,c("year", farm)], wide_lice[, wild])
+      names(mod_df) = c("year", "farm", "wild")
       mod_df$wild_scenario = wild
       mod_df$farm_group = farm
       

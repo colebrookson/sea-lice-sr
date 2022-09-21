@@ -35,6 +35,10 @@
 # new_esc_df_test = read_csv(here(
 #   "./data/prepped-data/stock-recruit-data-frames/escapement-database-with-exploitation.csv"
 # ))
+# lice_pred = read_csv(here::here(
+#   paste0("./data/wild-lice-data/clean/",
+#          "all-scenario-yearly-lice-per-fish-estimates.csv")
+# ))
 
 #############################
 # get_data_nuseds_raw() function
@@ -657,18 +661,23 @@ define_min_pairs = function(new_esc_df, min_pop, file_path) {
 #############################
 # determine_lice_scenario() function
 #############################
-determine_lice_scenario = function(lice_pred, scenario) {
+determine_lice_scenario = function(lice_pred, focal_scen) {
   
   #' cut dataframe to size to look at just the lice values that are 
   #' the ones to be focused on at hand 
   
   lice_pred_filtered = lice_pred %>% 
-    dplyr::filter(scenario == scenario)
+    dplyr::filter(scenario == focal_scen) %>% 
+    dplyr::mutate(
+      # making year is for the case_when()
+      year_match = year + 1
+    )
   
   return(lice_pred_filtered)
   
 }
 
+lice_pred = determine_lice_scenario(lice_pred, "scen1_indiv")
 #############################
 # add_louse_covariate() function
 #############################
@@ -676,12 +685,59 @@ add_louse_covariate = function(final_rivers_df, lice_pred, file_path, min_pop) {
   
   #' add in the covariate of the wild lice to this focal dataframe 
   
-  final_rivers_df$lice = NA
+  final_rivers_df_lice = rbind(
+    final_rivers_df %>% 
+      dplyr::filter((area != 12) | (area == 12 & year < 2002)) %>% 
+      dplyr::mutate(fit = 
+        dplyr::case_when(
+          area == 12 & year < 2002  ~ 0,
+          area != 12                ~ 0
+        )
+      ),
+    dplyr::left_join(
+      final_rivers_df %>% 
+        filter(area == 12 & year >= 2002),
+      lice_pred %>% 
+        dplyr::select(year_match, fit) %>% 
+        dplyr::rename(year = year_match) %>% 
+        dplyr::filter(year >= 2002),
+      # use the year match column
+      by = c("year")
+    )
+  ) %>% 
+    dplyr::rename(lice = fit)
   
   # deal with all zero values first - non-area 12, and pre-2001
-  final_rivers_df[which(final_rivers_df$area != 12), "lice"] = 0
-  final_rivers_df[which(final_rivers_df$area == 12 & 
-                          final_rivers_df$year < 2002), "lice"] = 0
+  final_rivers_df = final_rivers_df %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+      lice = ifelse(
+        area == 12 & year < 2002, 
+        0, 
+        ifelse(
+          area != 12, 
+          0, 
+          NA
+        )
+      )
+    )
+  
+  final_rivers_df_lice = final_rivers_df %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+      lice = dplyr::case_when(
+        area != 12 ~ 0,
+        area == 12 & year < 2002 ~ 0,
+        area == 12 & year > 2002 ~ 
+          lice_pred %>% 
+            dplyr::filter(
+              year == year_match
+            ) %>% 
+            dplyr::select(
+              fit
+            )
+      )
+    )
   
   # now do the area 12 that we can
   for(yr in 2002:2017) {
@@ -690,18 +746,19 @@ add_louse_covariate = function(final_rivers_df, lice_pred, file_path, min_pop) {
     final_rivers_df[which(final_rivers_df$area == 12 & 
                             final_rivers_df$year == yr), "lice"] = 
       # find the value from the other dataset
-      lice_pred[which(lice_pred$year == yr-1), "fit"]
+      lice_pred[which(lice_pred$year == (yr-1)), "fit"]
     ## NOTE ###
     # the -1 in line above is supposed to be there, to pair the year of the lice
     # infection with the return year
     ## END NOTE ##
   }
   
-  # readr::write_csv(final_rivers_df, past0(file_path, 
-  #                                         "stock-recruit-data-lice-included-",
-  #                                         min_pop, "-pairs.csv"))
+  readr::write_csv(final_rivers_df, paste0(file_path,
+                                          "stock-recruit-data-lice-included-",
+                                          min_pop, "-pairs.csv"))
   
   return(final_rivers_df)
+
 }
 
 #############################
@@ -809,8 +866,8 @@ execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions,
   lice_pred = determine_lice_scenario(all_lice_predictions, scenario)
 
   # add in the louse covariate
-  #final_rivers_df = add_louse_covariate(final_rivers_df, lice_pred, 
-  #                                      file_path, min_pop)
+  final_rivers_df = add_louse_covariate(final_rivers_df, lice_pred,
+                                       file_path, min_pop)
   
   # add in content for the plot
   #final_rivers_plot_df = make_plot_df(final_rivers_df)

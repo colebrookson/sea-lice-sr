@@ -6,7 +6,7 @@ name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iterat
 >>>>>>> 2c38ef3dcf2d5e790b8ccd6a7d65fbc4d4433f46|||||||||||||||||
 add_exploitation_rates|function|c3ae98dfa71ba057|||||||||||||||
 add_in_empirical_proportions|function|a420ef2c3a13c047|||||||||||||||
-add_louse_covariate|function|2aba6156f3aea99a|||||||||||||||
+add_louse_covariate|function|ff388bd0a3feb19d|||||||||||||||
 all_scen_lice|object|31d53f3f746bea73|||||||||||||||
 bati_data|stem|32ad82ed00caff35|15cf45363a6e2bf3|852e69043e58a4af|499463961||t19242.6406872007s|7c32e22f5fe8024c|46929|rds|local|vector|||0.07||
 beta_plot|function|ebcea03278c2e238|||||||||||||||
@@ -42,8 +42,8 @@ execute_model_predictions|function|6474624f92e55a84|||||||||||||||
 execute_predictions_plot|function|6793de8f20416b24|||||||||||||||
 execute_scenario_models|function|da2348d11cd53bfe|||||||||||||||
 execute_sr_data_prep|function|e1933a04905d295a|||||||||||||||
-execute_sr_database|function|041646d2394bb4c5|||||||||||||||
-execute_wild_farm_regressions|function|b075203e536c110c|||||||||||||||
+execute_sr_database|function|5a73eda7bf6d6b08|||||||||||||||
+execute_wild_farm_regressions|function|7ad1dddb10b0746e|||||||||||||||
 exploitation_rate_data_prep|stem|6c0caf3cccf19c97|92904d22f9209382|0c161a379102fffd|-1069593082||t19254.911928372s|cc252ff0a2013b06|42339|rds|local|vector|||176.246||
 extract_rivers|function|5b6b1dd86e6183df|||||||||||||||
 farm_df|object|027cb1d149586c0b|||||||||||||||
@@ -95,7 +95,7 @@ marty_data|stem|c4ab7ec277269254|15c300f56e5a141a|ba992c2f2d1765c2|-2054066338||
 marty_df|object|3a45d93842d4016a|||||||||||||||
 match_inventory_data|function|3a9235be65c7451b|||||||||||||||
 model|object|7a21a361734d4bf2|||||||||||||||
-model_all_farm_combos_and_scenarios|stem|03c206554b772849|11572e136d4c43e1|49f8c00f754b4512|712436781||t19253.2013237246s|3299ac9a967a8130|1746|rds|local|vector|||22.378|Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.|
+model_all_farm_combos_and_scenarios|stem|f73c0b4f3436686b|11572e136d4c43e1|ca9e88dd32638870|712436781||t19255.9866677415s|2d7412559e38a767|1825|rds|local|vector|||23.225|Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.. Removed 2 rows containing nonfinite values stat_smooth.. Removed 2 rows containing missing values geom_point.|
 model_resids|function|8b5fb9b7dd881971|||||||||||||||
 mot_2001_prediction|function|86754cd5d491f619|||||||||||||||
 motile_proportions_logistic_regression|stem|6dbe1d1ca77fb247|6488863b5ff44390|178068d57c44ddf4|1991784082||t19250.8543954736s|2329c4c5fc3455ae|4814758|rds|local|vector|||4.375|noninteger successes in a binomial glm. Removed 36212 rows containing missing values geom_point.|
@@ -172,7 +172,7 @@ sr_20_pairs_scen1_year|stem|9137a8b8c6fee91c|9d74e09468eff74b|860c9788c9e20fcc|-
 sr_20_pairs_scen2|stem|9137a8b8c6fee91c|546cb2fb40ac5582|860c9788c9e20fcc|1890618198||t19254.968411574s|cf4be3bc14963d13|2795|rds|local|vector|||109.418||
 sr_20_pairs_scen3|stem|9137a8b8c6fee91c|267f612d850ccbf1|860c9788c9e20fcc|-956745750||t19254.9709192794s|cf4be3bc14963d13|2795|rds|local|vector|||109.154||
 sr_20_pairs_scen4|stem|9137a8b8c6fee91c|79d69ee3f2c0e53c|860c9788c9e20fcc|-750530433||t19254.9721769977s|cf4be3bc14963d13|2795|rds|local|vector|||108.656||
-sr_3_pairs_scen1_indiv|stem|9137a8b8c6fee91c|0ee98f05219823e5|860c9788c9e20fcc|-944628811||t19254.9696559129s|cf4be3bc14963d13|2795|rds|local|vector|||107.504||
+sr_3_pairs_scen1_indiv|stem|9137a8b8c6fee91c|0ee98f05219823e5|1791ace6f566a250|-944628811||t19254.9696559129s||2795|rds|local|vector|||110.353||Assigned data value must be compatible with row subscript i.31m39m 8 rows must be assigned.31m39m Assigned data has 5 rows.34mℹ39m Only vectors of size 1 are recycled.
 sr_3_pairs_scen1_year|stem|9137a8b8c6fee91c|6e56d805943e2703|860c9788c9e20fcc|1297494443||t19254.974683223s|cf4be3bc14963d13|2795|rds|local|vector|||107.478||
 sr_3_pairs_scen2|stem|9137a8b8c6fee91c|cf4412766323bad0|860c9788c9e20fcc|-1091294873||t19254.9646584651s|cf4be3bc14963d13|2795|rds|local|vector|||108.074||
 sr_3_pairs_scen3|stem|9137a8b8c6fee91c|c7e734f1a17c9c2d|860c9788c9e20fcc|278154402||t19254.9658871559s|cf4be3bc14963d13|2795|rds|local|vector|||106.158||
@@ -189,7 +189,7 @@ theme_small_map|function|2d83776b3178fa9f|||||||||||||||
 trim_clean_dfo_open_data|function|e01a3483c9e03dde|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
 trim_nuseds|function|780e273eb24caf14|||||||||||||||
-wild_farm_regression|function|fe1373ddd5e7c1c6|||||||||||||||
+wild_farm_regression|function|12ed82f7753d878e|||||||||||||||
 wild_lice_beta_regression|stem|6fcbcb2559ac7b97|bbc132a8ec09079f|48d57c89702595a4|577821677||t19250.8552302378s|6c5716952e947034|12864|rds|local|vector|||4.606||
 wild_lice_nonlinear_regression|stem|19b987db445948e4|f4908d6d0bdaf050|337501f62a5ecc78|183052523||t19250.8571160601s|aaa5182d0103ecdd|13761|rds|local|vector|||5.236||
 write_bound_file|function|7cc1c305cbb7be90|||||||||||||||
