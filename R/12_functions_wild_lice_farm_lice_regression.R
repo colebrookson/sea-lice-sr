@@ -93,7 +93,7 @@ reshape_scenario_lice = function(all_scen_lice) {
   
   # take just the fit value here 
   fit_lice = all_scen_lice %>% 
-    dplyr::select(-c(farm_name, week, lower, upper)) %>% 
+    dplyr::select(-c(lower, upper)) %>% 
     dplyr::mutate(scenario = as.factor(scenario)) %>% 
     # rowwise, add in a log fit value
     dplyr::rowwise() %>% 

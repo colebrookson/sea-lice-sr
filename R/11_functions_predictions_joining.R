@@ -8,6 +8,27 @@
 ##########
 ##########
 
+# pred1_in = read_csv(here::here(
+#   paste0("./outputs/model-outputs/lice-per-fish",
+#          "-regression/scenario-1-indiv/scen1_indiv.csv")
+# ))
+# pred1_yr = read_csv(here::here(
+#   paste0("./outputs/model-outputs/lice-per-fish",
+#          "-regression/scenario-1-year/scen1_year.csv")
+# ))
+# pred2 = read_csv(here::here(
+#   paste0("./outputs/model-outputs/lice-per-fish",
+#          "-regression/scenario-2/scen2.csv")
+# ))
+# pred3 = read_csv(here::here(
+#   paste0("./outputs/model-outputs/lice-per-fish",
+#          "-regression/scenario-3/scen3.csv")
+# ))
+# pred4 = read_csv(here::here(
+#   paste0("./outputs/model-outputs/lice-per-fish",
+#          "-regression/scenario-4/scen4.csv")
+# ))
+
 #############################
 # plot_predictions() function 
 #############################
@@ -16,13 +37,14 @@ join_prediction_df = function(pred1_in, pred1_yr, pred2, pred3, pred4) {
   #' Take in all four data frames, and join them together so we can compare the 
   #' different assumptions in the estimates
   
-  all_pred_df = rbind(
+  all_pred_df = dplyr::as_tibble(
+    rbind(
     pred1_in,
     pred1_yr,
     pred2,
     pred3,
     pred4
-  )
+  ))
   
   return(all_pred_df)
 }
@@ -154,18 +176,6 @@ plot_predictions = function(all_pred_df, path) {
 }
 
 #############################
-# write_bound_file() function 
-#############################
-write_bound_file = function(df, file_path) {
-  
-  #' Take the bound df and write it out so a temp file exists
-  
-  readr::write_csv(
-    df, file_path
-  )
-}
-
-#############################
 # execute_predictions_plot() function 
 #############################
 execute_predictions_plot = function(pred1_in, pred1_yr, pred2, 
@@ -178,8 +188,8 @@ execute_predictions_plot = function(pred1_in, pred1_yr, pred2,
   # join the various df's together
   all_pred_df = join_prediction_df(pred1_in, pred1_yr, pred2, pred3, pred4)
   
-  # write out the file 
-  write_bound_file(all_pred_df, file_path)
+  # write_file
+  readr::write_csv(all_pred_df, file_path)
   
   # plot the predictions (with legend shift helper)
   plot_predictions(all_pred_df, fig_path)

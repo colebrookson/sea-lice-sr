@@ -668,16 +668,17 @@ determine_lice_scenario = function(lice_pred, focal_scen) {
   
   lice_pred_filtered = lice_pred %>% 
     dplyr::filter(scenario == focal_scen) %>% 
+    dplyr::rowwise() %>% 
     dplyr::mutate(
       # making year is for the case_when()
-      year_match = year + 1
+      year_match = as.numeric(year) + 1
     )
   
   return(lice_pred_filtered)
   
 }
 
-lice_pred = determine_lice_scenario(lice_pred, "scen1_indiv")
+# lice_pred = determine_lice_scenario(lice_pred, "scen1_indiv")
 #############################
 # add_louse_covariate() function
 #############################
@@ -707,53 +708,7 @@ add_louse_covariate = function(final_rivers_df, lice_pred, file_path, min_pop) {
   ) %>% 
     dplyr::rename(lice = fit)
   
-  # deal with all zero values first - non-area 12, and pre-2001
-  final_rivers_df = final_rivers_df %>% 
-    dplyr::rowwise() %>% 
-    dplyr::mutate(
-      lice = ifelse(
-        area == 12 & year < 2002, 
-        0, 
-        ifelse(
-          area != 12, 
-          0, 
-          NA
-        )
-      )
-    )
-  
-  final_rivers_df_lice = final_rivers_df %>% 
-    dplyr::rowwise() %>% 
-    dplyr::mutate(
-      lice = dplyr::case_when(
-        area != 12 ~ 0,
-        area == 12 & year < 2002 ~ 0,
-        area == 12 & year > 2002 ~ 
-          lice_pred %>% 
-            dplyr::filter(
-              year == year_match
-            ) %>% 
-            dplyr::select(
-              fit
-            )
-      )
-    )
-  
-  # now do the area 12 that we can
-  for(yr in 2002:2017) {
-    
-    # get the subset 
-    final_rivers_df[which(final_rivers_df$area == 12 & 
-                            final_rivers_df$year == yr), "lice"] = 
-      # find the value from the other dataset
-      lice_pred[which(lice_pred$year == (yr-1)), "fit"]
-    ## NOTE ###
-    # the -1 in line above is supposed to be there, to pair the year of the lice
-    # infection with the return year
-    ## END NOTE ##
-  }
-  
-  readr::write_csv(final_rivers_df, paste0(file_path,
+  readr::write_csv(final_rivers_df_lice, paste0(file_path,
                                           "stock-recruit-data-lice-included-",
                                           min_pop, "-pairs.csv"))
   
@@ -793,7 +748,7 @@ make_plot_df = function(final_rivers_df) {
 #############################
 # plot_df() function
 #############################
-plot_df = function(final_rivers_plot_df) {
+plot_df = function(final_rivers_plot_df, fig_path, min_pop) {
   
   #' Make and return plot of the option with this many of spawner-recruit pairs
 
@@ -815,12 +770,12 @@ plot_df = function(final_rivers_plot_df) {
     ) +
     scale_colour_manual(
       "Area",
-      values = col_vals,
+      values = wesanderson::wes_palette("Rushmore1"),
       labels = c(7, 8, 9, 10, 12)
     ) +
     scale_fill_manual(
       "Area",
-      values = col_vals,
+      values = wesanderson::wes_palette("Rushmore1"),
       labels = c(7, 8, 9, 10, 12)
     ) +
     annotate(
@@ -835,10 +790,7 @@ plot_df = function(final_rivers_plot_df) {
       fill = guide_legend(override.aes = list(shape = 21)),
       shape = guide_legend(override.aes = list(fill = "grey20"))
     ) +
-    coord_fixed(2) +
-    theme(
-      legend.position = "none"
-    )
+    coord_fixed(2)
   
   # save plot
   ggplot2::ggsave(
@@ -852,7 +804,7 @@ plot_df = function(final_rivers_plot_df) {
 # execute_sr_database() function
 #############################
 execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions, 
-                               scenario, file_path, fig_path) {
+                               focal_scen, file_path, fig_path) {
   
   #' Take in the values from the nuseds prep and make the full database 
   
@@ -863,16 +815,16 @@ execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions,
   final_rivers_df = define_min_pairs(new_esc_df, min_pop, file_path)
   
   # figure out which scenario to highlight
-  lice_pred = determine_lice_scenario(all_lice_predictions, scenario)
+  lice_pred = determine_lice_scenario(all_lice_predictions, focal_scen)
 
   # add in the louse covariate
   final_rivers_df = add_louse_covariate(final_rivers_df, lice_pred,
                                        file_path, min_pop)
   
   # add in content for the plot
-  #final_rivers_plot_df = make_plot_df(final_rivers_df)
+  final_rivers_plot_df = make_plot_df(final_rivers_df)
   
   # make plot
-  #plot_df(final_rivers_plot_df, fig_path)
+  plot_df(final_rivers_plot_df, fig_path, min_pop)
 
 }

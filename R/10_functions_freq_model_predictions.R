@@ -81,14 +81,15 @@ make_model_predictions = function(model, scenario) {
   )
   
   # now add in the values to the predict_data df
-  predict_data = predict_data %>% 
+  predict_data = data.frame(predict_data %>% 
     dplyr::mutate(
       fit = all_lep_df$fit,
       lower = all_lep_df$fit - (1.96 * all_lep_df$se.fit),
       upper = all_lep_df$fit + (1.96 * all_lep_df$se.fit),
       # add in which scenario this is
       scenario = scenario
-    )
+    ) %>% 
+      dplyr::select(-c(farm_name, week)))
   
   return(predict_data)
 }
@@ -125,6 +126,6 @@ execute_model_predictions = function(scfs_df, farm_df, model, scenario, path) {
   save_predict_data(predictions, path, scenario)
   
   # return the predictions df
-  return(predictions)
+  return(data.frame(predictions))
   
 }
