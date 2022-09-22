@@ -22,6 +22,8 @@ check_data = function(df) {
       year_fac = as.factor(year),
       population_name = as.factor(population_name)
     ) %>% 
+    # really important to get rid of the NA's or the bootstrapping
+    # won't work
     dplyr::filter(
       !is.na(lice)
     )
@@ -216,7 +218,7 @@ bootstrap = function(x) {
 #############################
 # perform_bootstrapping() function 
 #############################
-perform_bootstrapping = function(df, alt_model) {
+perform_bootstrapping = function(df, alt_model, output_path) {
   
   #' Do the actual bootstrapping 
   
@@ -248,30 +250,149 @@ perform_bootstrapping = function(df, alt_model) {
   cl = parallel::makeCluster(cores)
   parallel::clusterExport(cl, varlist = list("job_seeds", "sr_df", "parameters"))
   output = parallel::clusterApply(cl, x = c(1:n_jobs), fun = bootstrap)
+  
+  saveRDS(output, paste0(output_path,
+                         "bootstrap-output",
+                          unique(df_rand_fixed$scenario),
+                          "-",
+                          unique(df_rand_fixed$min_pop),
+                          "min-pops",
+                          ".rds"))
+  
+  # unlist results
+  p_all = matrix(nrow = n_jobs, ncol = 2)
+  for(i in 1:n_jobs) p_all[i,] = as.numeric(output[[i]])
+  
+  # now make the actual confidence intervals 
+  ci = apply(p_all, 2, quantile, c(0.025, 0.975))
+  ci = rbind(ci[1,], as.numeric(
+    lme4::fixef(alt_model)[1:2]), ci[2,])
+  colnames(ci) = c("r", "c")
+  ci = data.frame(ci) %>% 
+    dplyr::mutate(
+      value = c("lower", "MLE", "upper")
+    )
+  
+  readr::write_csv(
+    ci, 
+    paste0(output_path,
+           "estimate-of-c-",
+           unique(df_rand_fixed$scenario),
+           "-",
+           unique(df_rand_fixed$min_pop),
+           "min-pops",
+           ".csv")
+  )
+  
+  return(ci)
+}
+
+get_percent_mortality_estimates = function(sr_df, ci) {
+  
+  #' use our formula for mortality to extract the lower, upper, and lme
+  #' values for each year we have in the model 
+  
+  # make a df for the louse values 
+  lice_df = unique(sr_df[which(sr_df$area == 12 & 
+                                 sr_df$year > 2001), c("lice", "year")])
+  
+  # get mortality extimates
+  mortality = data.frame(
+    mle = ci$c[which(ci$value=="MLE")]*lice_df$lice, # mle
+    upper = ci$c[which(ci$value=="upper")]*lice_df$lice, # 2.5%
+    lower = ci$c[which(ci$value=="lower")]*lice_df$lice # 97.5%
+  ) 
+  # percentage mortality 
+  p_mort = 100*(1-exp(mortality))
+  colnames(p_mort) = c("MLE", "lower", "upper")
+  p_mort = p_mort %>% 
+    dplyr::mutate(
+      year = c(2002:2016)
+    )
+  
+  return(p_mort)
+}
+
+predict_future_mortality = function(p_mort, predict_df, df) {
+  
+  #' Since we determine the survival is directly equal ot 1 - exp(-cWa, t-1)
+  #' we can predict the survival values for 2017 to 2021
+  
+  # get just the scenario at hand 
+  predict_df = predict_df %>% 
+    dplyr::filter(scenario == unique(df$scenario)) %>% 
+    dplyr::rename(all_lep = fit)
+  
+  add_years = data.frame(
+    predict_df[which(predict_df$year >= 2016), "all_lep"],
+    predict_df[which(predict_df$year >= 2016), "year"],
+    predict_df[which(predict_df$year >= 2016), "upper"],
+    predict_df[which(predict_df$year >= 2016), "lower"]
+  )
+  add_years$surv = NA
+  add_years$surv_up = NA
+  add_years$surv_low = NA
+  
+  # use established relationship to make prediction for further years
+  for(i in 2:nrow(add_years)) {
+    
+    # use the MLE to get the estimated value
+    add_years[i, "surv"] = 100*(1 - exp(
+      -0.2346664 * add_years[i-1, "all_lep"])
+    )
+    # use the upper and lower bounds ofthe 95% CI to get the same for the est here
+    add_years[i, "surv_up"] = 100*(1 - exp(
+      -0.2346664 * add_years[i-1, "upper"])
+    )
+    add_years[i, "surv_low"] = 100*(1 - exp(
+      -0.2346664 * add_years[i-1, "lower"])
+    )
+  }
+  # get rid of extraneous years 
+  add_years = add_years %>% 
+      dplyr::select(surv, surv_up, surv_low, year) %>% 
+      dplyr::filter(!is.na(surv)) %>% 
+      dplyr::rename(MLE = surv, upper = surv_up, lower = surv_low)
+  
+  # put the two data pieces together and make a column to differentiate
+  est_mort_df = rbind(
+    p_mort,
+    add_years
+  )
+  
+  est_mort_df = est_mort_df %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+      predict = ifelse(year > 2016, "predicted", "estimated"),
+      scenario = unique(df$scenario)
+    )
+  
+  return(est_mort_df)
 }
 
 
-library(tidyverse)
-library(here)
-library(lme4)
-library(parallel)
-library(broom.mixed)
-
-df = read_csv(here("./data/prepped-data/stock-recruit-data-frames/stock-recruit-data-lice-included-3-pairs.csv"))
-
-df = check_data(df)
-alt_model = run_models(df)
-df_rand_fixed = prepare_for_bootstrapping(df, alt_model)
-sr_df = check_data(df_rand_fixed)
-
-
-sr_df = readr::read_csv(here::here(
-  "./data/prepped-data/stock-recruit-data-cut-off-03.csv"
-))
-sr_df[which(sr_df$area == 12 & sr_df$year %in% c(1991:2001)), "lice"] = NA
-sr_df = subset(sr_df, is.na(lice)==FALSE)
-#sr_df = sr_df[which(sr_df$year > 1961),]
-
-sr_df$area = as.factor(sr_df$area)
-sr_df$year_fac = as.factor(sr_df$year)
-sr_df$population_name = as.factor(sr_df$population_name)
+# library(tidyverse)
+# library(here)
+# library(lme4)
+# library(parallel)
+# library(broom.mixed)
+# 
+# df = read_csv(here("./data/prepped-data/stock-recruit-data-frames/stock-recruit-data-lice-included-3-pairs.csv"))
+# predict_df = read_csv(here("./data/wild-lice-data/clean/all-scenario-yearly-lice-per-fish-estimates.csv"))
+# 
+# df = check_data(df)
+# alt_model = run_models(df)
+# df_rand_fixed = prepare_for_bootstrapping(df, alt_model)
+# sr_df = check_data(df_rand_fixed)
+# 
+# 
+# sr_df = readr::read_csv(here::here(
+#   "./data/prepped-data/stock-recruit-data-cut-off-03.csv"
+# ))
+# sr_df[which(sr_df$area == 12 & sr_df$year %in% c(1991:2001)), "lice"] = NA
+# sr_df = subset(sr_df, is.na(lice)==FALSE)
+# #sr_df = sr_df[which(sr_df$year > 1961),]
+# 
+# sr_df$area = as.factor(sr_df$area)
+# sr_df$year_fac = as.factor(sr_df$year)
+# sr_df$population_name = as.factor(sr_df$population_name)
