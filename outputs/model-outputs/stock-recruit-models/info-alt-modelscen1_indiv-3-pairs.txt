@@ -1,0 +1,1 @@
+with lmer(), value of fitted r (growth rate) is 1.04381050020984 and the value of c (effect of sea lice) is -0.242713042682954
