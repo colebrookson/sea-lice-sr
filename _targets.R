@@ -26,11 +26,13 @@ source(here::here("./R/10_functions_freq_model_predictions.R"))
 source(here::here("./R/11_functions_predictions_joining.R"))
 source(here::here("./R/12_functions_wild_lice_farm_lice_regression.R"))
 source(here::here("./R/13_functions_stockrecruit_prep.R"))
+source(here::here("./R/14_functions_stockrecruit_models.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
                             "DHARMa", "parallel", "gtable", "grid", "cowplot",
-                            "wesanderson", "patchwork", "stringr"))
+                            "wesanderson", "patchwork", "stringr", "lme4",
+                            "broom.mixed"))
 list(
   ####################
   # files
@@ -478,6 +480,16 @@ list(
                ),
                here::here(
                  "./figs/stock-recruit-data/"
+               )
+             )),
+  ####################
+  # fit stock recruit models
+  ####################
+  tar_target(stock_recruit_model_scen1_3pairs,
+             execute_c_estimates(
+               sr_3_pairs_scen1_indiv,
+               here::here(
+                 "./outputs/model-outputs/stock-recruit-models/"
                )
              ))
 )

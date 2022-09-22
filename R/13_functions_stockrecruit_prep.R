@@ -692,7 +692,7 @@ add_louse_covariate = function(final_rivers_df, lice_pred, file_path,
                                           "stock-recruit-data-lice-included-",
                                           min_pop, "-pairs.csv"))
   
-  return(final_rivers_df)
+  return(final_rivers_df_lice)
 
 }
 
@@ -806,6 +806,8 @@ execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions,
   
   # make plot
   plot_df(final_rivers_plot_df, fig_path, min_pop)
+  
+  return(final_rivers_df)
 
 }
 

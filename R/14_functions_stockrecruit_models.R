@@ -16,7 +16,7 @@ check_data = function(df) {
   
   #' make sure the columns that need to be factors are factors 
   
-  df = df %>% 
+  df_fixed = df %>% 
     dplyr::mutate(
       area = as.factor(area),
       year_fac = as.factor(year),
@@ -27,13 +27,15 @@ check_data = function(df) {
     dplyr::filter(
       !is.na(lice)
     )
+  
+  return(df_fixed)
 }
 
 #############################
 # run_models() function 
 #############################
 run_models = function(df, 
-                      #output_path
+                      output_path
                       ) {
   
   #' Run both the null model and the alternative model 
@@ -42,68 +44,68 @@ run_models = function(df,
   null_model = lme4::lmer(log_survival ~ S:population_name + 
                             (1|year_fac/area),
                           data = df)
-  # saveRDS(null_model, paste0(output_path, 
-  #                            "null-model", 
-  #                            unique(df$scenario),
-  #                            "-",
-  #                            unique(df$min_pop),
-  #                            "-pairs.rds"))
+  saveRDS(null_model, paste0(output_path,
+                             "null-model",
+                             unique(df$scenario),
+                             "-",
+                             unique(df$min_pop),
+                             "-pairs.rds"))
   # extract vals of use
   coefs = broom::tidy(null_model)
   fitted_vals = broom::augment(null_model)
   model_vals = broom::glance(null_model)
   
-  # readr::write_csv(coefs, 
-  #                  paste0(output_path, "coefs-null-model", 
-  #                         unique(df$scenario), "-", 
-  #                         unique(df$min_pop), "-pairs.csv"))
-  # readr::write_csv(fitted_vals, 
-  #                  paste0(output_path, "fitted-vals-null-model", 
-  #                         unique(df$scenario), "-", 
-  #                         unique(df$min_pop), "-pairs.csv"))
-  # readr::write_csv(model_vals, 
-  #                  paste0(output_path, "model-vals-null-model", 
-  #                         unique(df$scenario), "-", 
-  #                         unique(df$min_pop), "-pairs.csv"))
+  readr::write_csv(coefs,
+                   paste0(output_path, "coefs-null-model",
+                          unique(df$scenario), "-",
+                          unique(df$min_pop), "-pairs.csv"))
+  readr::write_csv(fitted_vals,
+                   paste0(output_path, "fitted-vals-null-model",
+                          unique(df$scenario), "-",
+                          unique(df$min_pop), "-pairs.csv"))
+  readr::write_csv(model_vals,
+                   paste0(output_path, "model-vals-null-model",
+                          unique(df$scenario), "-",
+                          unique(df$min_pop), "-pairs.csv"))
   
   # ALTERNATIVE MODEL
   alt_model = lme4::lmer(log_survival ~ S:population_name +
                            lice + (1|year_fac/area),
                          data = df)
-  # saveRDS(alt_model, paste0(output_path, 
-  #                            "alt-model", 
-  #                            unique(df$scenario),
-  #                            "-",
-  #                            unique(df$min_pop),
-  #                            "-pairs.rds"))
+  saveRDS(alt_model, paste0(output_path,
+                             "alt-model",
+                             unique(df$scenario),
+                             "-",
+                             unique(df$min_pop),
+                             "-pairs.rds"))
   coefs = broom::tidy(alt_model)
   fitted_vals = broom::augment(alt_model)
   model_vals = broom::glance(alt_model)
   
-  # readr::write_csv(coefs, 
-  #                  paste0(output_path, "coefs-alt-model", 
-  #                         unique(df$scenario), "-", 
-  #                         unique(df$min_pop), "-pairs.csv"))
-  # readr::write_csv(fitted_vals, 
-  #                  paste0(output_path, "fitted-vals-alt-model", 
-  #                         unique(df$scenario), "-", 
-  #                         unique(df$min_pop), "-pairs.csv"))
-  # readr::write_csv(model_vals, 
-  #                  paste0(output_path, "model-vals-alt-model", 
-  #                         unique(df$scenario), "-", 
-  #                         unique(df$min_pop), "-pairs.csv"))
-  
+  readr::write_csv(coefs,
+                   paste0(output_path, "coefs-alt-model",
+                          unique(df$scenario), "-",
+                          unique(df$min_pop), "-pairs.csv"))
+  readr::write_csv(fitted_vals,
+                   paste0(output_path, "fitted-vals-alt-model",
+                          unique(df$scenario), "-",
+                          unique(df$min_pop), "-pairs.csv"))
+  readr::write_csv(model_vals,
+                   paste0(output_path, "model-vals-alt-model",
+                          unique(df$scenario), "-",
+                          unique(df$min_pop), "-pairs.csv"))
+
   # get the useful summary 
   print_info = 
     paste0("with lmer(), value of fitted r (growth rate) is ", 
       lme4::fixef(alt_model)[1],
       " and the value of c (effect of sea lice) is ", lme4::fixef(alt_model)[2])
-  # readr::write_lines(
-  #   print_info,
-  #   paste0(output_path,
-  #          "info-alt-model", unique(df$scenario), "-", 
-  #          unique(df$min_pop), "-pairs.txt")
-  # )
+  readr::write_lines(
+    print_info,
+    paste0(output_path,
+           "info-alt-model", unique(df$scenario), "-",
+           unique(df$min_pop), "-pairs.txt")
+  )
   
   return(alt_model)
 }
@@ -215,6 +217,7 @@ bootstrap = function(x) {
   params_result = lme4::fixef(model)[1:2]
   return(params_result)
 }
+
 #############################
 # perform_bootstrapping() function 
 #############################
@@ -248,7 +251,8 @@ perform_bootstrapping = function(df, alt_model, output_path) {
   
   t0 = proc.time()
   cl = parallel::makeCluster(cores)
-  parallel::clusterExport(cl, varlist = list("job_seeds", "sr_df", "parameters"))
+  parallel::clusterExport(cl, varlist = list("job_seeds", 
+                                             "sr_df", "parameters"))
   output = parallel::clusterApply(cl, x = c(1:n_jobs), fun = bootstrap)
   
   saveRDS(output, paste0(output_path,
@@ -287,6 +291,35 @@ perform_bootstrapping = function(df, alt_model, output_path) {
   return(ci)
 }
 
+#############################
+# perform_bootstrapping() function 
+#############################
+execute_c_estimates = function(df, output_path) {
+  
+  #' Use helper functions to make the actual estimate of the c value 
+  
+  # make sure all formats of the data are correct 
+  df = check_data(df)
+  
+  # fit the model and null model 
+  alt_model = run_models(df, output_path)
+  # 
+  # # get the values we need for bootstrapping to occur)
+  df_rand_fixed = prepare_for_bootstrapping(df, alt_model)
+  # 
+  # # check the data again before it actually goes 
+  sr_df = check_data(df_rand_fixed)
+  # 
+  # # get MLE and upper and lower bounds of the actual c value 
+  ci = perform_bootstrapping(df, alt_model, output_path)
+  # 
+  return(ci)
+  
+}
+
+#############################
+# perform_bootstrapping() function 
+#############################
 get_percent_mortality_estimates = function(sr_df, ci) {
   
   #' use our formula for mortality to extract the lower, upper, and lme
@@ -313,6 +346,9 @@ get_percent_mortality_estimates = function(sr_df, ci) {
   return(p_mort)
 }
 
+#############################
+# perform_bootstrapping() function 
+#############################
 predict_future_mortality = function(p_mort, predict_df, df) {
   
   #' Since we determine the survival is directly equal ot 1 - exp(-cWa, t-1)
