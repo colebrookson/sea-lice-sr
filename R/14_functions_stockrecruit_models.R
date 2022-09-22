@@ -83,15 +83,15 @@ run_models = function(df,
   model_vals = broom::glance(alt_model)
   
   readr::write_csv(coefs,
-                   paste0(output_path, "coefs-alt-model",
+                   paste0(output_path, "coefs-alt-model-",
                           unique(df$scenario), "-",
                           unique(df$min_pop), "-pairs.csv"))
   readr::write_csv(fitted_vals,
-                   paste0(output_path, "fitted-vals-alt-model",
+                   paste0(output_path, "fitted-vals-alt-model-",
                           unique(df$scenario), "-",
                           unique(df$min_pop), "-pairs.csv"))
   readr::write_csv(model_vals,
-                   paste0(output_path, "model-vals-alt-model",
+                   paste0(output_path, "model-vals-alt-model-",
                           unique(df$scenario), "-",
                           unique(df$min_pop), "-pairs.csv"))
 
@@ -103,7 +103,7 @@ run_models = function(df,
   readr::write_lines(
     print_info,
     paste0(output_path,
-           "info-alt-model", unique(df$scenario), "-",
+           "info-alt-model-", unique(df$scenario), "-",
            unique(df$min_pop), "-pairs.txt")
   )
   
@@ -219,11 +219,54 @@ bootstrap = function(x) {
 }
 
 #############################
+# prep_bootstrap_data() function 
+#############################
+prep_bootstrap_data = function(df, output_path) {
+  
+  #' Use helper functions to make the actual estimate of the c value 
+  
+  # make sure all formats of the data are correct 
+  df = check_data(df)
+  
+  # fit the model and null model 
+  alt_model = run_models(df, output_path)
+   
+  # # get the values we need for bootstrapping to occur)
+  df_rand_fixed = prepare_for_bootstrapping(df, alt_model)
+  
+  # # check the data again before it actually goes 
+  sr_df = check_data(df_rand_fixed)
+  
+  # list up the results
+  results_list = list(df, alt_model, df_rand_fixed, sr_df)
+   
+  return(results_list)
+  
+}
+
+
+#############################
 # perform_bootstrapping() function 
 #############################
-perform_bootstrapping = function(df, alt_model, output_path) {
+perform_bootstrapping = function(df, output_path) {
   
   #' Do the actual bootstrapping 
+  
+  df = check_data(df)
+  
+  # fit the model and null model 
+  alt_model = run_models(df, output_path)
+  
+  # # get the values we need for bootstrapping to occur)
+  df_rand_fixed = prepare_for_bootstrapping(df, alt_model)
+  
+  # # check the data again before it actually goes 
+  sr_df = check_data(df_rand_fixed)
+  # unlist results
+  # df = results_list[[1]]
+  # alt_model = results_list[[2]]
+  # df_rand_fixed = results_list[[3]]
+  # sr_df = results_list[[4]]
   
   # set up estimated variances for bootstrap algorithm
   b = as.numeric(lme4::fixef(alt_model)[3:length(lme4::fixef(alt_model))])
@@ -247,83 +290,86 @@ perform_bootstrapping = function(df, alt_model, output_path) {
   job_seeds = matrix(nrow = n_jobs, ncol = 7)
   job_seeds[1,] = .Random.seed
   
-  for(i in 2:n_jobs) job_seeds[i,] = parallel::nextRNGStream(job_seeds[i-1,])
+  for(i in 2:n_jobs){
+    job_seeds[i,] = parallel::nextRNGStream(job_seeds[i-1,])
+  } 
   
   t0 = proc.time()
   cl = parallel::makeCluster(cores)
-  parallel::clusterExport(cl, varlist = list("job_seeds", 
-                                             "sr_df", "parameters"))
+  parallel::clusterExport(cl, varlist = list("job_seeds",
+                                             "sr_df", "parameters"),
+                          envir = environment())
   output = parallel::clusterApply(cl, x = c(1:n_jobs), fun = bootstrap)
-  
+  # parallel::stopCluster(cl)
   saveRDS(output, paste0(output_path,
                          "bootstrap-output",
-                          unique(df_rand_fixed$scenario),
-                          "-",
-                          unique(df_rand_fixed$min_pop),
-                          "min-pops",
-                          ".rds"))
-  
+                         unique(df$scenario),
+                         "-",
+                         unique(df$min_pop),
+                         "-min-pops",
+                         ".rds"))
+
   # unlist results
   p_all = matrix(nrow = n_jobs, ncol = 2)
   for(i in 1:n_jobs) p_all[i,] = as.numeric(output[[i]])
-  
-  # now make the actual confidence intervals 
+
+  # now make the actual confidence intervals
   ci = apply(p_all, 2, quantile, c(0.025, 0.975))
   ci = rbind(ci[1,], as.numeric(
     lme4::fixef(alt_model)[1:2]), ci[2,])
   colnames(ci) = c("r", "c")
-  ci = data.frame(ci) %>% 
+  ci = data.frame(ci) %>%
     dplyr::mutate(
       value = c("lower", "MLE", "upper")
     )
-  
+
   readr::write_csv(
-    ci, 
+    ci,
     paste0(output_path,
            "estimate-of-c-",
-           unique(df_rand_fixed$scenario),
+           unique(df$scenario),
            "-",
-           unique(df_rand_fixed$min_pop),
+           unique(df$min_pop),
            "min-pops",
            ".csv")
   )
-  
+
   return(ci)
 }
 
 #############################
-# perform_bootstrapping() function 
+# execute_c_estimate() function 
 #############################
-execute_c_estimates = function(df, output_path) {
-  
-  #' Use helper functions to make the actual estimate of the c value 
-  
-  # make sure all formats of the data are correct 
-  df = check_data(df)
-  
-  # fit the model and null model 
-  alt_model = run_models(df, output_path)
-  # 
-  # # get the values we need for bootstrapping to occur)
-  df_rand_fixed = prepare_for_bootstrapping(df, alt_model)
-  # 
-  # # check the data again before it actually goes 
-  sr_df = check_data(df_rand_fixed)
-  # 
-  # # get MLE and upper and lower bounds of the actual c value 
-  ci = perform_bootstrapping(df, alt_model, output_path)
-  # 
-  return(ci)
-  
-}
+#' execute_c_estimate = function(results_list, output_path) {
+#'   
+#'   #' Take in values and get estimates and confidence intervals
+#'   #' for the values of the "c" parameter
+#'   
+#'   # unlist results
+#'   df = results_list[[1]]
+#'   alt_model = results_list[[2]]
+#'   df_rand_fixed = results_list[[3]]
+#'   sr_df = results_list[[4]]
+#'   
+#'   # perform the actual bootstrapping
+#'   ci = perform_bootstrapping(sr_df, alt_model, output_path, df)
+#'   
+#'   return(ci)
+#' }
 
 #############################
-# perform_bootstrapping() function 
+# get_percent_mortality_estimates() function 
 #############################
-get_percent_mortality_estimates = function(sr_df, ci) {
+get_percent_mortality_estimates = function(results_list, ci, output_path) {
   
   #' use our formula for mortality to extract the lower, upper, and lme
   #' values for each year we have in the model 
+  
+  # unlist results
+  df = results_list[[1]]
+  alt_model = results_list[[2]]
+  df_rand_fixed = results_list[[3]]
+  sr_df = results_list[[4]]
   
   # make a df for the louse values 
   lice_df = unique(sr_df[which(sr_df$area == 12 & 
@@ -343,16 +389,34 @@ get_percent_mortality_estimates = function(sr_df, ci) {
       year = c(2002:2016)
     )
   
+  readr::write_csv(
+    p_mort,
+    paste0(output_path,
+           "mortality-estimates-",
+           unique(df$scenario),
+           "-",
+           unique(df$min_pop),
+           "min-pops",
+           ".csv")
+  )
+  
   return(p_mort)
 }
 
 #############################
-# perform_bootstrapping() function 
+# predict_future_mortality() function 
 #############################
-predict_future_mortality = function(p_mort, predict_df, df) {
+predict_future_mortality = function(results_list, p_mort, 
+                                    predict_df, output_path) {
   
   #' Since we determine the survival is directly equal ot 1 - exp(-cWa, t-1)
   #' we can predict the survival values for 2017 to 2021
+  
+  # unlist results
+  df = results_list[[1]]
+  alt_model = results_list[[2]]
+  df_rand_fixed = results_list[[3]]
+  sr_df = results_list[[4]]
   
   # get just the scenario at hand 
   predict_df = predict_df %>% 
@@ -403,6 +467,17 @@ predict_future_mortality = function(p_mort, predict_df, df) {
       scenario = unique(df$scenario)
     )
   
+  readr::write_csv(
+    est_mort_df,
+    paste0(output_path,
+           "future-predicted-mortality-estimates-",
+           unique(df$scenario),
+           "-",
+           unique(df$min_pop),
+           "min-pops",
+           ".csv")
+  )
+  
   return(est_mort_df)
 }
 
@@ -415,6 +490,15 @@ predict_future_mortality = function(p_mort, predict_df, df) {
 # 
 # df = read_csv(here("./data/prepped-data/stock-recruit-data-frames/stock-recruit-data-lice-included-3-pairs.csv"))
 # predict_df = read_csv(here("./data/wild-lice-data/clean/all-scenario-yearly-lice-per-fish-estimates.csv"))
+# 
+# results_list = prep_bootstrap_data(df, here::here(
+#   "./outputs/model-outputs/stock-recruit-models/"
+# ))
+# ci = perform_bootstrapping(results_list,
+#                         here::here(
+#                           "./outputs/model-outputs/stock-recruit-models/"
+#                         ))
+# 
 # 
 # df = check_data(df)
 # alt_model = run_models(df)

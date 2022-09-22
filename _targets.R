@@ -485,9 +485,34 @@ list(
   ####################
   # fit stock recruit models
   ####################
-  tar_target(stock_recruit_model_scen1_3pairs,
-             execute_c_estimates(
+  # scenario 1 
+  tar_target(prep_bootstrap_data_scen1indiv_3pairs,
+             prep_bootstrap_data(
                sr_3_pairs_scen1_indiv,
+               here::here(
+                 "./outputs/model-outputs/stock-recruit-models/"
+               )
+             )),
+  tar_target(sr_c_estimate_scen1indiv_3pairs,
+             perform_bootstrapping(
+               sr_3_pairs_scen1_indiv,
+               here::here(
+                 "./outputs/model-outputs/stock-recruit-models/"
+               )
+             )),
+  tar_target(sr_percent_mort_scen1_3pairs,
+             get_percent_mortality_estimates(
+               prep_bootstrap_data_scen1indiv_3pairs,
+               sr_c_estimate_scen1indiv_3pairs, 
+               here::here(
+                 "./outputs/model-outputs/stock-recruit-models/"
+               )
+             )),
+  tar_target(sr_future_mort_scen1indiv_3pairs,
+             predict_future_mortality(
+               prep_bootstrap_data_scen1indiv_3pairs,
+               sr_percent_mort_scen1_3pairs,
+               join_all_scenario_predictions,
                here::here(
                  "./outputs/model-outputs/stock-recruit-models/"
                )
