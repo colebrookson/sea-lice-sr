@@ -17,10 +17,10 @@ library(PNWColors)
 source(here::here("./src/01_plot_themes.R"))
 
 sr_df = readr::read_csv(here::here(
-  "./data/for-model-runs/stock-recruit-data-cut-off-03.csv"
+  "./data/prepped-data/stock-recruit-data-cut-off-03.csv"
 ))
 predict_df = readr::read_csv(here::here(
-                     "./data/regression-data/predicted-lice-abundance.csv"))
+                     "./data/prepped-data/predicted-lice-abundance.csv"))
 cat("Final dataset: \n Total number of populations (even/odd): ", 
     length(unique(sr_df$pop)), "\n Total number of S-R pairs: ", 
     dim(sr_df)[1], "\n Total number of rivers: ", 
