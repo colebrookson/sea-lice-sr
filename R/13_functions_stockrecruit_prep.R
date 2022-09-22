@@ -8,38 +8,6 @@
 ##########
 ##########
 
-# library(here)
-# library(tidyverse)
-# 
-# nuseds_raw = read_csv(here::here(
-#   "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"),
-#   guess_max = 1000000)
-# pink_exp = read_csv(here::here(
-#   "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"))
-# pink_recon = read_csv(here::here(
-#   "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"))
-# pink_helper = read_csv(here::here(
-#   "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
-# `%notin%` = negate(`%in%`)
-# #
-# nuseds = trim_nuseds(nuseds_raw)
-# esc_df = pull_escapment_values(nuseds)
-# rivers_helper_df = make_rivers_helper(pink_helper)
-# pink_exp_fixed = make_exp_vals_numeric(pink_exp)
-# pink_area12 = set_up_catch_data(pink_recon, pink_helper)
-# esc_df_short = add_exploitation_rates(esc_df, pink_exp_fixed, pink_area12, rivers_helper_df)
-# new_esc_df = read_csv(here(
-#   "./data/prepped-data/stock-recruit-data-frames/escapement-database.csv"
-# ))
-# new_esc_df = set_up_full_sr_database(esc_df_short)
-# new_esc_df_test = read_csv(here(
-#   "./data/prepped-data/stock-recruit-data-frames/escapement-database-with-exploitation.csv"
-# ))
-# lice_pred = read_csv(here::here(
-#   paste0("./data/wild-lice-data/clean/",
-#          "all-scenario-yearly-lice-per-fish-estimates.csv")
-# ))
-
 #############################
 # get_data_nuseds_raw() function
 #############################
@@ -682,7 +650,8 @@ determine_lice_scenario = function(lice_pred, focal_scen) {
 #############################
 # add_louse_covariate() function
 #############################
-add_louse_covariate = function(final_rivers_df, lice_pred, file_path, min_pop) {
+add_louse_covariate = function(final_rivers_df, lice_pred, file_path, 
+                               min_pop, focal_scen) {
   
   #' add in the covariate of the wild lice to this focal dataframe 
   
@@ -706,7 +675,18 @@ add_louse_covariate = function(final_rivers_df, lice_pred, file_path, min_pop) {
       by = c("year")
     )
   ) %>% 
-    dplyr::rename(lice = fit)
+    dplyr::rename(lice = fit) %>% 
+    # also add in that for years 1991-2001 in area 12 we have
+    # to assume NA's
+    dplyr::mutate(
+      lice = ifelse((area == 12 & year %in% c(1991:2001)),
+                    NA,
+                    lice)
+    ) %>% 
+    dplyr::mutate(
+      scenario = focal_scen,
+      min_pop = min_pop
+    ) 
   
   readr::write_csv(final_rivers_df_lice, paste0(file_path,
                                           "stock-recruit-data-lice-included-",
@@ -819,7 +799,7 @@ execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions,
 
   # add in the louse covariate
   final_rivers_df = add_louse_covariate(final_rivers_df, lice_pred,
-                                       file_path, min_pop)
+                                       file_path, min_pop, focal_scen)
   
   # add in content for the plot
   final_rivers_plot_df = make_plot_df(final_rivers_df)
@@ -828,3 +808,39 @@ execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions,
   plot_df(final_rivers_plot_df, fig_path, min_pop)
 
 }
+
+
+
+
+######## MANUAL TESTING
+# library(here)
+# library(tidyverse)
+# 
+# nuseds_raw = read_csv(here::here(
+#   "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"),
+#   guess_max = 1000000)
+# pink_exp = read_csv(here::here(
+#   "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"))
+# pink_recon = read_csv(here::here(
+#   "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"))
+# pink_helper = read_csv(here::here(
+#   "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"))
+# `%notin%` = negate(`%in%`)
+# #
+# nuseds = trim_nuseds(nuseds_raw)
+# esc_df = pull_escapment_values(nuseds)
+# rivers_helper_df = make_rivers_helper(pink_helper)
+# pink_exp_fixed = make_exp_vals_numeric(pink_exp)
+# pink_area12 = set_up_catch_data(pink_recon, pink_helper)
+# esc_df_short = add_exploitation_rates(esc_df, pink_exp_fixed, pink_area12, rivers_helper_df, file_path)
+# new_esc_df = read_csv(here(
+#   "./data/prepped-data/stock-recruit-data-frames/escapement-database.csv"
+# ))
+# new_esc_df = set_up_full_sr_database(esc_df_short, file_path)
+# new_esc_df_test = read_csv(here(
+#   "./data/prepped-data/stock-recruit-data-frames/escapement-database-with-exploitation.csv"
+# ))
+# lice_pred = read_csv(here::here(
+#   paste0("./data/wild-lice-data/clean/",
+#          "all-scenario-yearly-lice-per-fish-estimates.csv")
+# ))

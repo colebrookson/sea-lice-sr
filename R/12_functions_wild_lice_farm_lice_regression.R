@@ -9,15 +9,6 @@
 ##########
 
 options(dplyr.summarise.inform = FALSE)
-# 
-# library(here)
-# library(tidyverse)
-# library(wesanderson)
-# library(patchwork)
-# 
-# farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
-# all_scen_lice = read_csv(here("./data/wild-lice-data/clean/all-scenario-yearly-lice-per-fish-estimates.csv"))
-# df = read_csv(here("./data/prepped-data/scfs-regression-scen2.csv"))
 
 #############################
 # make_farm_groupings() function
@@ -344,6 +335,18 @@ execute_wild_farm_regressions = function(farm_df, all_scen_lice,
 
   return(df)
 }
+
+############### MANUAL TESTING
+# 
+# library(here)
+# library(tidyverse)
+# library(wesanderson)
+# library(patchwork)
+# 
+# farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
+# all_scen_lice = read_csv(here("./data/wild-lice-data/clean/all-scenario-yearly-lice-per-fish-estimates.csv"))
+# df = read_csv(here("./data/prepped-data/scfs-regression-scen2.csv"))
+
 # mod_path = here::here(
 #   "./outputs/model-outputs/wild-farm-regressions/"
 # )

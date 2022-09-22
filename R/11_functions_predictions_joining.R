@@ -8,27 +8,6 @@
 ##########
 ##########
 
-# pred1_in = read_csv(here::here(
-#   paste0("./outputs/model-outputs/lice-per-fish",
-#          "-regression/scenario-1-indiv/scen1_indiv.csv")
-# ))
-# pred1_yr = read_csv(here::here(
-#   paste0("./outputs/model-outputs/lice-per-fish",
-#          "-regression/scenario-1-year/scen1_year.csv")
-# ))
-# pred2 = read_csv(here::here(
-#   paste0("./outputs/model-outputs/lice-per-fish",
-#          "-regression/scenario-2/scen2.csv")
-# ))
-# pred3 = read_csv(here::here(
-#   paste0("./outputs/model-outputs/lice-per-fish",
-#          "-regression/scenario-3/scen3.csv")
-# ))
-# pred4 = read_csv(here::here(
-#   paste0("./outputs/model-outputs/lice-per-fish",
-#          "-regression/scenario-4/scen4.csv")
-# ))
-
 #############################
 # plot_predictions() function 
 #############################
@@ -197,3 +176,25 @@ execute_predictions_plot = function(pred1_in, pred1_yr, pred2,
   return(all_pred_df)
   
 }
+
+###### MANUAL TESTING 
+# pred1_in = read_csv(here::here(
+#   paste0("./outputs/model-outputs/lice-per-fish",
+#          "-regression/scenario-1-indiv/scen1_indiv.csv")
+# ))
+# pred1_yr = read_csv(here::here(
+#   paste0("./outputs/model-outputs/lice-per-fish",
+#          "-regression/scenario-1-year/scen1_year.csv")
+# ))
+# pred2 = read_csv(here::here(
+#   paste0("./outputs/model-outputs/lice-per-fish",
+#          "-regression/scenario-2/scen2.csv")
+# ))
+# pred3 = read_csv(here::here(
+#   paste0("./outputs/model-outputs/lice-per-fish",
+#          "-regression/scenario-3/scen3.csv")
+# ))
+# pred4 = read_csv(here::here(
+#   paste0("./outputs/model-outputs/lice-per-fish",
+#          "-regression/scenario-4/scen4.csv")
+# ))
