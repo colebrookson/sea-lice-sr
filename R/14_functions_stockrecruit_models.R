@@ -1,6 +1,6 @@
 ########## 
 ##########
-# Get NuSEDs data in the right form
+# Do the stock recruit models 
 ##########
 ##########
 # AUTHOR: Cole B. Brookson
