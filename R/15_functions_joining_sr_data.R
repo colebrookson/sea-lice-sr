@@ -11,3 +11,11 @@
 library(tidyverse)
 library(here)
 
+# take the various objects and join them together 
+join_
+
+# write out the joined up material 
+
+# make relevant plots to compare across the various values 
+
+
