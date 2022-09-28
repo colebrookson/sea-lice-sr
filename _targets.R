@@ -882,5 +882,22 @@ list(
                  "./outputs/model-outputs/stock-recruit-models/",
                  "joined-mortality-estimates.csv"
                ))
+             )),
+  tar_target(join_future_mortality_estimates,
+             collect_estimates(
+               sr_future_mort_scen1indiv_20pairs,
+               sr_future_mort_scen1indiv_3pairs,
+               sr_future_mort_scen1year_20pairs,
+               sr_future_mort_scen1year_3pairs,
+               sr_future_mort_scen2_20pairs,
+               sr_future_mort_scen2_3pairs,
+               sr_future_mort_scen3_20pairs,
+               sr_future_mort_scen3_3pairs,
+               sr_future_mort_scen4_20pairs,
+               sr_future_mort_scen4_3pairs,
+               here::here(paste0(
+                 "./outputs/model-outputs/stock-recruit-models/",
+                 "joined-future-mortality-estimates.csv"
+               ))
              ))
 )
