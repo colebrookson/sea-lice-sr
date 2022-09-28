@@ -1,6 +1,6 @@
 ########## 
 ##########
-# Do the stock recruit models 
+# Join up the outputs from all the sr models
 ##########
 ##########
 # AUTHOR: Cole B. Brookson
