@@ -28,6 +28,7 @@ clean_data_scfs|function|6a77680be598d65e|||||||||||||||
 clean_dfo_open_data|function|dd1372a3283cfb39|||||||||||||||
 clean_open_dfo_data|stem|66fe5e72fb17a5c3|fc6dc7fc70cbbf08|61b86088b3d8ba60|1901894046||t19258.0083787266s|a6f002f29bb6a2e4|54017|rds|local|vector|||0.172||
 coalesce_data_scfs|function|97a8fd480f3490f2|||||||||||||||
+collect_c_estimates|function|9255e70e30a57242|||||||||||||||
 cope_2002_2004_prediction|function|fe482675160057ce|||||||||||||||
 cope_proportions_logistic_regression|stem|829e69f35ae47748|49434ca0f1b3bd11|8f615136bbe91536|-1067662679||t19258.0107398822s|036ed0cfa060f5ee|1555189|rds|local|vector|||3.072|noninteger successes in a binomial glm. Removed 171 rows containing missing values geom_point.|
 cope_regression|function|81f54dc1e5468fc6|||||||||||||||
@@ -78,6 +79,7 @@ get_pink_df|function|f55fbb93cbb1e4ef|||||||||||||||
 inpute_all_chal_data|function|40ab655ae4fa4ca6|||||||||||||||
 join_all_farm_data|stem|776de6b2383e1e0f|28546ad75a920ccb|7f547609e6602af3|669325057||t19258.0201620951s|b4744a7d4137c6a8|43569|rds|local|vector|||15.345||
 join_all_scenario_predictions|stem|5fe7f953435124fa|605695e44bfb99e6|e5c0e83095002ee8|-104754300||t19258.6521135359s|db2f55a69b5a92ac|2778|rds|local|vector|||0.92||
+join_c_estimates|stem|a0c2e1b43e85a1bd|c27f4c01638c1851|a32b518848d6fc06|-2080984987||t19263.7545781661s|732cb9fc41365a4a|739|rds|local|vector|||0.192||
 join_clean_bati|function|12dc8126613142a9|||||||||||||||
 join_clean_late|function|79ac99623e9f056e|||||||||||||||
 join_clean_marty|function|cfec1edaffa203f4|||||||||||||||
@@ -134,6 +136,7 @@ prep_bootstrap_data_scen3_20pairs|stem|af96a8d8c3295123|e7cb7be93e2a85fe|26719b9
 prep_bootstrap_data_scen3_3pairs|stem|e8d8ecb823ba1bd3|c29eca7332c106d2|6fb537beffdc9535|-442514697||t19258.7025264663s|e7d2e95a184ba593|1134278|rds|local|vector|||4.313|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
 prep_bootstrap_data_scen4_20pairs|stem|3007bec0a260c28a|ab8b971f980316a9|0bd203c79596526c|1332080295||t19258.7007240484s|28a1d80ea29ae464|816108|rds|local|vector|||1.841|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
 prep_bootstrap_data_scen4_3pairs|stem|dc382930f77711d6|9f2f638575ee3566|859d12f257010997|-1233833111||t19258.6941729921s|3aabfc6f666b8625|1134406|rds|local|vector|||4.442|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+prep_c_estimate|function|1a03dbec82454c14|||||||||||||||
 prep_data_cope|function|8940d94c415933c3|||||||||||||||
 prep_data_mot|function|2bbe6168ea243ee9|||||||||||||||
 prep_data_nonlinear|function|ef8c847a16905c72|||||||||||||||

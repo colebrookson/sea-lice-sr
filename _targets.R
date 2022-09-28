@@ -27,6 +27,7 @@ source(here::here("./R/11_functions_predictions_joining.R"))
 source(here::here("./R/12_functions_wild_lice_farm_lice_regression.R"))
 source(here::here("./R/13_functions_stockrecruit_prep.R"))
 source(here::here("./R/14_functions_stockrecruit_models.R"))
+source(here::here("./R/15_functions_joining_sr_data.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
@@ -843,6 +844,43 @@ list(
                here::here(paste0(
                  "./outputs/model-outputs/stock-recruit-models/",
                  "scen4/twenty-pairs/"
+               ))
+             )),
+  ####################
+  # join data
+  ####################
+  tar_target(join_c_estimates,
+             collect_estimates(
+               sr_c_estimate_scen1indiv_20pairs,
+               sr_c_estimate_scen1indiv_3pairs,
+               sr_c_estimate_scen1year_20pairs,
+               sr_c_estimate_scen1year_3pairs,
+               sr_c_estimate_scen2_20pairs,
+               sr_c_estimate_scen2_3pairs,
+               sr_c_estimate_scen3_20pairs,
+               sr_c_estimate_scen3_3pairs,
+               sr_c_estimate_scen4_20pairs,
+               sr_c_estimate_scen4_3pairs,
+               here::here(paste0(
+                 "./outputs/model-outputs/stock-recruit-models/",
+                 "joined-c-estimates.csv"
+               ))
+             )),
+  tar_target(join_mortality_estimates,
+             collect_estimates(
+               sr_percent_mort_scen1indiv_20pairs,
+               sr_percent_mort_scen1indiv_3pairs,
+               sr_percent_mort_scen1year_20pairs,
+               sr_percent_mort_scen1year_3pairs,
+               sr_percent_mort_scen2_20pairs,
+               sr_percent_mort_scen2_3pairs,
+               sr_percent_mort_scen3_20pairs,
+               sr_percent_mort_scen3_3pairs,
+               sr_percent_mort_scen4_20pairs,
+               sr_percent_mort_scen4_3pairs,
+               here::here(paste0(
+                 "./outputs/model-outputs/stock-recruit-models/",
+                 "joined-mortality-estimates.csv"
                ))
              ))
 )
