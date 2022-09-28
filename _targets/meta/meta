@@ -29,6 +29,7 @@ clean_dfo_open_data|function|dd1372a3283cfb39|||||||||||||||
 clean_open_dfo_data|stem|66fe5e72fb17a5c3|fc6dc7fc70cbbf08|61b86088b3d8ba60|1901894046||t19258.0083787266s|a6f002f29bb6a2e4|54017|rds|local|vector|||0.172||
 coalesce_data_scfs|function|97a8fd480f3490f2|||||||||||||||
 collect_c_estimates|function|9255e70e30a57242|||||||||||||||
+collect_estimates|function|b8e10d1e7105ab0d|||||||||||||||
 cope_2002_2004_prediction|function|fe482675160057ce|||||||||||||||
 cope_proportions_logistic_regression|stem|829e69f35ae47748|49434ca0f1b3bd11|8f615136bbe91536|-1067662679||t19258.0107398822s|036ed0cfa060f5ee|1555189|rds|local|vector|||3.072|noninteger successes in a binomial glm. Removed 171 rows containing missing values geom_point.|
 cope_regression|function|81f54dc1e5468fc6|||||||||||||||
@@ -79,12 +80,13 @@ get_pink_df|function|f55fbb93cbb1e4ef|||||||||||||||
 inpute_all_chal_data|function|40ab655ae4fa4ca6|||||||||||||||
 join_all_farm_data|stem|776de6b2383e1e0f|28546ad75a920ccb|7f547609e6602af3|669325057||t19258.0201620951s|b4744a7d4137c6a8|43569|rds|local|vector|||15.345||
 join_all_scenario_predictions|stem|5fe7f953435124fa|605695e44bfb99e6|e5c0e83095002ee8|-104754300||t19258.6521135359s|db2f55a69b5a92ac|2778|rds|local|vector|||0.92||
-join_c_estimates|stem|a0c2e1b43e85a1bd|c27f4c01638c1851|a32b518848d6fc06|-2080984987||t19263.7545781661s|732cb9fc41365a4a|739|rds|local|vector|||0.192||
+join_c_estimates|stem|a0c2e1b43e85a1bd|2278835ec4f9acfc|64a0290fef79162f|-2080984987||t19263.7619362415s|732cb9fc41365a4a|739|rds|local|vector|||0.156||
 join_clean_bati|function|12dc8126613142a9|||||||||||||||
 join_clean_late|function|79ac99623e9f056e|||||||||||||||
 join_clean_marty|function|cfec1edaffa203f4|||||||||||||||
 join_clean_missing|function|06454f058c3084a2|||||||||||||||
 join_farm_data|function|85df4a07bab9cf2b|||||||||||||||
+join_mortality_estimates|stem|ddce03e67369cd9c|6a485ba9367706e8|5d3865f9feb19c13|-2023238906||t19263.7619375841s|e08a59128ce30d4b|3786|rds|local|vector|||0.038||
 join_prediction_df|function|c219b5793a5efa0c|||||||||||||||
 lep_mot_regression|function|a62bd526f9c7fc08|||||||||||||||
 lep_regression_cope|function|146aefd0b2c0e4d0|||||||||||||||
@@ -140,6 +142,7 @@ prep_c_estimate|function|1a03dbec82454c14|||||||||||||||
 prep_data_cope|function|8940d94c415933c3|||||||||||||||
 prep_data_mot|function|2bbe6168ea243ee9|||||||||||||||
 prep_data_nonlinear|function|ef8c847a16905c72|||||||||||||||
+prep_df_estimate|function|1a03dbec82454c14|||||||||||||||
 prepare_for_bootstrapping|function|c4165dbb747a8bcd|||||||||||||||
 prepare_scfs_data|function|a6343bf1c478f831|||||||||||||||
 prepare_wild_lice_data|stem|f3641fdde16734ab|59d90a6809f5aa56|9e81c302203c75ee|-486621467||t19258.0083762729s|6f92eb34b07f6d9c|399128|rds|local|vector|||57.176||

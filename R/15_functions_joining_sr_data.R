@@ -68,5 +68,5 @@ collect_estimates = function(df_1_in_20, df_1_in_3, df_1_yr_20, df_1_yr_3,
 #   "scen4/three-pairs/estimate-of-c.csv"
 # )))
 
-df_mort = read_csv(here::here("./outputs/model-outputs/stock-recruit-models/scen4/three-pairs/mortality-estimates.csv"))
-df_future = read_csv(here::here("./outputs/model-outputs/stock-recruit-models/scen4/three-pairs/future-predicted-mortality-estimates.csv"))
+# df_mort = read_csv(here::here("./outputs/model-outputs/stock-recruit-models/scen4/three-pairs/mortality-estimates.csv"))
+# df_future = read_csv(here::here("./outputs/model-outputs/stock-recruit-models/scen4/three-pairs/future-predicted-mortality-estimates.csv"))
