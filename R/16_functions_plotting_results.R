@@ -13,6 +13,7 @@ library(tidyverse)
 library(ggthemes)
 
 df_c = read_csv(here("./outputs/model-outputs/stock-recruit-models/joined-c-estimates.csv"))
+df_est = read_csv(here("./outputs/model-outputs/stock-recruit-models/joined-mortality-estimates.csv"))
 
 df_c$min_pop = as.factor(df_c$min_pop)
 df_c_wide = df_c %>% 
@@ -38,4 +39,35 @@ ggplot(data = df_c_wide, aes(x = scenario, y = -MLE, fill = min_pop)) +
     labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)", "Scenario 2", 
                "Scenario 3", "Scenario 4")
   )
-  
+
+
+
+
+
+df_est$min_pop = as.factor(df_est$min_pop)
+ggplot(data = df_est, aes(x = year, y = MLE, fill = min_pop, shape = scenario)) + 
+  geom_errorbar(mapping = aes(ymin = lower, ymax = upper),
+                position = position_dodge(width = 0.5),
+                width = 0) +
+  geom_point(position = position_dodge(width = 0.5), size = 3) +
+  facet_wrap(~scenario) + 
+  ggthemes::theme_base() + 
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2), 
+    strip.text.x = element_blank()
+  ) +
+  scale_x_continuous(breaks = c(2002:2016),
+                     labels = c(2001:2015)) + 
+  labs(x = "Return Year", y = "MLE and 95% CI's") +
+  scale_shape_manual(
+    "Scenario",
+    values = c(21:25),
+    labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)", 
+               "Scenario 2", "Scenario 3", "Scenario 4")) +
+  scale_fill_manual(
+    "Min. # of S-R \npairs per pop'n", 
+    values = wesanderson::wes_palette("Royal1", 2)
+  ) +
+  guides(
+    fill = guide_legend(override.aes = list(shape = 21, size = 3))
+  ) 
