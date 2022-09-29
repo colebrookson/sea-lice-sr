@@ -125,6 +125,7 @@ pink_helper|stem|f6ccae6d1010f916|c55132471cd8df2e|c3b5fc02cdc369c1|35854130|/ho
 pink_recon|stem|dec350c963e1d51b|9ae41775d0bdac20|c3b5fc02cdc369c1|-747649540|/home/cole/Github/sea-lice-sr/./data/sr-data/dfo-data/clean/pink-reconstructions.csv|t19198.283148407s|1b6fb6dd0f4ac109|79456|file|local|vector|||0||
 plot_df|function|b8c4d08bbf4ed371|||||||||||||||
 plot_predictions|function|4511d5997207f596|||||||||||||||
+plot_timeseries|function|c5f9ac1f2c5deab6|||||||||||||||
 predict_future_mortality|function|62bbb8e55b13e2ca|||||||||||||||
 predicted_values_copes|function|b85aedecdb5fbf44|||||||||||||||
 predicted_values_mots|function|3f99ac8fa966cdfb|||||||||||||||
@@ -147,6 +148,7 @@ prep_data_cope|function|8940d94c415933c3|||||||||||||||
 prep_data_mot|function|2bbe6168ea243ee9|||||||||||||||
 prep_data_nonlinear|function|ef8c847a16905c72|||||||||||||||
 prep_df_estimate|function|1a03dbec82454c14|||||||||||||||
+prep_df_for_timeseries|function|c2a7f960673a7b5e|||||||||||||||
 prepare_for_bootstrapping|function|c4165dbb747a8bcd|||||||||||||||
 prepare_scfs_data|function|a6343bf1c478f831|||||||||||||||
 prepare_wild_lice_data|stem|f3641fdde16734ab|59d90a6809f5aa56|9e81c302203c75ee|-486621467||t19258.0083762729s|6f92eb34b07f6d9c|399128|rds|local|vector|||57.176||
@@ -250,6 +252,7 @@ theme_farm_grouping|function|5d2a4b8b075eb5fb|||||||||||||||
 theme_mod_comp|function|3e0c4f4884b44fa3|||||||||||||||
 theme_raw_comp|function|792c6c006c7283ec|||||||||||||||
 theme_small_map|function|2d83776b3178fa9f|||||||||||||||
+timeseries_plots|stem|1b9fea6296cad688|37d5654ea7992ad4|c37ecf652b7a2233|642728573||t19264.9015652758s|f21b4888ae8bdafc|118|rds|local|vector|||1.906||
 trim_clean_dfo_open_data|function|e01a3483c9e03dde|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
 trim_nuseds|function|780e273eb24caf14|||||||||||||||

@@ -917,5 +917,12 @@ list(
                here::here(
                  "./figs/stock-recruit-results/"
                )
+             )),
+  tar_target(timeseries_plots,
+             plot_timeseries(
+               join_all_farm_data, 
+               here::here(
+                 "./figs/timeseries/"
+               )
              ))
 )
