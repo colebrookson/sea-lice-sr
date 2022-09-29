@@ -134,3 +134,186 @@ make_mortality_plot = function(df_fut, output_path) {
   )
   
 }
+
+df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
+
+df = df %>% 
+  dplyr::filter(
+    year > 2000,
+    year < 2021,
+    month %in% c(3, 4)
+  ) %>% 
+  dplyr::rowwise() %>% 
+  dplyr::mutate(
+    day = 1,
+    date = lubridate::make_date(year, month)
+  ) %>% 
+  dplyr::mutate(
+    year = as.factor(year), 
+    month = as.factor(month)
+  )
+
+df_all_farms = df %>% 
+  dplyr::group_by(year, month) %>% 
+  dplyr::summarize(
+    sum_inventory = sum(inventory, na.rm = TRUE),
+    sum_lice = sum(lep_tot, na.rm = TRUE)
+  ) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::group_by(year) %>% 
+  dplyr::summarize(
+    sum_inventory = mean(sum_inventory, na.rm = TRUE),
+    sum_lice = mean(sum_lice, na.rm = TRUE)
+  ) %>% 
+  dplyr::mutate(
+    year = as.numeric(as.character(year)),
+    farm = "all"
+  )
+
+df_ktc = df %>% 
+  dplyr::filter(
+    ktc == 1
+  ) %>% 
+  dplyr::group_by(year, month) %>% 
+  dplyr::summarize(
+    sum_inventory = sum(inventory, na.rm = TRUE),    
+    sum_lice = sum(lep_tot, na.rm = TRUE)
+  ) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::group_by(year) %>% 
+  dplyr::summarize(
+    sum_inventory = mean(sum_inventory, na.rm = TRUE),
+    sum_lice = mean(sum_lice, na.rm = TRUE)
+  ) %>% 
+  dplyr::mutate(
+    year = as.numeric(as.character(year)),
+    farm = "ktc"
+  )
+
+df_hsd = df %>% 
+  dplyr::filter(
+    hump_sarg_doc == 1
+  ) %>% 
+  dplyr::group_by(year, month) %>% 
+  dplyr::summarize(
+    sum_inventory = sum(inventory, na.rm = TRUE),
+    sum_lice = sum(lep_tot, na.rm = TRUE)
+  ) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::group_by(year) %>% 
+  dplyr::summarize(
+    sum_inventory = mean(sum_inventory, na.rm = TRUE),
+    sum_lice = mean(sum_lice, na.rm = TRUE)
+  ) %>% 
+  dplyr::mutate(
+    year = as.numeric(as.character(year)),
+    farm = "hsd"
+  ) 
+
+df_farms = rbind(df_all_farms, df_hsd, df_ktc)
+  
+
+ggplot(data = df_farms) + 
+  geom_line(aes(x = year, y = sum_inventory/1000000, group = farm)) +
+  geom_point(aes(x = year, y = sum_inventory/1000000, fill = farm), 
+             shape = 21, size = 3) + 
+  ggthemes::theme_base() + 
+  labs(x = "Year", y = "Number of Farmed Salmon (millions)") + 
+  scale_fill_manual(
+    "Farm Groupings", 
+    values = wesanderson::wes_palette("Darjeeling2", 3),
+    labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight-Tribune Corridor")
+  ) + 
+  scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    legend.position = c(0.7, 0.7)
+  )
+
+ggplot(data = df_farms) + 
+  geom_line(aes(x = year, y = sum_lice/1000000, group = farm)) +
+  geom_point(aes(x = year, y = sum_lice/1000000, fill = farm), 
+             shape = 21, size = 3) + 
+  ggthemes::theme_base() + 
+  labs(x = "Year", y = "Number of Farmed Salmon (millions)") + 
+  scale_fill_manual(
+    "Farm Groupings", 
+    values = wesanderson::wes_palette("Darjeeling2", 3),
+    labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight-Tribune Corridor")
+  ) + 
+  scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    legend.position = "none"
+  )
+
+
+
+ggplot() + 
+  geom_point(data = df_all_farms, aes(x = year, y = sum_inventory/1000000),
+             shape = 21, colour = "black", fill = "red") + 
+  geom_line(data = df_all_farms, aes(x = year, y = sum_inventory/1000000)) +
+  geom_point(data = df_ktc, aes(x = year, y = sum_inventory/1000000)) +
+  geom_line(data = df_ktc, aes(x = year, y = sum_inventory/1000000)) + 
+  geom_point(data = df_hsd, aes(x = year, y = sum_inventory/1000000)) +
+  geom_line(data = df_hsd, aes(x = year, y = sum_inventory/1000000))
+  
+  
+  
+
+
+
+
+
+
+
+df_all_lice = df %>% 
+  dplyr::group_by(year) %>% 
+  dplyr::summarize(
+    sum_lice = sum(lep_tot, na.rm = TRUE)
+  ) %>% 
+  dplyr::mutate(
+    year = as.numeric(as.character(year))
+  )
+
+
+
+ggplot(data = df_all_lice) + 
+  geom_point(aes(x = year, y = sum_lice/1000000)) +
+  geom_line(aes(x = year, y = sum_lice/1000000))
+
+bati_df = read_csv(here("./data/farm-data/clean/bati-data-clean.csv"))
+
+bati_df = bati_df %>% 
+  dplyr::rowwise() %>% 
+  dplyr::mutate(
+    date = lubridate::make_date(year, month)
+  ) %>% 
+  dplyr::group_by(date) %>% 
+  dplyr::summarize(
+    sum_inventory = sum(inventory, na.rm = TRUE)
+  )
+  
+ggplot(data = bati_df) + 
+  geom_point(aes(x = date, y = sum_inventory/1000000)) + 
+  geom_line(aes(x = date, y = sum_inventory/1000000))
+
+
+marty_df = read_csv(here("./data/farm-data/clean/marty-data-clean.csv"))
+
+marty_df = marty_df %>%
+  dplyr::filter(
+    year > 2000
+  ) %>% 
+  dplyr::rowwise() %>% 
+  dplyr::mutate(
+    date = lubridate::make_date(year, month)
+  ) %>% 
+  dplyr::group_by(date) %>% 
+  dplyr::summarize(
+    sum_inventory = sum(inventory, na.rm = TRUE)
+  ) 
+
+ggplot(data = marty_df) + 
+  geom_point(aes(x = date, y = sum_inventory/1000000)) + 
+  geom_line(aes(x = date, y = sum_inventory/1000000))
