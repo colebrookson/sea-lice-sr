@@ -93,9 +93,11 @@ lep_mot_regression|function|a62bd526f9c7fc08|||||||||||||||
 lep_regression_cope|function|146aefd0b2c0e4d0|||||||||||||||
 lep_regression_mot|function|52cbfc489ff75f2a|||||||||||||||
 make_all_farm_groupings|stem||d4727b2418f8bfb6|cf3d1333ab4a043b|-773624273||t19253.1704358326s||0|rds|local|vector|||0.029||object all_group_farms not found
+make_c_plot|function|34f2590019375ec2|||||||||||||||
 make_exp_vals_numeric|function|affaac9f25a50dc0|||||||||||||||
 make_farm_groupings|function|b7f6bde0e94503a5|||||||||||||||
 make_model_predictions|function|0bceb3021bb4f2ef|||||||||||||||
+make_mortality_plot|function|79f975cd484ab5e1|||||||||||||||
 make_plot_df|function|4455f8af5d8f5418|||||||||||||||
 make_rivers_helper|function|12e319e68476fd40|||||||||||||||
 make_stock_recruit_data_3_pairs|stem|9137a8b8c6fee91c|0ee98f05219823e5|860c9788c9e20fcc|-140145221||t19254.9590203757s|cf4be3bc14963d13|2795|rds|local|vector|||105.933||
@@ -140,6 +142,7 @@ prep_bootstrap_data_scen3_3pairs|stem|e8d8ecb823ba1bd3|c29eca7332c106d2|6fb537be
 prep_bootstrap_data_scen4_20pairs|stem|3007bec0a260c28a|ab8b971f980316a9|0bd203c79596526c|1332080295||t19258.7007240484s|28a1d80ea29ae464|816108|rds|local|vector|||1.841|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
 prep_bootstrap_data_scen4_3pairs|stem|dc382930f77711d6|9f2f638575ee3566|859d12f257010997|-1233833111||t19258.6941729921s|3aabfc6f666b8625|1134406|rds|local|vector|||4.442|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
 prep_c_estimate|function|1a03dbec82454c14|||||||||||||||
+prep_c_plot_df|function|11ea6f3cfbc48970|||||||||||||||
 prep_data_cope|function|8940d94c415933c3|||||||||||||||
 prep_data_mot|function|2bbe6168ea243ee9|||||||||||||||
 prep_data_nonlinear|function|ef8c847a16905c72|||||||||||||||
@@ -160,6 +163,8 @@ read_data_clean_scfs|function|fcc3863c08823970|||||||||||||||
 read_regression_cope|function|13e2eb5b56340168|||||||||||||||
 read_regression_mot|function|13e2eb5b56340168|||||||||||||||
 reshape_scenario_lice|function|15041aaee710524d|||||||||||||||
+results_plot_c|stem|d637b9254027d9f5|af3b4604ecac9508|f7850833b1b4b47f|-570322781||t19264.7763664389s|b0efa4f1e05eee68|121|rds|local|vector|||1.205||
+results_plot_mortality|stem|2c6441c8b7e5792e|28002d7cc44d841f|341d9bd8eb25c937|1213586849||t19264.7763917171s|24d52ebf1535bba2|123|rds|local|vector|||2.156||
 run_models|function|1857275e2604c770|||||||||||||||
 save_beta_regression|function|c900dc45e3930c0d|||||||||||||||
 save_data_chalimus_drawn|function|8388601829929641|||||||||||||||

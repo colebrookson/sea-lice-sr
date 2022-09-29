@@ -28,12 +28,13 @@ source(here::here("./R/12_functions_wild_lice_farm_lice_regression.R"))
 source(here::here("./R/13_functions_stockrecruit_prep.R"))
 source(here::here("./R/14_functions_stockrecruit_models.R"))
 source(here::here("./R/15_functions_joining_sr_data.R"))
+source(here::here("./R/16_functions_plotting_results.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
                             "DHARMa", "parallel", "gtable", "grid", "cowplot",
                             "wesanderson", "patchwork", "stringr", "lme4",
-                            "broom.mixed"))
+                            "broom.mixed", "tidyr"))
 list(
   ####################
   # files
@@ -899,5 +900,22 @@ list(
                  "./outputs/model-outputs/stock-recruit-models/",
                  "joined-future-mortality-estimates.csv"
                ))
+             )),
+  ####################
+  # plot results of stock recruit models
+  ####################
+  tar_target(results_plot_c,
+             make_c_plot(
+               join_c_estimates,
+               here::here(
+                 "./figs/stock-recruit-results/"
+               )
+             )),
+  tar_target(results_plot_mortality, 
+             make_mortality_plot(
+               join_future_mortality_estimates,
+               here::here(
+                 "./figs/stock-recruit-results/"
+               )
              ))
 )

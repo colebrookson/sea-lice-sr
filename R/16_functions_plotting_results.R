@@ -8,66 +8,129 @@
 ##########
 ##########
 
-library(here)
-library(tidyverse)
-library(ggthemes)
+# library(here)
+# library(tidyverse)
+# library(ggthemes)
+# 
+# df_c = read_csv(here("./outputs/model-outputs/stock-recruit-models/joined-c-estimates.csv"))
+# df_est = read_csv(here("./outputs/model-outputs/stock-recruit-models/joined-mortality-estimates.csv"))
+# df_fut = read_csv(here("./outputs/model-outputs/stock-recruit-models/joined-future-mortality-estimates.csv"))
+# 
+# df_c$min_pop = as.factor(df_c$min_pop)
+# df_c_wide = df_c %>% 
+#   tidyr::pivot_wider(., 
+#                      id_cols = c(scenario, min_pop),
+#                      names_from = value,
+#                      values_from = c)
 
-df_c = read_csv(here("./outputs/model-outputs/stock-recruit-models/joined-c-estimates.csv"))
-df_est = read_csv(here("./outputs/model-outputs/stock-recruit-models/joined-mortality-estimates.csv"))
+#############################
+# prep_c_plot_df() function 
+#############################
+prep_c_plot_df = function(df_c) {
+  
+  #' Take in dataframe that's not ready and make a couple of small changes
+  
+  df_c_wide = df_c %>% 
+    tidyr::pivot_wider(., 
+                       id_cols = c(scenario, min_pop),
+                       names_from = value,
+                       values_from = c)
+  
+  return(df_c_wide)
+}
 
-df_c$min_pop = as.factor(df_c$min_pop)
-df_c_wide = df_c %>% 
-  tidyr::pivot_wider(., 
-                     id_cols = c(scenario, min_pop),
-                     names_from = value,
-                     values_from = c)
-
-ggplot(data = df_c_wide, aes(x = scenario, y = -MLE, fill = min_pop)) + 
-  geom_errorbar(mapping = aes(ymin = -lower, ymax = -upper),
-                position = position_dodge(width = 0.5),
-                width = 0) +
-  geom_point(position = position_dodge(width = 0.5), shape = 21, size = 3) +
-  ylim(c(0, 0.5)) + 
-  ggthemes::theme_base() + 
-  labs(x = "Scenario", y = "MLE and 95% CI's") + 
-  scale_fill_manual("Min. # of S-R \npairs per pop'n", 
-                    values = wesanderson::wes_palette("Royal1", 2)) +
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2)
-  ) + 
-  scale_x_discrete(
-    labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)", "Scenario 2", 
-               "Scenario 3", "Scenario 4")
+#############################
+# make_c_plot() function 
+#############################
+make_c_plot = function(df_c, output_path) {
+  
+  #' Make the plot of the focal dataframe 
+  
+  df_c_wide = prep_c_plot_df(df_c) %>% 
+    dplyr::mutate(
+      min_pop = as.factor(min_pop),
+      scenario = as.factor(scenario)
+    )
+  
+  c_plot = ggplot(data = df_c_wide, aes(x = scenario, y = -MLE, 
+                                        fill = min_pop)) + 
+    geom_errorbar(mapping = aes(ymin = -lower, ymax = -upper),
+                  position = position_dodge(width = 0.5),
+                  width = 0) +
+    geom_point(position = position_dodge(width = 0.5), shape = 21, size = 3) +
+    ylim(c(0, 0.5)) + 
+    ggthemes::theme_base() + 
+    labs(x = "Scenario", y = "Estiamted Effect (c) - MLE and 95% CI's") + 
+    scale_fill_manual("Min. # of S-R \npairs per pop'n", 
+                      values = c("purple", "goldenrod2")) +
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2)
+    ) + 
+    scale_x_discrete(
+      labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)", "Scenario 2", 
+                 "Scenario 3", "Scenario 4")
+    )
+  
+  ggsave(
+    paste0(output_path, "c-estimate-plot.png"),
+    c_plot,
+    height = 6, width = 8,
+    dpi = 600
   )
+}
 
+#############################
+# make_mortality_plot() function 
+#############################
+make_mortality_plot = function(df_fut, output_path) {
+  
+  #' Make plot of estimated and predicted mortality 
 
+  # first make sure important values are factors 
+  df_fut$min_pop = as.factor(df_fut$min_pop)
+  df_fut$predict = as.factor(df_fut$predict)
+  df_fut$scenario = as.factor(df_fut$scenario)
+  df_fut$year = as.numeric(df_fut$year)
+  
+  # make the actual plot
+  mort_plot = ggplot(data = df_fut, aes(x = year, y = MLE, fill = min_pop,
+                                        shape = scenario,
+                                        alpha = predict)) +
+    geom_errorbar(mapping = aes(ymin = lower, ymax = upper),
+                  position = position_dodge(width = 0.5),
+                  width = 0) +
+    geom_point(position = position_dodge(width = 0.5), size = 3) +
+    facet_wrap(~scenario) +
+    ggthemes::theme_base() +
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2),
+      strip.text.x = element_blank()
+    ) +
+    scale_x_continuous(breaks = c(2002:2021),
+                       labels = c(2001:2020)) +
+    labs(x = "Return Year", y = "Estimated Mortality - MLE and 95% CI's") +
+    scale_shape_manual(
+      "Scenario",
+      values = c(21:25),
+      labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)",
+                 "Scenario 2", "Scenario 3", "Scenario 4")) +
+    scale_fill_manual(
+      "Min. # of S-R \npairs per pop'n",
+      values = c("purple", "goldenrod2")
+    ) +
+    scale_alpha_manual(
+      "Estimated vs. Predicted",
+      values = c(1, 0.4)
+    ) +
+    guides(
+      fill = guide_legend(override.aes = list(shape = 21, size = 3))
+    )
 
-
-
-df_est$min_pop = as.factor(df_est$min_pop)
-ggplot(data = df_est, aes(x = year, y = MLE, fill = min_pop, shape = scenario)) + 
-  geom_errorbar(mapping = aes(ymin = lower, ymax = upper),
-                position = position_dodge(width = 0.5),
-                width = 0) +
-  geom_point(position = position_dodge(width = 0.5), size = 3) +
-  facet_wrap(~scenario) + 
-  ggthemes::theme_base() + 
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2), 
-    strip.text.x = element_blank()
-  ) +
-  scale_x_continuous(breaks = c(2002:2016),
-                     labels = c(2001:2015)) + 
-  labs(x = "Return Year", y = "MLE and 95% CI's") +
-  scale_shape_manual(
-    "Scenario",
-    values = c(21:25),
-    labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)", 
-               "Scenario 2", "Scenario 3", "Scenario 4")) +
-  scale_fill_manual(
-    "Min. # of S-R \npairs per pop'n", 
-    values = wesanderson::wes_palette("Royal1", 2)
-  ) +
-  guides(
-    fill = guide_legend(override.aes = list(shape = 21, size = 3))
-  ) 
+  ggsave(
+    paste0(output_path, "mortality-plot.png"),
+    mort_plot,
+    height = 6, width = 12, 
+    dpi = 600
+  )
+  
+}
