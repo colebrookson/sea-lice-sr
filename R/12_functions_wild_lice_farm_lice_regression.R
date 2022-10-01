@@ -301,7 +301,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
     fig_path, "all_scenario_farm_regression_plots.png"),
     all_plots,
     height = 12, 
-    width = 30,
+    width = 35,
     dpi = 600)
 
   # join all the prediction df's together and write it out

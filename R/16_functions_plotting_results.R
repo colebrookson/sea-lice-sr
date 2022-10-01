@@ -234,7 +234,7 @@ plot_timeseries = function(df, output_path) {
     labs(x = "Year", y = "Number of Farmed \n Salmon (millions)") + 
     scale_fill_manual(
       "Farm Groupings", 
-      values = wesanderson::wes_palette("Darjeeling2", 3),
+      values = wesanderson::wes_palette("FantasticFox1", 3),
       labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight-Tribune Corridor")
     ) + 
     scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
@@ -252,7 +252,7 @@ plot_timeseries = function(df, output_path) {
     labs(x = "Year", y = "Lice on Farmed \n Salmon (millions)") + 
     scale_fill_manual(
       "Farm Groupings", 
-      values = wesanderson::wes_palette("Darjeeling2", 3),
+      values = wesanderson::wes_palette("FantasticFox1", 3),
       labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight-Tribune Corridor")
     ) + 
     scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
