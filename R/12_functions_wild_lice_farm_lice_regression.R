@@ -300,7 +300,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
   ggsave(paste0(
     fig_path, "all_scenario_farm_regression_plots.png"),
     all_plots,
-    height = 12, 
+    height = 16, 
     width = 35,
     dpi = 600)
 
