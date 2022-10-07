@@ -125,7 +125,7 @@ pink_helper|stem|f6ccae6d1010f916|c55132471cd8df2e|c3b5fc02cdc369c1|35854130|/ho
 pink_recon|stem|dec350c963e1d51b|9ae41775d0bdac20|c3b5fc02cdc369c1|-747649540|/home/cole/Github/sea-lice-sr/./data/sr-data/dfo-data/clean/pink-reconstructions.csv|t19198.283148407s|1b6fb6dd0f4ac109|79456|file|local|vector|||0||
 plot_df|function|b8c4d08bbf4ed371|||||||||||||||
 plot_predictions|function|4511d5997207f596|||||||||||||||
-plot_timeseries|function|0fdba95cc2007822|||||||||||||||
+plot_timeseries|function|6fb4047259184bac|||||||||||||||
 predict_future_mortality|function|62bbb8e55b13e2ca|||||||||||||||
 predicted_values_copes|function|b85aedecdb5fbf44|||||||||||||||
 predicted_values_mots|function|3f99ac8fa966cdfb|||||||||||||||
@@ -252,7 +252,7 @@ theme_farm_grouping|function|5d2a4b8b075eb5fb|||||||||||||||
 theme_mod_comp|function|3e0c4f4884b44fa3|||||||||||||||
 theme_raw_comp|function|792c6c006c7283ec|||||||||||||||
 theme_small_map|function|2d83776b3178fa9f|||||||||||||||
-timeseries_plots|stem|e223286a0ea7b6c0|37d5654ea7992ad4|fedd0bd66d8bcab5|642728573||t19271.7506615705s|6556730b296d7213|119|rds|local|vector|||1.366||
+timeseries_plots|stem|259183a86aa36db1|37d5654ea7992ad4|616d9d0e9441fd60|642728573||t19272.2645523226s|bf0d8caacacad815|112|rds|local|vector|||2.428||
 trim_clean_dfo_open_data|function|e01a3483c9e03dde|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
 trim_nuseds|function|780e273eb24caf14|||||||||||||||

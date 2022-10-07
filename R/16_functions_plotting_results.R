@@ -109,7 +109,7 @@ make_mortality_plot = function(df_fut, output_path) {
     scale_x_continuous(breaks = c(2002:2021),
                        labels = c(2001:2020)) +
     labs(x = "Return Year", y = "Estimated Mortality - MLE and 95% CI's") +
-    scale_shape_manual(
+    scale_shape_manual( 
       "Scenario",
       values = c(21:25),
       labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)",
@@ -266,6 +266,50 @@ plot_timeseries = function(df, output_path) {
   ggsave(
     paste0(output_path, "timeseries-lice-fish-abundance.png"),
     final,
+    height = 7, width = 10, 
+    dpi = 600
+  )
+  
+  # make dataset to plot a timeseries of just KTC
+  only_ktc = rbind(
+    #inventory part of it
+    df_farms %>% 
+    dplyr::filter(farm == "ktc") %>% 
+    dplyr::select(year, sum_inventory) %>% 
+    dplyr::rename(val = sum_inventory) %>% 
+    dplyr::mutate(type = "inventory"), 
+    df_farms %>% 
+      dplyr::filter(farm == "ktc") %>% 
+      dplyr::select(year, sum_lice) %>% 
+      dplyr::rename(val = sum_lice) %>% 
+      dplyr::mutate(type = "lice")
+  ) %>% 
+    dplyr::mutate(type = as.factor(type))
+   
+  
+  ktc_only_plot = ggplot(data = only_ktc) + 
+    geom_line(aes(x = year, y = val/1000000, group = type,
+                  linetype = type)) +
+    geom_point(aes(x = year, y = val/1000000, fill = type), 
+                size = 4, shape = 21) + 
+    ggthemes::theme_base() + 
+    labs(x = "Year", y = "Numbers (millions)") + 
+    scale_fill_manual(
+      "Farm Groupings", 
+      values = wesanderson::wes_palette("FantasticFox1", 3),
+      labels = c("Farmed Salmon", "Lice on Farmed\nSalmon")
+    ) + 
+    scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
+    theme(
+      axis.text.x = element_text(angle = 90)
+    ) +
+    guides(
+      linetype = "none"
+    )
+  
+  ggsave(
+    paste0(output_path, "timeseries-ktc-only.png"),
+    ktc_only_plot,
     height = 7, width = 10, 
     dpi = 600
   )
