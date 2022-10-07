@@ -305,7 +305,9 @@ wild_farm_regression = function(all_group_farms, wide_lice,
     dpi = 600)
 
   # join all the prediction df's together and write it out
-  df = df_obs[[1]]
+  
+  # note - [[1]] is all farms, [[2]] is ktc farms
+  df = df_obs[[2]]
   for(i in 2:length(df_obs)) {
     df = rbind(df, df_obs[[i]])
   }
