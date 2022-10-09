@@ -1,1 +1,1 @@
-with lmer(), value of fitted r (growth rate) is 1.04555632443743 and the value of c (effect of sea lice) is -0.210263059683509 for scen4 scenario  and 3 number of pairs.
+with lmer(), value of fitted r (growth rate) is 1.0455563244424 and the value of c (effect of sea lice) is -0.210263059683664 for scen4 scenario  and 3 number of pairs.
