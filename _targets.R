@@ -663,7 +663,7 @@ list(
                  "./outputs/model-outputs/stock-recruit-models/",
                  "scen2/three-pairs/"
                ))
-             )),m
+             )),
   tar_target(sr_future_mort_scen2_3pairs,
              predict_future_mortality(
                prep_bootstrap_data_scen2_3pairs,
