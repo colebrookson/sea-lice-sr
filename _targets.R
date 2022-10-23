@@ -663,7 +663,7 @@ list(
                  "./outputs/model-outputs/stock-recruit-models/",
                  "scen2/three-pairs/"
                ))
-             )),
+             )),m
   tar_target(sr_future_mort_scen2_3pairs,
              predict_future_mortality(
                prep_bootstrap_data_scen2_3pairs,
@@ -872,7 +872,7 @@ list(
                here::here(paste0(
                  "./outputs/model-outputs/stock-recruit-models/",
                  "joined-c-estimates.csv"
-               ))m
+               ))
              )),
   tar_target(join_mortality_estimates,
              collect_estimates(
