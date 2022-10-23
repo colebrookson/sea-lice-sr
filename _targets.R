@@ -872,7 +872,7 @@ list(
                here::here(paste0(
                  "./outputs/model-outputs/stock-recruit-models/",
                  "joined-c-estimates.csv"
-               ))
+               ))m
              )),
   tar_target(join_mortality_estimates,
              collect_estimates(
@@ -937,6 +937,15 @@ list(
                join_all_farm_data, 
                here::here(
                  "./figs/timeseries/"
+               )
+             )),
+  tar_target(study_map,
+             all_make_map_tasks(
+               geo_spatial_data, 
+               farm_name_location_helper, 
+               join_all_farm_data,
+               here::here(
+                 "./figs/maps/study-map-area.png"
                )
              ))
 )

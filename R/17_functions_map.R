@@ -12,11 +12,11 @@
 #############################
 # read_geo_data() function
 #############################
-read_geo_data = function(file) {
+read_geo_data = function(geo_file) {
   
   #' Reads in geo data to remove download troubles
   
-  geo_data = readRDS(file)
+  geo_data = readRDS(geo_file)
   
   return(geo_data)
 }
@@ -24,11 +24,11 @@ read_geo_data = function(file) {
 #############################
 # read_geo_data() function
 #############################
-read_farm_helper_data = function(file) {
+read_farm_helper_data = function(farm_file) {
   
   #' Reads in geo data to remove download troubles
   
-  clean_farms = readr::read_csv(file)
+  clean_farms = readr::read_csv(farm_file)
   
   return(clean_farms)
 }
@@ -92,98 +92,71 @@ clean_geo_data = function(geo_data) {
    return(farm_locs)
    
  }
+ 
+ #############################
+ # set_up_data() function
+ #############################
+ make_map = function(canada_prov, farm_locs, output_file) {
+   
+   #' make the map with the geo-data and the farm data
+   
+   map = ggplot() +
+     geom_polygon(data = canada_prov,
+                  aes(x = long, y = lat, group = group),
+                  colour = "black",
+                  size = 0.01,
+                  fill = "grey65") +
+     coord_cartesian(xlim = c(-127, -126.1), ylim = c(50.5, 50.9)) +
+     geom_point(data = farm_locs,
+                aes(x = long, y = lat, fill = group), shape = 21,
+                size = 4) +
+     geom_text_repel(data = farm_locs,
+                     aes(x = long, y = lat, 
+                         label = farm_num
+                     )) +
+     scale_fill_manual("Farm Group", 
+                       values = c("purple", "#078282FF", "orange")) +
+     ggthemes::theme_base() +
+     labs(x = "Longitude", y = "Latitude") +
+     theme(
+       legend.background = element_rect(fill="white",
+                                        size=0.5, linetype="solid", 
+                                        colour ="black"),
+       legend.position = c(0.13, 0.2)
+     ) +
+     guides(
+       fill = guide_legend(
+         override.aes = list(size = 4)
+       )
+     )
+   
+   ggsave(output_file, map)
+ }
+ 
+ #############################
+ # all_make_map_tasks() function
+ #############################
+ all_make_map_tasks = function(geo_file, farm_file, clean_farms) {
+   
+   #' Helper function to put it all together
+   
+   # set up the location stuff
+   canada_prov = clean_geo_data(read_geo_data(geo_file))
+   
+   # clean and prepare data
+   farm_locs = set_up_data(read_farm_helper_data(farm_file), clean_farms)
+   
+   # make the map
+   make_map(canada_prov, farm_locs, output_file)
+   
+ }
 
-library(here)
-library(tidyverse)
-
-clean_farms <- read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
-loc_data <- read_csv(here("./data/farm-data/raw/farm-name-reference.csv"))
-
-farms_focal <- clean_farms %>% 
-  dplyr::select(farm_name, hump_sarg_doc, ktc, ref) %>% 
-  unique()
-
-farm_locs <- rbind(dplyr::left_join(
-  farms_focal %>% 
-    dplyr::filter(farm_name %notin% c("NA_7", "NA_15")), 
-  loc_data %>% 
-    dplyr::select(ref, Latitude, Longitude) %>% 
-    dplyr::rename(lat = Latitude, long = Longitude),
-  by = "ref"
-  ),
-  data.frame(
-    farm_name = c("NA_7", "NA_15", "Glacier Falls 2"),
-    hump_sarg_doc = c(0, 0, 0),
-    ktc = c(1, 0, 1),
-    ref = c(NA, NA, NA),
-    lat = c(50.84947, 50.74335, 50.80490),
-    long = c(-126.5012, -126.6151, -126.4273)
-  )) %>% 
-  dplyr::rowwise() %>% 
-  dplyr::mutate(
-    group = ifelse(
-        farm_name %in% c("Wicklow Point", "Burdwood", "Glacier Falls"),
-        "Sampling Site",
-        ifelse(
-          ktc == 1, 
-          "KTF farm",
-        "Non-KTF farm"
-      )
-    )
-  ) %>% 
-  dplyr::ungroup() %>% 
-  dplyr::mutate(farm_num = seq(1, nrow(.)))
-
-
-clean_geo_data = function()
-
-
-
-
-ggplot() +
-  geom_polygon(data = canada_prov,
-               aes(x = long, y = lat, group = group),
-               colour = "black",
-               size = 0.01,
-               fill = "grey65") +
-  coord_cartesian(xlim = c(-127, -126.1), ylim = c(50.5, 50.9)) +
-  geom_point(data = farm_locs, 
-             aes(x = Longitude, y = Latitude), shape = 22) + 
-  geom_text_repel(data = all_farm_locations,
-                  aes(x = Longitude, y = Latitude, 
-                      label = name#, colour = sampled
-                  )) 
-
-
-ggplot() +
-  geom_polygon(data = canada_prov,
-               aes(x = long, y = lat, group = group),
-               colour = "black",
-               size = 0.01,
-               fill = "grey65") +
-  coord_cartesian(xlim = c(-127, -126.1), ylim = c(50.5, 50.9)) +
-  geom_point(data = farm_locs,
-             aes(x = long, y = lat, fill = group), shape = 21,
-             size = 4) +
-  geom_text_repel(data = farm_locs,
-                  aes(x = long, y = lat, 
-                      label = farm_num
-                  )) +
-  scale_fill_manual("Farm Group", 
-                    values = c("purple", "#078282FF", "orange")) +
-  ggthemes::theme_base() +
-  labs(x = "Longitude", y = "Latitude") +
-  theme(
-    legend.background = element_rect(fill="white",
-                                     size=0.5, linetype="solid", 
-                                     colour ="black"),
-    legend.position = c(0.13, 0.2)
-  ) +
-  guides(
-    fill = guide_legend(
-      override.aes = list(size = 4)
-    )
-  )
+# library(here)
+# library(tidyverse)
+# 
+# clean_farms <- read_csv(
+# here("./data/farm-data/clean/all-farms-joined-clean.csv"))
+# loc_data <- read_csv(here("./data/farm-data/raw/farm-name-reference.csv"))
 
 
 
