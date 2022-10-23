@@ -97,7 +97,7 @@ make_c_plot|function|34f2590019375ec2|||||||||||||||
 make_exp_vals_numeric|function|affaac9f25a50dc0|||||||||||||||
 make_farm_groupings|function|b7f6bde0e94503a5|||||||||||||||
 make_model_predictions|function|0bceb3021bb4f2ef|||||||||||||||
-make_mortality_plot|function|79f975cd484ab5e1|||||||||||||||
+make_mortality_plot|function|8458b33a45152edf|||||||||||||||
 make_plot_df|function|4455f8af5d8f5418|||||||||||||||
 make_rivers_helper|function|12e319e68476fd40|||||||||||||||
 make_stock_recruit_data_3_pairs|stem|9137a8b8c6fee91c|0ee98f05219823e5|860c9788c9e20fcc|-140145221||t19254.9590203757s|cf4be3bc14963d13|2795|rds|local|vector|||105.933||
@@ -125,7 +125,7 @@ pink_helper|stem|f6ccae6d1010f916|c55132471cd8df2e|c3b5fc02cdc369c1|35854130|/ho
 pink_recon|stem|dec350c963e1d51b|9ae41775d0bdac20|c3b5fc02cdc369c1|-747649540|/home/cole/Github/sea-lice-sr/./data/sr-data/dfo-data/clean/pink-reconstructions.csv|t19198.283148407s|1b6fb6dd0f4ac109|79456|file|local|vector|||0||
 plot_df|function|b8c4d08bbf4ed371|||||||||||||||
 plot_predictions|function|4511d5997207f596|||||||||||||||
-plot_timeseries|function|0fdba95cc2007822|||||||||||||||
+plot_timeseries|function|6fb4047259184bac|||||||||||||||
 predict_future_mortality|function|62bbb8e55b13e2ca|||||||||||||||
 predicted_values_copes|function|b85aedecdb5fbf44|||||||||||||||
 predicted_values_mots|function|3f99ac8fa966cdfb|||||||||||||||
@@ -166,7 +166,7 @@ read_regression_cope|function|13e2eb5b56340168|||||||||||||||
 read_regression_mot|function|13e2eb5b56340168|||||||||||||||
 reshape_scenario_lice|function|15041aaee710524d|||||||||||||||
 results_plot_c|stem|06cba52c9d1d641a|af3b4604ecac9508|933814e24180fa73|-570322781||t19271.799187403s|4956b68a23f9e1fc|122|rds|local|vector|||0.737||
-results_plot_mortality|stem|40ed6d943a7f2c2a|28002d7cc44d841f|d5b00b92d305bd75|1213586849||t19271.7992059213s|24d52ebf1535bba2|123|rds|local|vector|||1.489||
+results_plot_mortality|stem|40ed6d943a7f2c2a|28002d7cc44d841f|8a5385a51d70c866|1213586849||t19271.7992059213s||123|rds|local|vector|||1.928||Must subset elements with a valid subscript vector.34mℹ39m Logical subscripts must match the size of the indexed input.31m39m Input has size 20 but subscript i has size 200.
 run_models|function|1857275e2604c770|||||||||||||||
 save_beta_regression|function|c900dc45e3930c0d|||||||||||||||
 save_data_chalimus_drawn|function|8388601829929641|||||||||||||||
@@ -252,7 +252,7 @@ theme_farm_grouping|function|5d2a4b8b075eb5fb|||||||||||||||
 theme_mod_comp|function|3e0c4f4884b44fa3|||||||||||||||
 theme_raw_comp|function|792c6c006c7283ec|||||||||||||||
 theme_small_map|function|2d83776b3178fa9f|||||||||||||||
-timeseries_plots|stem|e223286a0ea7b6c0|37d5654ea7992ad4|fedd0bd66d8bcab5|642728573||t19271.7506615705s|6556730b296d7213|119|rds|local|vector|||1.366||
+timeseries_plots|stem|259183a86aa36db1|37d5654ea7992ad4|616d9d0e9441fd60|642728573||t19272.2645523226s|bf0d8caacacad815|112|rds|local|vector|||2.428||
 trim_clean_dfo_open_data|function|e01a3483c9e03dde|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
 trim_nuseds|function|780e273eb24caf14|||||||||||||||

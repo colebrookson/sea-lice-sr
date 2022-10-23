@@ -354,7 +354,7 @@ trim_clean_dfo_open_data = function(dfo_df, marty_df) {
     # rename the months to numbers for consistency & make other import. columns
     dplyr::mutate(
       month = ifelse(month == "March", 3, 4),
-      ktc = "Broughton", 
+      ktf = "Broughton", 
       hump_sarg_doc = "Other"
     ) %>% 
     # now join with the mean inventory calculations from the clean marty df
@@ -514,8 +514,8 @@ join_clean_bati = function(bati_df) {
         farm_name == "Humphrey Rock"  ~ 1,
         TRUE                          ~ 0
       ),
-      ktc = dplyr::case_when(
-        ref %in% c(728, 821, 1144, 820,
+      ktf = dplyr::case_when(
+        ref %in% c(728, 821, 1144, 820, 1059,
                    136, 1586, 1086, 1618)  ~ 1,
         farm_name == "NA_7"               ~ 1,
         TRUE                              ~ 0
@@ -558,7 +558,7 @@ join_clean_marty = function(marty_df) {
         farm_name == "Humphrey Rock"  ~ 1,
         TRUE                          ~ 0
       ),
-      ktc = dplyr::case_when(
+      ktf = dplyr::case_when(
         ref %in% c(728, 821, 1144, 820,
                    136, 1586, 1086, 1618)  ~ 1,
         farm_name == "NA_7"               ~ 1,
@@ -610,7 +610,7 @@ join_clean_late = function(late_df) {
   late_df %>% 
     dplyr::mutate(
       data_source = "AVG_ALL_FARMS",
-      ktc = 0,
+      ktf = 0,
       hump_sarg_doc = 0,
       # also make unique farm/year/month identifier
       time_place_id = paste(ref, year, month, sep = "_")

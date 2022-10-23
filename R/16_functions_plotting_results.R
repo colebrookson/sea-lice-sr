@@ -109,7 +109,7 @@ make_mortality_plot = function(df_fut, output_path) {
     scale_x_continuous(breaks = c(2002:2021),
                        labels = c(2001:2020)) +
     labs(x = "Return Year", y = "Estimated Mortality - MLE and 95% CI's") +
-    scale_shape_manual(
+    scale_shape_manual( 
       "Scenario",
       values = c(21:25),
       labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)",
@@ -130,6 +130,32 @@ make_mortality_plot = function(df_fut, output_path) {
     paste0(output_path, "mortality-plot.png"),
     mort_plot,
     height = 6, width = 12, 
+    dpi = 600
+  )
+  
+  # make version of the plot with only ktf and 3 pairs 
+  df_fut_focal = df_fut %>% 
+    dplyr::filter(
+      scenario == "scenario-1-yr",
+      min_pop == 3
+    )
+  
+  focal_only = ggplot(data = df_fut_focal) + 
+    geom_errorbar(aes(x = year, ymin = lower, ymax = upper),
+                  width = 0) + 
+    geom_point(aes(x = year, y = MLE),
+               size = 4, colour = "black", fill = "purple", shape = 21) + 
+    scale_x_continuous(breaks = c(2002:2021),
+                       labels = c(2001:2020)) +
+    labs(x = "Return Year", y = "Estimated Mortality - MLE and 95% CI's") + 
+    ggthemes::theme_base()  + 
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2)
+    )
+  
+  ggsave(
+    paste0(output_path, "focal-mortality-plot.png"),
+    focal_only,
     dpi = 600
   )
   
@@ -175,9 +201,9 @@ prep_df_for_timeseries = function(df) {
       farm = "all"
     )
   
-  df_ktc = df %>% 
+  df_ktf = df %>% 
     dplyr::filter(
-      ktc == 1
+      ktf == 1
     ) %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
@@ -192,7 +218,7 @@ prep_df_for_timeseries = function(df) {
     ) %>% 
     dplyr::mutate(
       year = as.numeric(as.character(year)),
-      farm = "ktc"
+      farm = "ktf"
     )
   
   df_hsd = df %>% 
@@ -215,7 +241,7 @@ prep_df_for_timeseries = function(df) {
       farm = "hsd"
     ) 
   
-  df_farms = rbind(df_all_farms, df_hsd, df_ktc)
+  df_farms = rbind(df_all_farms, df_hsd, df_ktf)
   
   return(df_farms)
 }
@@ -235,7 +261,7 @@ plot_timeseries = function(df, output_path) {
     scale_fill_manual(
       "Farm Groupings", 
       values = wesanderson::wes_palette("FantasticFox1", 3),
-      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight-Tribune Corridor")
+      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight Inlet-Tribune Channel-Fife Sound")
     ) + 
     scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
     theme(
@@ -253,7 +279,7 @@ plot_timeseries = function(df, output_path) {
     scale_fill_manual(
       "Farm Groupings", 
       values = wesanderson::wes_palette("FantasticFox1", 3),
-      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight-Tribune Corridor")
+      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight Inlet-Tribune Channel-Fife Sound")
     ) + 
     scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
     theme(
@@ -270,10 +296,56 @@ plot_timeseries = function(df, output_path) {
     dpi = 600
   )
   
+  # make dataset to plot a timeseries of just ktf
+  only_ktf = rbind(
+    #inventory part of it
+    df_farms %>% 
+    dplyr::filter(farm == "ktf") %>% 
+    dplyr::select(year, sum_inventory) %>% 
+    dplyr::rename(val = sum_inventory) %>% 
+    dplyr::mutate(type = "inventory"), 
+    df_farms %>% 
+      dplyr::filter(farm == "ktf") %>% 
+      dplyr::select(year, sum_lice) %>% 
+      dplyr::rename(val = sum_lice) %>% 
+      dplyr::mutate(type = "lice")
+  ) %>% 
+    dplyr::mutate(type = as.factor(type))
+   
+  
+  ktf_only_plot = ggplot(data = only_ktf) + 
+    geom_line(aes(x = year, y = val/1000000, group = type,
+                  linetype = type)) +
+    geom_point(aes(x = year, y = val/1000000, fill = type), 
+                size = 4, shape = 21) + 
+    ggthemes::theme_base() + 
+    labs(x = "Year", y = "Numbers (millions)") + 
+    scale_fill_manual(
+      "Farm Groupings", 
+      values = wesanderson::wes_palette("FantasticFox1", 3),
+      labels = c("Farmed Salmon", "Lice on Farmed\nSalmon")
+    ) + 
+    scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
+    theme(
+      axis.text.x = element_text(angle = 90)
+    ) +
+    guides(
+      linetype = "none"
+    )
+  
+  ggsave(
+    paste0(output_path, "timeseries-ktf-only.png"),
+    ktf_only_plot,
+    height = 7, width = 10, 
+    dpi = 600
+  )
+  
 }
+
+
 # 
 # df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
-# 
+# df_fut = read_csv(here("./outputs/model-outputs/stock-recruit-models/joined-future-mortality-estimates.csv"))
 # 
 # 
 # 
@@ -286,8 +358,8 @@ plot_timeseries = function(df, output_path) {
 #   geom_point(data = df_all_farms, aes(x = year, y = sum_inventory/1000000),
 #              shape = 21, colour = "black", fill = "red") + 
 #   geom_line(data = df_all_farms, aes(x = year, y = sum_inventory/1000000)) +
-#   geom_point(data = df_ktc, aes(x = year, y = sum_inventory/1000000)) +
-#   geom_line(data = df_ktc, aes(x = year, y = sum_inventory/1000000)) + 
+#   geom_point(data = df_ktf, aes(x = year, y = sum_inventory/1000000)) +
+#   geom_line(data = df_ktf, aes(x = year, y = sum_inventory/1000000)) + 
 #   geom_point(data = df_hsd, aes(x = year, y = sum_inventory/1000000)) +
 #   geom_line(data = df_hsd, aes(x = year, y = sum_inventory/1000000))
 #   
@@ -329,7 +401,7 @@ plot_timeseries = function(df, output_path) {
 #   
 # ggplot(data = bati_df) + 
 #   geom_point(aes(x = date, y = sum_inventory/1000000)) + 
-#   geom_line(aes(x = date, y = sum_inventory/1000000))
+#   geom_line(aes(x = date, y = sum_inventory/1000000))-
 # 
 # 
 # marty_df = read_csv(here("./data/farm-data/clean/marty-data-clean.csv"))

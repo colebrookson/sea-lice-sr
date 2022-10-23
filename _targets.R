@@ -34,7 +34,7 @@ tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes",
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
                             "DHARMa", "parallel", "gtable", "grid", "cowplot",
                             "wesanderson", "patchwork", "stringr", "lme4",
-                            "broom.mixed", "tidyr"))
+                            "broom.mixed", "tidyr", "ggrepel"))
 list(
   ####################
   # files
@@ -74,6 +74,14 @@ list(
              here::here(
                "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"
              ), format = "file"),
+  tar_target(farm_name_location_helper,
+             here::here(
+               "./data/farm-data/raw/farm-name-reference.csv"
+             ), format = "file"),
+  tar_target(geo_spatial_data,
+             here::here(
+               "./data/geo-data/gadm36_CAN_1_sp.rds"
+             ), format = "file"),
   ####################
   # cleaning data
   ####################
@@ -88,7 +96,6 @@ list(
                get_data_dfo_ref(dfo_farm_ref_data),
                here::here("./data/farm-data/clean/marty-data-clean.csv")),
              format = "rds"),
-               #here::here("./data/farm-data/clean/marty-data-clean.csv"))),
   tar_target(bati_data,
              clean_data_bati(
                raw_data_file_bati,
