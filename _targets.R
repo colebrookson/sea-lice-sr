@@ -925,6 +925,13 @@ list(
                  "./figs/stock-recruit-results/"
                )
              )),
+  tar_target(results_focal_plot_mortality, 
+             focal_plot(
+               join_future_mortality_estimates,
+               here::here(
+                 "./figs/stock-recruit-results/"
+               )
+             )),
   tar_target(timeseries_plots,
              plot_timeseries(
                join_all_farm_data, 

@@ -85,13 +85,13 @@ make_c_plot = function(df_c, output_path) {
 make_mortality_plot = function(df_fut, output_path) {
   
   #' Make plot of estimated and predicted mortality 
-
-  # first make sure important values are factors 
+  
+  # first make sure important values are factors
   df_fut$min_pop = as.factor(df_fut$min_pop)
   df_fut$predict = as.factor(df_fut$predict)
   df_fut$scenario = as.factor(df_fut$scenario)
   df_fut$year = as.numeric(df_fut$year)
-  
+
   # make the actual plot
   mort_plot = ggplot(data = df_fut, aes(x = year, y = MLE, fill = min_pop,
                                         shape = scenario,
@@ -129,7 +129,7 @@ make_mortality_plot = function(df_fut, output_path) {
   ggsave(
     paste0(output_path, "mortality-plot.png"),
     mort_plot,
-    height = 6, width = 12, 
+    height = 6, width = 12,
     dpi = 600
   )
   
@@ -158,6 +158,47 @@ make_mortality_plot = function(df_fut, output_path) {
     focal_only,
     dpi = 600
   )
+  
+}
+
+#############################
+# focal_plot() function 
+#############################
+focal_plot = function(df_fut, output_path) {
+  
+  #' use the bound mortality estimates to make plot of the focal scenario 
+  
+  # first make sure important values are factors
+  df_fut$min_pop = as.factor(df_fut$min_pop)
+  df_fut$predict = as.factor(df_fut$predict)
+  df_fut$scenario = as.factor(df_fut$scenario)
+  df_fut$year = as.numeric(df_fut$year)
+  
+  df_fut_focal = as_tibble(df_fut) %>%
+    dplyr::filter(
+      scenario == "scenario-1-yr",
+      min_pop == 3
+    ) 
+  
+  focal_mort = ggplot(data = df_fut_focal) + 
+    geom_line(aes(x = year, y = MLE)) +
+    geom_point(aes(x = year, y = MLE, fill = predict),
+               size = 4, shape = 21,  colour = "black") +
+    scale_x_continuous(breaks = c(2002:2021)) +
+    labs(x = "Return Year", y = "Estimated Mortality - MLE and 95% CI's") +
+    ggthemes::theme_base() +
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2)
+    ) +
+    scale_fill_manual("Predicted vs. Estimated",
+                      values = c("purple", "goldenrod2"))
+  
+  ggsave(
+    paste0(output_path, "focal-scenario-mortality-plot.png"),
+    focal_mort,
+    dpi = 600
+  )
+
   
 }
 
