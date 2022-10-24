@@ -29,12 +29,13 @@ source(here::here("./R/13_functions_stockrecruit_prep.R"))
 source(here::here("./R/14_functions_stockrecruit_models.R"))
 source(here::here("./R/15_functions_joining_sr_data.R"))
 source(here::here("./R/16_functions_plotting_results.R"))
+source(here::here("./R/17_functions_map.R"))
 
 tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
                             "ggplot2", "betareg", "lubridate", "glmmTMB", 
                             "DHARMa", "parallel", "gtable", "grid", "cowplot",
                             "wesanderson", "patchwork", "stringr", "lme4",
-                            "broom.mixed", "tidyr", "ggrepel"))
+                            "broom.mixed", "tidyr", "ggrepel", "sp"))
 list(
   ####################
   # files

@@ -462,4 +462,4 @@ plot_timeseries = function(df, output_path) {
 # 
 # ggplot(data = marty_df) + 
 #   geom_point(aes(x = date, y = sum_inventory/1000000)) + 
-#   geom_line(aes(x = date, y = sum_inventory/1000000))
+  # geom_line(aes(x = date, y = sum_inventory/1000000))

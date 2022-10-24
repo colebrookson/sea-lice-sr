@@ -55,7 +55,7 @@ clean_geo_data = function(geo_data) {
    #' and returns the data ready for the mapping
    
    farms_focal <- clean_farms %>% 
-     dplyr::select(farm_name, hump_sarg_doc, ktc, ref) %>% 
+     dplyr::select(farm_name, hump_sarg_doc, ktf, ref) %>% 
      unique()
    
    farm_locs <- rbind(dplyr::left_join(
@@ -69,7 +69,7 @@ clean_geo_data = function(geo_data) {
    data.frame(
      farm_name = c("NA_7", "NA_15", "Glacier Falls 2"),
      hump_sarg_doc = c(0, 0, 0),
-     ktc = c(1, 0, 1),
+     ktf = c(1, 0, 1),
      ref = c(NA, NA, NA),
      lat = c(50.84947, 50.74335, 50.80490),
      long = c(-126.5012, -126.6151, -126.4273)
@@ -80,7 +80,7 @@ clean_geo_data = function(geo_data) {
          farm_name %in% c("Wicklow Point", "Burdwood", "Glacier Falls"),
          "Sampling Site",
          ifelse(
-           ktc == 1, 
+           ktf == 1, 
            "KTF farm",
            "Non-KTF farm"
          )
@@ -130,13 +130,14 @@ clean_geo_data = function(geo_data) {
        )
      )
    
-   ggsave(output_file, map)
+   ggsave(output_file, map, 
+          width = 9, height = 9)
  }
  
  #############################
  # all_make_map_tasks() function
  #############################
- all_make_map_tasks = function(geo_file, farm_file, clean_farms) {
+ all_make_map_tasks = function(geo_file, farm_file, clean_farms, output_file) {
    
    #' Helper function to put it all together
    
