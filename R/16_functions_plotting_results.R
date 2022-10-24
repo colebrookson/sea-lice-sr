@@ -85,9 +85,9 @@ make_c_plot = function(df_c, output_path) {
 make_mortality_plot = function(df_fut, output_path) {
   
   #' Make plot of estimated and predicted mortality 
-  
+
   # first make sure important values are factors
-  df_fut$min_pop = as.factor(df_fut$min_pop)
+  df_fut$min_pop = as.factor(as.integer(df_fut$min_pop))
   df_fut$predict = as.factor(df_fut$predict)
   df_fut$scenario = as.factor(df_fut$scenario)
   df_fut$year = as.numeric(df_fut$year)
@@ -134,7 +134,7 @@ make_mortality_plot = function(df_fut, output_path) {
   )
   
   # make version of the plot with only ktf and 3 pairs 
-  df_fut_focal = df_fut %>% 
+  df_fut_focal = data.frame(df_fut) %>% 
     dplyr::filter(
       scenario == "scenario-1-yr",
       min_pop == 3

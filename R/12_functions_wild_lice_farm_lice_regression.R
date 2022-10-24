@@ -15,7 +15,7 @@ options(dplyr.summarise.inform = FALSE)
 #############################
 make_farm_groupings = function(farm_df) {
   
-  #' Make three groupings of the farms - all the farms, the KTC farms, 
+  #' Make three groupings of the farms - all the farms, the ktf farms, 
   #' and the HSD Triangle Farms, return all three of these dataframes 
   #' grouped by years 
   
@@ -32,20 +32,20 @@ make_farm_groupings = function(farm_df) {
     ) %>% 
     dplyr::select(-all_leps)
   
-  # make ktc farm df
-  ktc_farms <- farm_df %>%
+  # make ktf farm df
+  ktf_farms <- farm_df %>%
     dplyr::filter(year > 2000) %>%
     # keep only months that fish actually migrate through during
     dplyr::filter(month %in% c(3, 4)) %>%
-    dplyr::filter(ktc == 1) %>%
+    dplyr::filter(ktf == 1) %>%
     dplyr::group_by(year) %>%
     dplyr::summarise(
-      ktc_leps = mean(lep_tot, na.rm = TRUE)
+      ktf_leps = mean(lep_tot, na.rm = TRUE)
     ) %>%
     dplyr::mutate(
-      log_ktc_leps = log10(ktc_leps)
+      log_ktf_leps = log10(ktf_leps)
     ) %>%
-    dplyr::select(-ktc_leps)
+    dplyr::select(-ktf_leps)
 
   # make the hsd farms df
   hsd_farms <- farm_df %>%
@@ -65,7 +65,7 @@ make_farm_groupings = function(farm_df) {
   # bind together all farm combos
   all_group_farms <- as_tibble(cbind(
     all_farms,
-    ktc_farms %>%
+    ktf_farms %>%
       dplyr::select(-year),
     hsd_farms %>%
       dplyr::select(-year)
@@ -246,11 +246,11 @@ wild_farm_regression = function(all_group_farms, wide_lice,
     all_farms_plot,
     dpi = 600)
   
-  ktc_farms_plot = plot_obs[[6]] | plot_obs[[7]] | plot_obs[[8]] | plot_obs[[9]] | 
+  ktf_farms_plot = plot_obs[[6]] | plot_obs[[7]] | plot_obs[[8]] | plot_obs[[9]] | 
     plot_obs[[10]]
   ggsave(paste0(
-    fig_path, "ktc_farm_scenario_comparison_regression_plots.png"),
-    ktc_farms_plot,
+    fig_path, "ktf_farm_scenario_comparison_regression_plots.png"),
+    ktf_farms_plot,
     dpi = 600)
   
   hsd_farms_plot = plot_obs[[11]] | plot_obs[[12]] | plot_obs[[13]] | plot_obs[[14]] | 
@@ -306,7 +306,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
 
   # join all the prediction df's together and write it out
   
-  # note - [[1]] is all farms, [[2]] is ktc farms
+  # note - [[1]] is all farms, [[2]] is ktf farms
   df = df_obs[[2]]
   for(i in 2:length(df_obs)) {
     df = rbind(df, df_obs[[i]])
