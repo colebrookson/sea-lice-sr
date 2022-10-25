@@ -8,7 +8,7 @@ name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iterat
 add_exploitation_rates|function|c3ae98dfa71ba057|||||||||||||||
 add_in_empirical_proportions|function|a420ef2c3a13c047|||||||||||||||
 add_louse_covariate|function|0187486f6c81981e|||||||||||||||
-all_make_map_tasks|function|7f0bd5d21d8c8c97|||||||||||||||
+all_make_map_tasks|function|5e5b7dd75b296a38|||||||||||||||
 all_scen_lice|object|31d53f3f746bea73|||||||||||||||
 bati_data|stem|32ad82ed00caff35|15cf45363a6e2bf3|852e69043e58a4af|499463961||t19288.9488521551s|7c32e22f5fe8024c|46929|rds|local|vector|||0.227||
 beta_plot|function|ebcea03278c2e238|||||||||||||||
@@ -102,7 +102,7 @@ make_all_farm_groupings|stem||d4727b2418f8bfb6|cf3d1333ab4a043b|-773624273||t192
 make_c_plot|function|34f2590019375ec2|||||||||||||||
 make_exp_vals_numeric|function|affaac9f25a50dc0|||||||||||||||
 make_farm_groupings|function|ea79a622357443b6|||||||||||||||
-make_map|function|c8d8f478d2804a67|||||||||||||||
+make_map|function|ee8cb902e0ea248d|||||||||||||||
 make_model_predictions|function|0bceb3021bb4f2ef|||||||||||||||
 make_mortality_plot|function|91a28096220501c6|||||||||||||||
 make_plot_df|function|4455f8af5d8f5418|||||||||||||||
@@ -255,7 +255,7 @@ sr_percent_mort_scen4_20pairs|stem|a096f27acbef5102|4eb4a28e79488a0a|dabe938414b
 sr_percent_mort_scen4_3pairs|stem|47a9edeb8fba1aa6|24d12d3b182ad241|dce6d06684d3a775|-1195290236||t19289.0672624835s|f3cf95d7b5806e03|565|rds|local|vector|||0.006||
 standardize_names|function|df4fc583e60014a9|||||||||||||||
 stock_recruit_model_scen1_3pairs|stem|3cf9b6d3debb0399|dd8a9b1231e7cb3c|5d3a1c33deeb0f40|-1596842110||t19257.6099850913s|3c187ffa31a31952|199|rds|local|vector|||166.938|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling. Unknown or uninitialised column scenario.. Unknown or uninitialised column min_pop.. Unknown or uninitialised column scenario.. Unknown or uninitialised column min_pop.|
-study_map|stem|3c5871f4b78b38d7|3c8507d8c020f8f5|1fd508ffb310c5d7|934061817||t19289.0370430563s|ebd1054f3f481e45|110|rds|local|vector|||13.846||
+study_map|stem|3c5871f4b78b38d7|3c8507d8c020f8f5|484b3f8e54d3528a|934061817||t19290.0488236479s|ebd1054f3f481e45|110|rds|local|vector|||13.954||
 summary_columns|function|578d17c11edaec54|||||||||||||||
 temp|object|de6a0928ab3ebb22|||||||||||||||
 test_all_farm_data|stem|fa414575f26f5f5e|9349ea042b3ca24b|fd53ee90ca678cbc|288979997||t19288.9632232401s|a1c456b03adbfbf8|44|rds|local|vector|||0.062||

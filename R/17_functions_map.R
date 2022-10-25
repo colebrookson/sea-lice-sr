@@ -122,7 +122,8 @@ clean_geo_data = function(geo_data) {
        legend.background = element_rect(fill="white",
                                         size=0.5, linetype="solid", 
                                         colour ="black"),
-       legend.position = c(0.13, 0.2)
+       legend.position = c(0.13, 0.2),
+       legend.text = element_text(size = 12)
      ) +
      guides(
        fill = guide_legend(
@@ -131,7 +132,7 @@ clean_geo_data = function(geo_data) {
      )
    
    ggsave(output_file, map, 
-          width = 9, height = 9)
+          width = 9, height = 7)
  }
  
  #############################
