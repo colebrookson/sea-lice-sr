@@ -20,6 +20,17 @@ get_data_nuseds_ref = function(file) {
 }
 
 #############################
+# get_data_psf_exp() function
+#############################
+#' get_data_psf_exp = function(file) {
+#'   
+#'   #' Read in .csv file with DFO farm reference numbers
+#'   
+#'   readr::read_csv(file, show_col_types = FALSE,
+#'                   guess_max = 1000000)
+#' }
+
+#############################
 # get_pink_df() function
 #############################
 get_pink_df = function(file) {
@@ -46,6 +57,20 @@ trim_nuseds = function(nuseds_raw_df) {
   
   return(nuseds)
 }
+
+#############################
+# trim_psf_data() function
+#############################
+#' trim_psf_data = function(psf_raw_df) {
+#'   
+#'   #' Only keep the data of importance here
+#'   
+#'   psf_df = psf_raw_df %>% 
+#'     dplyr::filter(species %in% c("Pink (even)", "Pink (odd)"))
+#'   
+#'   return(psf_df)
+#'   
+#' }
 
 #############################
 # pull_escapment_values() function
@@ -267,25 +292,7 @@ add_exploitation_rates = function(esc_df, pink_exp_fixed,
   esc_df_short = esc_df %>% 
     dplyr::filter(year <= 2016)
   esc_df_short$exp = NA
-  
-  # join the two pink exp dfs
-  # pink_exp$conservation_unit = NA
-  # rbind(pink_exp,
-  #       pink_area12 %>% 
-  #         dplyr::mutate(area = 12) %>% 
-  #         dplyr::select(year, exp_rate, area, conservation_unit)
-  #       )
-  # 
-  # 
-  # esc_df_short %>% 
-  #   dplyr::rowwise() %>% 
-  #   dplyr::mutate(
-  #     exp = dplyr::case_when(
-  #       
-  #     )
-  #   )
-  
-  
+
   # again, kind of ugly loop but makes it more explicit
   for(row in seq_len(nrow(esc_df_short))){
     
@@ -846,3 +853,5 @@ execute_sr_database = function(esc_df_short, min_pop, all_lice_predictions,
 #   paste0("./data/wild-lice-data/clean/",
 #          "all-scenario-yearly-lice-per-fish-estimates.csv")
 # ))
+
+# psf_raw = read_csv(here("./data/sr-data/PSF-PSE/dataset1_stream.csv"))

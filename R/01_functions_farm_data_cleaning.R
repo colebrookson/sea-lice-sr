@@ -515,8 +515,8 @@ join_clean_bati = function(bati_df) {
         TRUE                          ~ 0
       ),
       ktf = dplyr::case_when(
-        ref %in% c(728, 821, 1144, 820, 1059,
-                   136, 1586, 1086, 1618)  ~ 1,
+        ref %in% c(136, 728, 820, 821, 
+                1059, 1144, 1586, 1618)   ~ 1,
         farm_name == "NA_7"               ~ 1,
         TRUE                              ~ 0
       ),
@@ -559,8 +559,8 @@ join_clean_marty = function(marty_df) {
         TRUE                          ~ 0
       ),
       ktf = dplyr::case_when(
-        ref %in% c(728, 821, 1144, 820,
-                   136, 1586, 1086, 1618)  ~ 1,
+        ref %in% c(136, 728, 820, 821, 
+                1059, 1144, 1586, 1618)   ~ 1,
         farm_name == "NA_7"               ~ 1,
         TRUE                              ~ 0
       )

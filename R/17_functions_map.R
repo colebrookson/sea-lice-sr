@@ -122,7 +122,7 @@ clean_geo_data = function(geo_data) {
        legend.background = element_rect(fill="white",
                                         size=0.5, linetype="solid", 
                                         colour ="black"),
-       legend.position = c(0.13, 0.2),
+       legend.position = c(0.13, 0.12),
        legend.text = element_text(size = 12)
      ) +
      guides(
@@ -132,7 +132,7 @@ clean_geo_data = function(geo_data) {
      )
    
    ggsave(output_file, map, 
-          width = 9, height = 7)
+          width = 8, height = 6)
  }
  
  #############################
@@ -156,8 +156,7 @@ clean_geo_data = function(geo_data) {
 # library(here)
 # library(tidyverse)
 # 
-# clean_farms <- read_csv(
-# here("./data/farm-data/clean/all-farms-joined-clean.csv"))
+#clean_farms=read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
 # loc_data <- read_csv(here("./data/farm-data/raw/farm-name-reference.csv"))
 
 

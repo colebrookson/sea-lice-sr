@@ -63,6 +63,10 @@ list(
              here::here(
                "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"),
              format = "file"),
+  tar_target(raw_psf_exp,
+             here::here(
+               "./data/sr-data/PSF-PSE/dataset1_stream.csv"),
+             format = "file"),
   tar_target(raw_pink_exp,
              here::here(
                "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"

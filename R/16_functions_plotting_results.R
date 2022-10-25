@@ -143,20 +143,25 @@ make_mortality_plot = function(df_fut, output_path) {
   focal_only = ggplot(data = df_fut_focal) + 
     geom_errorbar(aes(x = year, ymin = lower, ymax = upper),
                   width = 0) + 
-    geom_point(aes(x = year, y = MLE),
-               size = 4, colour = "black", fill = "purple", shape = 21) + 
+    geom_point(aes(x = year, y = MLE, fill = predict),
+               size = 4, colour = "black", shape = 21) + 
     scale_x_continuous(breaks = c(2002:2021),
                        labels = c(2001:2020)) +
-    labs(x = "Return Year", y = "Estimated Mortality - MLE and 95% CI's") + 
+    labs(x = "Return Year", y = "Estimated Mortality") + 
     ggthemes::theme_base()  + 
     theme(
       axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2)
+    ) + 
+    scale_fill_manual("Predicted vs. Estimated", values = c("purple", "orange")) +
+    theme(
+      legend.position = c(0.7, 0.7)
     )
   
   ggsave(
     paste0(output_path, "focal-mortality-plot.png"),
     focal_only,
-    dpi = 600
+    dpi = 600,
+    width = 6, height = 5
   )
   
 }

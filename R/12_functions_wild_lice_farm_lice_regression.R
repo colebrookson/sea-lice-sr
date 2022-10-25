@@ -193,6 +193,44 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       # extract adjusted r-squared to put on plot pane
       rsq = model_vals$adj.r.squared
       
+      # make special plot for focal scenario 
+      if(wild == "scen1_year") {
+        
+        # make plot for this particular model 
+        plot <- ggplot(data = mod_df, aes(x = 10^(farm), y = 10^(wild))) + 
+          geom_point(
+            # use the shape and colour to denote which are which
+            fill = "30D5C8", shape = 21,
+            colour = "black", size = 5) +
+          stat_smooth(method = stats::lm, formula = y ~ x,
+                      colour = "black", alpha = 0.2) +
+          ggthemes::theme_base() +
+          labs(
+            x = "Lice on Farmed Fish",
+            y = "Lice on Wild Fish"
+          ) + 
+          annotate(geom = "text", 
+                   x = 10^(min(mod_df$farm, na.rm = TRUE)), 
+                   y = 10^(max(mod_df$wild, na.rm = TRUE)), 
+                   label = paste("R^2 ==", round(rsq, 2)),
+                   size = 7,
+                   parse = TRUE,
+                   hjust = -0.5,
+                   vjust = 2) + 
+          theme(
+            legend.position = "none",
+            axis.title = element_text(size = 14)
+          )
+        
+        # save plot
+        ggsave(paste0(
+          fig_path, "focal-rgression.png"),
+          plot,
+          dpi = 600,
+          height = 5, width = 6)
+        
+      }
+      
       # make plot for this particular model 
       plot <- ggplot(data = mod_df, aes(x = farm, y = wild)) + 
         geom_point(
@@ -229,7 +267,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       ggsave(paste0(
         fig_path, farm, "_", wild, ".png"),
         plot,
-        dpi = 600)
+        dpi = 600) 
 
       # keep the plot object in the list 
       plot_obs[[list_loc]] <- plot
