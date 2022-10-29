@@ -194,7 +194,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       rsq = model_vals$adj.r.squared
       
       # make special plot for focal scenario 
-      if(wild == "scen1_year") {
+      if(wild == "scen1_year" & farm == "log_ktf_leps") {
         
         # make plot for this particular model 
         plot <- ggplot(data = mod_df, aes(x = 10^(farm), y = 10^(wild))) + 
