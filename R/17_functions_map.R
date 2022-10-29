@@ -58,7 +58,7 @@ clean_geo_data = function(geo_data) {
      dplyr::select(farm_name, hump_sarg_doc, ktf, ref) %>% 
      unique()
    
-   farm_locs <- rbind(dplyr::left_join(
+   farm_locs <- rbind(rbind(dplyr::left_join(
      farms_focal %>% 
        dplyr::filter(farm_name %notin% c("NA_7", "NA_15")), 
      loc_data %>% 
@@ -77,17 +77,27 @@ clean_geo_data = function(geo_data) {
      dplyr::rowwise() %>% 
      dplyr::mutate(
        group = ifelse(
-         farm_name %in% c("Wicklow Point", "Burdwood", "Glacier Falls"),
-         "Sampling Site",
-         ifelse(
            ktf == 1, 
            "KTF farm",
            "Non-KTF farm"
-         )
        )
      ) %>% 
      dplyr::ungroup() %>% 
-     dplyr::mutate(farm_num = seq(1, nrow(.)))
+     dplyr::mutate(farm_num = seq(1, nrow(.))),
+     data.frame(
+       farm_name = c("glacier_samp", "burd_samp", "wick_samp"),
+       hump_sarg_doc = c(0,0,0),
+       ktf = c(0,0,0),
+       ref = c(NA, NA, NA),
+       lat = c(50.83785, 50.80690, 50.77659),
+       long = c(-126.3292, -126.4958, -126.6915),
+       group = c("Sampling Site", "Sampling Site", "Sampling Site"),
+       farm_num = c(NA, NA, NA)
+       )) %>% 
+     dplyr::rowwise() %>% 
+     dplyr::mutate(
+       samp = as.factor(ifelse(group == "Sampling Site", 1, 0))
+     )
    
    return(farm_locs)
    
@@ -100,7 +110,7 @@ clean_geo_data = function(geo_data) {
    
    #' make the map with the geo-data and the farm data
    
-   map = ggplot() +
+   map =  ggplot() +
      geom_polygon(data = canada_prov,
                   aes(x = long, y = lat, group = group),
                   colour = "black",
@@ -108,16 +118,18 @@ clean_geo_data = function(geo_data) {
                   fill = "grey65") +
      coord_cartesian(xlim = c(-127, -126.1), ylim = c(50.5, 50.9)) +
      geom_point(data = farm_locs,
-                aes(x = long, y = lat, fill = group), shape = 21,
+                aes(x = long, y = lat, fill = group, shape = samp),
                 size = 4) +
      geom_text_repel(data = farm_locs,
                      aes(x = long, y = lat, 
                          label = farm_num
                      )) +
      scale_fill_manual("Farm Group", 
-                       values = c("purple", "#078282FF", "orange")) +
+                       values = c("purple", "#078282FF", "orange", "grey70")) +
+     scale_shape_manual("Farm Group",
+                       values = c(21, 22)) +
      ggthemes::theme_base() +
-     labs(x = "Longitude", y = "Latitude") +
+     labs(x = "Longitude (°)", y = "Latitude (°)") +
      theme(
        legend.background = element_rect(fill="white",
                                         size=0.5, linetype="solid", 
@@ -127,8 +139,9 @@ clean_geo_data = function(geo_data) {
      ) +
      guides(
        fill = guide_legend(
-         override.aes = list(size = 4)
-       )
+         override.aes = list(size = 4, shape = c(21, 21, 22))
+       ), 
+       shape = "none"
      )
    
    ggsave(output_file, map, 
@@ -156,8 +169,9 @@ clean_geo_data = function(geo_data) {
 # library(here)
 # library(tidyverse)
 # 
-#clean_farms=read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
+# clean_farms=read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
 # loc_data <- read_csv(here("./data/farm-data/raw/farm-name-reference.csv"))
+# farm_locs = set_up_data(loc_data, clean_farms)
 
 
 
