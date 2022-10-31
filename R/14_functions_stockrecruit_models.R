@@ -47,9 +47,9 @@ run_models = function(df,
   saveRDS(null_model, paste0(output_path,
                              "null-model.rds"))
   # extract vals of use
-  coefs = broom::tidy(null_model)
-  fitted_vals = broom::augment(null_model)
-  model_vals = broom::glance(null_model)
+  coefs = broom.mixed::tidy(null_model)
+  fitted_vals = broom.mixed::augment(null_model)
+  model_vals = broom.mixed::glance(null_model)
   
   readr::write_csv(coefs,
                    paste0(output_path, "coefs-null-model.csv"))
@@ -64,9 +64,9 @@ run_models = function(df,
                          data = df)
   saveRDS(alt_model, paste0(output_path,
                              "alt-model.rds"))
-  coefs = broom::tidy(alt_model)
-  fitted_vals = broom::augment(alt_model)
-  model_vals = broom::glance(alt_model)
+  coefs = broom.mixed::tidy(alt_model)
+  fitted_vals = broom.mixed::augment(alt_model)
+  model_vals = broom.mixed::glance(alt_model)
   
   readr::write_csv(coefs,
                    paste0(output_path, "coefs-alt-model.csv"))
@@ -359,6 +359,10 @@ predict_future_mortality = function(results_list, p_mort,
   df_rand_fixed = results_list[[3]]
   sr_df = results_list[[4]]
   
+  # get the coef for the lice 
+  terms = broom.mixed::tidy(alt_model)
+  val = terms[[which(terms[,"term"] == "lice"), "estimate"]]
+  
   # get just the scenario at hand 
   predict_df = predict_df %>% 
     dplyr::filter(scenario == unique(df$scenario)) %>% 
@@ -379,16 +383,17 @@ predict_future_mortality = function(results_list, p_mort,
     
     # use the MLE to get the estimated value
     add_years[i, "surv"] = 100*(1 - exp(
-      -0.2346664 * add_years[i-1, "all_lep"])
+      val * add_years[i-1, "all_lep"])
     )
     # use the upper and lower bounds ofthe 95% CI to get the same for the est here
     add_years[i, "surv_up"] = 100*(1 - exp(
-      -0.2346664 * add_years[i-1, "upper"])
+      val * add_years[i-1, "upper"])
     )
     add_years[i, "surv_low"] = 100*(1 - exp(
-      -0.2346664 * add_years[i-1, "lower"])
+      val * add_years[i-1, "lower"])
     )
   }
+  
   # get rid of extraneous years 
   add_years = add_years %>% 
       dplyr::select(surv, surv_up, surv_low, year) %>% 
@@ -424,12 +429,12 @@ predict_future_mortality = function(results_list, p_mort,
 # library(parallel)
 # library(broom.mixed)
 # 
-# df = read_csv(here("./data/prepped-data/stock-recruit-data-frames/stock-recruit-data-lice-included-3-pairs.csv"))
-# predict_df = read_csv(here("./data/wild-lice-data/clean/all-scenario-yearly-lice-per-fish-estimates.csv"))
-# 
-# results_list = prep_bootstrap_data(df, here::here(
-#   "./outputs/model-outputs/stock-recruit-models/"
-# ))
+df = read_csv(here("./data/prepped-data/stock-recruit-data-frames/stock-recruit-data-lice-included-3-pairs.csv"))
+predict_df = read_csv(here("./data/wild-lice-data/clean/all-scenario-yearly-lice-per-fish-estimates.csv"))
+
+results_list = prep_bootstrap_data(df, here::here(
+  "./outputs/model-outputs/stock-recruit-models/"
+))
 # ci = perform_bootstrapping(results_list,
 #                         here::here(
 #                           "./outputs/model-outputs/stock-recruit-models/"

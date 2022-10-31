@@ -43,3 +43,27 @@ check_lep_tot_values = function(farm_df) {
     }
   }
 }
+
+
+
+# bati_df <- read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
+# focal_time <- bati_df %>%
+#   #dplyr::filter(year > 2017) %>%
+#   dplyr::filter(month %in% c(3, 4)) %>%
+#   dplyr::filter(ref %in% c(136, 728, 820, 821, 1059, 1144, 1586, 1618)) %>% 
+#   dplyr::select(year, month, farm_name, inventory) 
+# 
+# focal_time$year <- as.factor(focal_time$year)
+# focal_time$month <- as.factor(focal_time$month)
+# focal_time$farm_name <- as.factor(focal_time$farm_name)
+# 
+# inventory_mean_by_farm <- focal_time %>%
+#   dplyr::group_by(year, farm_name) %>%
+#   dplyr::summarize(mean_inventory = mean(inventory, na.rm = TRUE))
+# 
+# inventory_sum_year <- inventory_mean_by_farm %>%
+#   dplyr::group_by(year) %>%
+#   dplyr::summarize(summed_inventory = sum(mean_inventory, na.rm = TRUE))
+# 
+# ggplot(inventory_sum_year) +
+#   geom_line(aes(x = as.integer(as.character(year)), y = summed_inventory))

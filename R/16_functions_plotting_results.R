@@ -146,10 +146,9 @@ make_mortality_plot = function(df_fut, output_path) {
     geom_point(aes(x = year, y = MLE, fill = predict),
                size = 4, colour = "black", shape = 21) + 
     scale_x_continuous(breaks = c(2002:2021),
-                       labels = c(2001:2020)) +
+                       labels = c(2002:2021)) +
     labs(x = "Return Year", y = "Estimated Mortality due to Sea Lice") + 
     ggthemes::theme_base()  + 
-    scale_x_continuous(breaks = c(2001:2020), labels = c(2002:2021)) +
     theme(
       axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2)
     ) + 
@@ -220,7 +219,7 @@ prep_df_for_timeseries = function(df) {
   df = df %>% 
     dplyr::filter(
       year > 2000,
-      year < 2021,
+      # year < 2021,
       month %in% c(3, 4)
     ) %>% 
     dplyr::rowwise() %>% 
@@ -230,21 +229,37 @@ prep_df_for_timeseries = function(df) {
     ) %>% 
     dplyr::mutate(
       year = as.factor(year), 
-      month = as.factor(month)
+      month = as.factor(month),
+      farm_name = as.factor(farm_name)
     )
+  
+  # make sure there's not more than one observation for year/month/farm combo
+  test = df %>% 
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(n_obs = n())
+  
+  if(max(test$n_obs) > 1) {
+    stop("ERROR - farm grouping not happening properly")
+  }
   
   # cut dataframe into pieces according to farm arrangement 
   df_all_farms = df %>% 
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_inventory = mean(inventory, na.rm = TRUE),
+      mean_lice = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      sum_inventory = sum(inventory, na.rm = TRUE),
-      sum_lice = sum(lep_tot, na.rm = TRUE)
+      mean_month_inventory = mean(mean_inventory, na.rm = TRUE),
+      mean_month_lice = mean(mean_lice, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      sum_inventory = mean(sum_inventory, na.rm = TRUE),
-      sum_lice = mean(sum_lice, na.rm = TRUE)
+      sum_inventory = mean(mean_month_inventory, na.rm = TRUE),
+      sum_month_lice = mean(mean_month_lice, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       year = as.numeric(as.character(year)),
@@ -255,16 +270,22 @@ prep_df_for_timeseries = function(df) {
     dplyr::filter(
       ktf == 1
     ) %>% 
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_inventory = mean(inventory, na.rm = TRUE),
+      mean_lice = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      sum_inventory = sum(inventory, na.rm = TRUE),    
-      sum_lice = sum(lep_tot, na.rm = TRUE)
+      mean_month_inventory = mean(mean_inventory, na.rm = TRUE),
+      mean_month_lice = mean(mean_lice, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      sum_inventory = mean(sum_inventory, na.rm = TRUE),
-      sum_lice = mean(sum_lice, na.rm = TRUE)
+      sum_inventory = mean(mean_month_inventory, na.rm = TRUE),
+      sum_month_lice = mean(mean_month_lice, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       year = as.numeric(as.character(year)),
@@ -275,16 +296,22 @@ prep_df_for_timeseries = function(df) {
     dplyr::filter(
       hump_sarg_doc == 1
     ) %>% 
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_inventory = mean(inventory, na.rm = TRUE),
+      mean_lice = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      sum_inventory = sum(inventory, na.rm = TRUE),
-      sum_lice = sum(lep_tot, na.rm = TRUE)
+      mean_month_inventory = mean(mean_inventory, na.rm = TRUE),
+      mean_month_lice = mean(mean_lice, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      sum_inventory = mean(sum_inventory, na.rm = TRUE),
-      sum_lice = mean(sum_lice, na.rm = TRUE)
+      sum_inventory = mean(mean_month_inventory, na.rm = TRUE),
+      sum_month_lice = mean(mean_month_lice, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       year = as.numeric(as.character(year)),
@@ -313,7 +340,7 @@ plot_timeseries = function(df, output_path) {
       values = wesanderson::wes_palette("FantasticFox1", 3),
       labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight Inlet-Tribune Channel-Fife Sound")
     ) + 
-    scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
+    scale_x_continuous(breaks = c(2001:2021), labels = c(2001:2021)) +
     theme(
       axis.text.x = element_blank(),
       legend.position = c(0.7, 0.7),
@@ -331,7 +358,7 @@ plot_timeseries = function(df, output_path) {
       values = wesanderson::wes_palette("FantasticFox1", 3),
       labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight Inlet-Tribune Channel-Fife Sound")
     ) + 
-    scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
+    scale_x_continuous(breaks = c(2001:2021), labels = c(2001:2021)) +
     theme(
       axis.text.x = element_text(angle = 90),
       legend.position = "none",
@@ -375,7 +402,7 @@ plot_timeseries = function(df, output_path) {
       values = wesanderson::wes_palette("FantasticFox1", 3),
       labels = c("Farmed Salmon", "Lice on Farmed\nSalmon")
     ) + 
-    scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
+    scale_x_continuous(breaks = c(2001:2021), labels = c(2001:2021)) +
     theme(
       axis.text.x = element_text(angle = 90)
     ) +

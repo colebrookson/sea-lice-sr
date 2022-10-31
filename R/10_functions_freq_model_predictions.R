@@ -95,7 +95,7 @@ make_model_predictions = function(model, scenario) {
 }
 
 #############################
-# make_model_predictions() function
+# save_predict_data() function
 #############################
 save_predict_data = function(df, path, scenario) {
   

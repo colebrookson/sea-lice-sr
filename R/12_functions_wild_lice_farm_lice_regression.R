@@ -19,47 +19,85 @@ make_farm_groupings = function(farm_df) {
   #' and the HSD Triangle Farms, return all three of these dataframes 
   #' grouped by years 
   
+  # trim data first 
+  farm_df = farm_df %>% 
+    dplyr::filter( 
+      year >= 2000,
+      # year < 2021,
+      month %in% c(3, 4)
+    ) %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+      year = as.factor(year), 
+      month = as.factor(month),
+      farm_name = as.factor(farm_name)
+    )
+  
   all_farms <- farm_df %>% 
-    dplyr::filter(year > 2000) %>% 
-    # keep only months that fish actually migrate through during
-    dplyr::filter(month %in% c(3, 4)) %>% 
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_farm_lice = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(year, month) %>% 
+    dplyr::summarize(
+      mean_all_leps = mean(mean_farm_lice, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      all_leps = mean(lep_tot, na.rm = TRUE)
+      all_leps = mean(mean_all_leps, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
-      log_all_farm_leps = base::log10(all_leps)
+      log_all_farm_leps = base::log10(all_leps),
+      year = as.numeric(as.character)
     ) %>% 
     dplyr::select(-all_leps)
   
   # make ktf farm df
   ktf_farms <- farm_df %>%
-    dplyr::filter(year > 2000) %>%
-    # keep only months that fish actually migrate through during
-    dplyr::filter(month %in% c(3, 4)) %>%
-    dplyr::filter(ktf == 1) %>%
-    dplyr::group_by(year) %>%
-    dplyr::summarise(
-      ktf_leps = mean(lep_tot, na.rm = TRUE)
-    ) %>%
+    dplyr::filter(ktf == 1) %>% 
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_farm_lice = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(year, month) %>% 
+    dplyr::summarize(
+      mean_all_leps = mean(mean_farm_lice, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(year) %>% 
+    dplyr::summarize(
+      ktf_leps = mean(mean_all_leps, na.rm = TRUE)
+    ) %>% 
     dplyr::mutate(
-      log_ktf_leps = log10(ktf_leps)
-    ) %>%
+      log_ktf_leps = base::log10(ktf_leps),
+      year = as.numeric(as.character)
+    ) %>% 
     dplyr::select(-ktf_leps)
 
   # make the hsd farms df
   hsd_farms <- farm_df %>%
-    dplyr::filter(year > 2000) %>%
-    # keep only months that fish actually migrate through during
-    dplyr::filter(month %in% c(3, 4)) %>%
     dplyr::filter(hump_sarg_doc == 1) %>%
-    dplyr::group_by(year) %>%
-    dplyr::summarise(
-      hsd_leps = mean(lep_tot, na.rm = TRUE)
-    ) %>%
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_farm_lice = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(year, month) %>% 
+    dplyr::summarize(
+      mean_all_leps = mean(mean_farm_lice, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(year) %>% 
+    dplyr::summarize(
+      hsd_leps = mean(mean_all_leps, na.rm = TRUE)
+    ) %>% 
     dplyr::mutate(
-      log_hsd_leps = log10(hsd_leps)
-    ) %>%
+      log_hsd_leps = base::log10(hsd_leps),
+      year = as.numeric(as.character)
+    ) %>% 
     dplyr::select(-hsd_leps)
 
   # bind together all farm combos
@@ -283,7 +321,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
   }
   
   # once loop is done, take all plot objects and stich them together
-  all_farms_plot = plot_obs[[1]] | plot_obs[[2]] | plot_obs[[3]] | plot_obs[[4]] | 
+   all_farms_plot = plot_obs[[1]] | plot_obs[[2]] | plot_obs[[3]] | plot_obs[[4]] | 
     plot_obs[[5]]
   ggsave(paste0(
     fig_path, "all_farm_scenario_comparison_regression_plots.png"),
@@ -388,7 +426,7 @@ execute_wild_farm_regressions = function(farm_df, all_scen_lice,
 # 
 # library(here)
 # library(tidyverse)
-# library(wesanderson)
+ # library(wesanderson)
 # library(patchwork)
 # 
 # farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
