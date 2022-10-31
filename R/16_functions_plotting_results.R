@@ -147,7 +147,7 @@ make_mortality_plot = function(df_fut, output_path) {
                size = 4, colour = "black", shape = 21) + 
     scale_x_continuous(breaks = c(2002:2021),
                        labels = c(2001:2020)) +
-    labs(x = "Return Year", y = "Estimated Mortality") + 
+    labs(x = "Outmigration Year", y = "Estimated Mortality due to Sea Lice") + 
     ggthemes::theme_base()  + 
     theme(
       axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2)
@@ -207,6 +207,9 @@ focal_plot = function(df_fut, output_path) {
   
 }
 
+#############################
+# prep_df_for_timeseries() function 
+#############################
 prep_df_for_timeseries = function(df) {
   
   #' Take in cleaned joined data from the farms, and plot both inventory and 
@@ -377,12 +380,15 @@ plot_timeseries = function(df, output_path) {
     ) +
     guides(
       linetype = "none"
+    ) +
+    theme(
+      legend.position = c(0.55, 0.7)
     )
   
   ggsave(
     paste0(output_path, "timeseries-ktf-only.png"),
     ktf_only_plot,
-    height = 7, width = 10, 
+    height = 5, width = 7, 
     dpi = 600
   )
   

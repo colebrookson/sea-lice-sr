@@ -197,7 +197,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       if(wild == "scen1_year" & farm == "log_ktf_leps") {
         
         # make plot for this particular model 
-        plot <- ggplot(data = mod_df, aes(x = 10^(farm), y = 10^(wild))) + 
+        plot <- ggplot(data = mod_df, aes(x = farm, y = wild)) + 
           geom_point(
             # use the shape and colour to denote which are which
             fill = "30D5C8", shape = 21,
@@ -209,9 +209,15 @@ wild_farm_regression = function(all_group_farms, wide_lice,
             x = "Lice on Farmed Fish",
             y = "Lice on Wild Fish"
           ) + 
+          scale_x_continuous(breaks = c(4.5, 5.0, 5.477121, 6.0, 6.477121), 
+                             labels = c("3e+04", "1e+05", "3e+05",
+                                        "1e+06", "3e+06")) + 
+          scale_y_continuous(breaks = c(-1.0, -0.5, 0.0, 0.5, 1.0),
+                            labels = c(0.1, 0.3, 1, 3, 10)) +
+          #scale_y_manual(labels = (10^(wild))) +
           annotate(geom = "text", 
-                   x = 10^(min(mod_df$farm, na.rm = TRUE)), 
-                   y = 10^(max(mod_df$wild, na.rm = TRUE)), 
+                   x = min(mod_df$farm, na.rm = TRUE), 
+                   y = max(mod_df$wild, na.rm = TRUE), 
                    label = paste("R^2 ==", round(rsq, 2)),
                    size = 7,
                    parse = TRUE,
