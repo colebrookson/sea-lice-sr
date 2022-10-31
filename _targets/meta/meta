@@ -100,7 +100,7 @@ make_exp_vals_numeric|function|affaac9f25a50dc0|||||||||||||||
 make_farm_groupings|function|ea79a622357443b6|||||||||||||||
 make_map|function|8236f4a9f2fc5b8e|||||||||||||||
 make_model_predictions|function|0bceb3021bb4f2ef|||||||||||||||
-make_mortality_plot|function|3071e732d310ddb7|||||||||||||||
+make_mortality_plot|function|233de249f29e58ef|||||||||||||||
 make_plot_df|function|4455f8af5d8f5418|||||||||||||||
 make_rivers_helper|function|12e319e68476fd40|||||||||||||||
 make_stock_recruit_data_3_pairs|stem|9137a8b8c6fee91c|0ee98f05219823e5|860c9788c9e20fcc|-140145221||t19254.9590203757s|cf4be3bc14963d13|2795|rds|local|vector|||105.933||
@@ -173,7 +173,7 @@ read_regression_mot|function|13e2eb5b56340168|||||||||||||||
 reshape_scenario_lice|function|15041aaee710524d|||||||||||||||
 results_focal_plot_mortality|stem|539d42664d6bcc42|fe1a6c2b9b6bcee2|92218cf6163a1909|-1721027436||t19296.7157193866s|083ed7cd5fdca87c|132|rds|local|vector|||0.678||
 results_plot_c|stem|06cba52c9d1d641a|af3b4604ecac9508|933814e24180fa73|-570322781||t19289.0672776223s|4956b68a23f9e1fc|122|rds|local|vector|||0.782||
-results_plot_mortality|stem|cb878db0ad3f7ceb|28002d7cc44d841f|5cef4c431f072cd9|1213586849||t19296.71571147s|e92536e5890953e5|126|rds|local|vector|||2.09||
+results_plot_mortality|stem|cb878db0ad3f7ceb|28002d7cc44d841f|02e88273bce57a6b|1213586849||t19296.7754106016s|e92536e5890953e5|126|rds|local|vector|||2.133||
 run_models|function|1857275e2604c770|||||||||||||||
 save_beta_regression|function|c900dc45e3930c0d|||||||||||||||
 save_data_chalimus_drawn|function|8388601829929641|||||||||||||||
@@ -261,7 +261,7 @@ theme_farm_grouping|function|5d2a4b8b075eb5fb|||||||||||||||
 theme_mod_comp|function|3e0c4f4884b44fa3|||||||||||||||
 theme_raw_comp|function|792c6c006c7283ec|||||||||||||||
 theme_small_map|function|2d83776b3178fa9f|||||||||||||||
-timeseries_plots|stem|56ce857830d94dbd|37d5654ea7992ad4|b442729800abd3a2|642728573||t19296.7208401341s|bf0d8caacacad815|112|rds|local|vector|||2.141||
+timeseries_plots|stem|56ce857830d94dbd|37d5654ea7992ad4|b442729800abd3a2|642728573||t19296.7748209298s|bf0d8caacacad815|112|rds|local|vector|||2.202||
 trim_clean_dfo_open_data|function|c552a623419ba5a0|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
 trim_nuseds|function|780e273eb24caf14|||||||||||||||
