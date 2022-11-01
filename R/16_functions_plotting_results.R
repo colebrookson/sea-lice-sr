@@ -224,23 +224,10 @@ prep_df_for_timeseries = function(df) {
     ) %>% 
     dplyr::rowwise() %>% 
     dplyr::mutate(
-      day = 1,
-      date = lubridate::make_date(year, month)
-    ) %>% 
-    dplyr::mutate(
       year = as.factor(year), 
       month = as.factor(month),
       farm_name = as.factor(farm_name)
     )
-  
-  # make sure there's not more than one observation for year/month/farm combo
-  test = df %>% 
-    dplyr::group_by(year, month, farm_name) %>% 
-    dplyr::summarize(n_obs = n())
-  
-  if(max(test$n_obs) > 1) {
-    stop("ERROR - farm grouping not happening properly")
-  }
   
   # cut dataframe into pieces according to farm arrangement 
   df_all_farms = df %>% 
@@ -252,14 +239,16 @@ prep_df_for_timeseries = function(df) {
     dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      mean_month_inventory = mean(mean_inventory, na.rm = TRUE),
-      mean_month_lice = mean(mean_lice, na.rm = TRUE)
+      sum_month_inventory = sum(mean_inventory, na.rm = TRUE),
+      sum_month_lice = sum(mean_lice, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      sum_inventory = mean(mean_month_inventory, na.rm = TRUE),
-      sum_month_lice = mean(mean_month_lice, na.rm = TRUE)
+      # NOTE - make sure this is nan.rm
+      sum_inventory = sum(sum_month_inventory, nan.rm = TRUE, 
+                                na.rm = TRUE),
+      sum_lice = sum(sum_month_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       year = as.numeric(as.character(year)),
@@ -278,14 +267,17 @@ prep_df_for_timeseries = function(df) {
     dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      mean_month_inventory = mean(mean_inventory, na.rm = TRUE),
-      mean_month_lice = mean(mean_lice, na.rm = TRUE)
+      # NOTE - make sure this is nan.rm
+      sum_month_inventory = sum(mean_inventory, nan.rm = TRUE, na.rm = TRUE),
+      sum_month_lice = sum(mean_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      sum_inventory = mean(mean_month_inventory, na.rm = TRUE),
-      sum_month_lice = mean(mean_month_lice, na.rm = TRUE)
+      # NOTE - make sure this is nan.rm
+      sum_inventory = sum(sum_month_inventory, nan.rm = TRUE, 
+                                na.rm = TRUE),
+      sum_lice = sum(sum_month_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       year = as.numeric(as.character(year)),
@@ -304,14 +296,17 @@ prep_df_for_timeseries = function(df) {
     dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      mean_month_inventory = mean(mean_inventory, na.rm = TRUE),
-      mean_month_lice = mean(mean_lice, na.rm = TRUE)
+      # NOTE - make sure this is nan.rm
+      sum_month_inventory = sum(mean_inventory, nan.rm = TRUE, na.rm = TRUE),
+      sum_month_lice = sum(mean_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      sum_inventory = mean(mean_month_inventory, na.rm = TRUE),
-      sum_month_lice = mean(mean_month_lice, na.rm = TRUE)
+      # NOTE - make sure this is nan.rm
+      sum_inventory = sum(sum_month_inventory, nan.rm = TRUE, 
+                                na.rm = TRUE),
+      sum_lice = sum(sum_month_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       year = as.numeric(as.character(year)),
@@ -323,6 +318,9 @@ prep_df_for_timeseries = function(df) {
   return(df_farms)
 }
 
+#############################
+# plot_timeseries() function 
+#############################
 plot_timeseries = function(df, output_path) {
   
   #' Plot the two timeseries 
@@ -338,7 +336,8 @@ plot_timeseries = function(df, output_path) {
     scale_fill_manual(
       "Farm Groupings", 
       values = wesanderson::wes_palette("FantasticFox1", 3),
-      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight Inlet-Tribune Channel-Fife Sound")
+      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", 
+                 "Knight Inlet-Tribune Channel-Fife Sound")
     ) + 
     scale_x_continuous(breaks = c(2001:2021), labels = c(2001:2021)) +
     theme(
@@ -356,7 +355,8 @@ plot_timeseries = function(df, output_path) {
     scale_fill_manual(
       "Farm Groupings", 
       values = wesanderson::wes_palette("FantasticFox1", 3),
-      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight Inlet-Tribune Channel-Fife Sound")
+      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", 
+                 "Knight Inlet-Tribune Channel-Fife Sound")
     ) + 
     scale_x_continuous(breaks = c(2001:2021), labels = c(2001:2021)) +
     theme(
@@ -423,7 +423,9 @@ plot_timeseries = function(df, output_path) {
 }
 
 
-# 
+# #############################
+# prep_df_for_timeseries() function 
+#############################
 # df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
 # df_fut = read_csv(here("./outputs/model-outputs/stock-recruit-models/joined-future-mortality-estimates.csv"))
 # 

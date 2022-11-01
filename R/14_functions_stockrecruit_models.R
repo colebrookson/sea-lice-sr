@@ -385,7 +385,7 @@ predict_future_mortality = function(results_list, p_mort,
     add_years[i, "surv"] = 100*(1 - exp(
       val * add_years[i-1, "all_lep"])
     )
-    # use the upper and lower bounds ofthe 95% CI to get the same for the est here
+    # use  upper and lower bounds of the 95% CI to get the same for the est here
     add_years[i, "surv_up"] = 100*(1 - exp(
       val * add_years[i-1, "upper"])
     )
@@ -429,12 +429,12 @@ predict_future_mortality = function(results_list, p_mort,
 # library(parallel)
 # library(broom.mixed)
 # 
-df = read_csv(here("./data/prepped-data/stock-recruit-data-frames/stock-recruit-data-lice-included-3-pairs.csv"))
-predict_df = read_csv(here("./data/wild-lice-data/clean/all-scenario-yearly-lice-per-fish-estimates.csv"))
-
-results_list = prep_bootstrap_data(df, here::here(
-  "./outputs/model-outputs/stock-recruit-models/"
-))
+# df = read_csv(here("./data/prepped-data/stock-recruit-data-frames/stock-recruit-data-lice-included-3-pairs.csv"))
+# predict_df = read_csv(here("./data/wild-lice-data/clean/all-scenario-yearly-lice-per-fish-estimates.csv"))
+# 
+# results_list = prep_bootstrap_data(df, here::here(
+#   "./outputs/model-outputs/stock-recruit-models/"
+# ))
 # ci = perform_bootstrapping(results_list,
 #                         here::here(
 #                           "./outputs/model-outputs/stock-recruit-models/"

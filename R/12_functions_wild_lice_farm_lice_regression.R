@@ -22,7 +22,7 @@ make_farm_groupings = function(farm_df) {
   # trim data first 
   farm_df = farm_df %>% 
     dplyr::filter( 
-      year >= 2000,
+      year > 2000,
       # year < 2021,
       month %in% c(3, 4)
     ) %>% 
@@ -36,21 +36,21 @@ make_farm_groupings = function(farm_df) {
   all_farms <- farm_df %>% 
     dplyr::group_by(year, month, farm_name) %>% 
     dplyr::summarize(
-      mean_farm_lice = mean(lep_tot, na.rm = TRUE)
+      mean_lice = mean(lep_tot, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      mean_all_leps = mean(mean_farm_lice, na.rm = TRUE)
+      sum_month_lice = sum(mean_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      all_leps = mean(mean_all_leps, na.rm = TRUE)
+      all_leps = mean(sum_month_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       log_all_farm_leps = base::log10(all_leps),
-      year = as.numeric(as.character)
+      year = as.numeric(as.character(year))
     ) %>% 
     dplyr::select(-all_leps)
   
@@ -59,21 +59,21 @@ make_farm_groupings = function(farm_df) {
     dplyr::filter(ktf == 1) %>% 
     dplyr::group_by(year, month, farm_name) %>% 
     dplyr::summarize(
-      mean_farm_lice = mean(lep_tot, na.rm = TRUE)
+      mean_lice = mean(lep_tot, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      mean_all_leps = mean(mean_farm_lice, na.rm = TRUE)
+      sum_month_lice = sum(mean_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      ktf_leps = mean(mean_all_leps, na.rm = TRUE)
+      ktf_leps = mean(sum_month_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       log_ktf_leps = base::log10(ktf_leps),
-      year = as.numeric(as.character)
+      year = as.numeric(as.character(year))
     ) %>% 
     dplyr::select(-ktf_leps)
 
@@ -82,21 +82,21 @@ make_farm_groupings = function(farm_df) {
     dplyr::filter(hump_sarg_doc == 1) %>%
     dplyr::group_by(year, month, farm_name) %>% 
     dplyr::summarize(
-      mean_farm_lice = mean(lep_tot, na.rm = TRUE)
+      mean_lice = mean(lep_tot, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      mean_all_leps = mean(mean_farm_lice, na.rm = TRUE)
+      sum_month_lice = sum(mean_lice, nan.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      hsd_leps = mean(mean_all_leps, na.rm = TRUE)
+      hsd_leps = mean(sum_month_lice, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       log_hsd_leps = base::log10(hsd_leps),
-      year = as.numeric(as.character)
+      year = as.numeric(as.character(year))
     ) %>% 
     dplyr::select(-hsd_leps)
 
@@ -189,19 +189,23 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       farm = farm_cols[i]; wild = wild_cols[j]
       # first put the two columns beside each other 
       mod_df = cbind(
-        all_group_farms[ ,c("year", farm)], wide_lice[, wild])
+        all_group_farms[ ,c("year", farm)], wide_lice[, wild]) 
       names(mod_df) = c("year", "farm", "wild")
       mod_df$wild_scenario = wild
       mod_df$farm_group = farm
       
+      mod_df = mod_df %>% 
+        dplyr::filter(!is.na(farm), !is.na(wild))
+      
       # save df ob
       df_obs[[list_loc]] <- mod_df
+      write_csv(mod_df, paste0(data_path, "test.csv"))
       
       # now fit the model
       mod = stats::lm(
-        wild ~ farm, 
-        data = mod_df
+        mod_df$wild ~ mod_df$farm
       )
+      
       # save into the list
       mod_obs[[list_loc]] <- mod
       
@@ -230,7 +234,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       
       # extract adjusted r-squared to put on plot pane
       rsq = model_vals$adj.r.squared
-      
+
       # make special plot for focal scenario 
       if(wild == "scen1_year" & farm == "log_ktf_leps") {
         
@@ -321,22 +325,22 @@ wild_farm_regression = function(all_group_farms, wide_lice,
   }
   
   # once loop is done, take all plot objects and stich them together
-   all_farms_plot = plot_obs[[1]] | plot_obs[[2]] | plot_obs[[3]] | plot_obs[[4]] | 
-    plot_obs[[5]]
+   all_farms_plot = plot_obs[[1]] | plot_obs[[2]] | plot_obs[[3]] | 
+     plot_obs[[4]] | plot_obs[[5]]
   ggsave(paste0(
     fig_path, "all_farm_scenario_comparison_regression_plots.png"),
     all_farms_plot,
     dpi = 600)
   
-  ktf_farms_plot = plot_obs[[6]] | plot_obs[[7]] | plot_obs[[8]] | plot_obs[[9]] | 
-    plot_obs[[10]]
+  ktf_farms_plot = plot_obs[[6]] | plot_obs[[7]] | plot_obs[[8]] | 
+    plot_obs[[9]] | plot_obs[[10]]
   ggsave(paste0(
     fig_path, "ktf_farm_scenario_comparison_regression_plots.png"),
     ktf_farms_plot,
     dpi = 600)
   
-  hsd_farms_plot = plot_obs[[11]] | plot_obs[[12]] | plot_obs[[13]] | plot_obs[[14]] | 
-    plot_obs[[15]]
+  hsd_farms_plot = plot_obs[[11]] | plot_obs[[12]] | plot_obs[[13]] |
+    plot_obs[[14]] | plot_obs[[15]]
   ggsave(paste0(
     fig_path, "hsd_farm_scenario_comparison_regression_plots.png"),
     hsd_farms_plot,
