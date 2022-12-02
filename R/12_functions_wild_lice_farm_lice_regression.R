@@ -23,7 +23,7 @@ make_farm_groupings = function(farm_df) {
   farm_df = farm_df %>% 
     dplyr::filter( 
       year > 2000,
-      # year < 2021,
+      #year < 2021,
       month %in% c(3, 4)
     ) %>% 
     dplyr::rowwise() %>% 
@@ -52,14 +52,15 @@ make_farm_groupings = function(farm_df) {
       log_all_farm_leps = base::log10(all_leps),
       year = as.numeric(as.character(year))
     ) %>% 
-    dplyr::select(-all_leps)
+    dplyr::select(-all_leps) %>% 
+    dplyr::arrange(year)
   
   # make ktf farm df
   ktf_farms <- farm_df %>%
     dplyr::filter(ktf == 1) %>% 
     dplyr::group_by(year, month, farm_name) %>% 
     dplyr::summarize(
-      mean_lice = mean(lep_tot, nan.rm = TRUE, na.rm = TRUE)
+      mean_lice = mean(lep_tot, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
@@ -75,7 +76,8 @@ make_farm_groupings = function(farm_df) {
       log_ktf_leps = base::log10(ktf_leps),
       year = as.numeric(as.character(year))
     ) %>% 
-    dplyr::select(-ktf_leps)
+    dplyr::select(-ktf_leps) %>% 
+    dplyr::arrange(year)
 
   # make the hsd farms df
   hsd_farms <- farm_df %>%
@@ -98,7 +100,8 @@ make_farm_groupings = function(farm_df) {
       log_hsd_leps = base::log10(hsd_leps),
       year = as.numeric(as.character(year))
     ) %>% 
-    dplyr::select(-hsd_leps)
+    dplyr::select(-hsd_leps) %>% 
+    dplyr::arrange(year)
 
   # bind together all farm combos
   all_group_farms <- as_tibble(cbind(
@@ -165,6 +168,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
     # make a column for which shape to use in the plot 
     num = c(21, 22, 23)
   ))
+  
   wild_cols_matching = dplyr::as_tibble(data.frame(
     variable = wild_cols,
     name = c("Scenario 1 (Individual)", "Scenario 1 (Year)", "Scenario 2", 
@@ -199,11 +203,11 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       
       # save df ob
       df_obs[[list_loc]] <- mod_df
-      write_csv(mod_df, paste0(data_path, "test.csv"))
       
       # now fit the model
       mod = stats::lm(
-        mod_df$wild ~ mod_df$farm
+        wild ~ farm,
+        data = mod_df
       )
       
       # save into the list
@@ -248,12 +252,12 @@ wild_farm_regression = function(all_group_farms, wide_lice,
                       colour = "black", alpha = 0.2) +
           ggthemes::theme_base() +
           labs(
-            x = "Lice on Farmed Fish",
+            x = "Lice on Farmed Fish (millions)",
             y = "Lice on Wild Fish"
           ) + 
           scale_x_continuous(breaks = c(4.5, 5.0, 5.477121, 6.0, 6.477121), 
-                             labels = c("3e+04", "1e+05", "3e+05",
-                                        "1e+06", "3e+06")) + 
+                             labels = c("3e+04", "1e+05", "0.3",
+                                        "1.0", "3.0")) + 
           scale_y_continuous(breaks = c(-1.0, -0.5, 0.0, 0.5, 1.0),
                             labels = c(0.1, 0.3, 1, 3, 10)) +
           #scale_y_manual(labels = (10^(wild))) +

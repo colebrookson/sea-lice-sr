@@ -4,7 +4,7 @@ name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iterat
 add_exploitation_rates|function|c3ae98dfa71ba057|||||||||||||||
 add_in_empirical_proportions|function|a420ef2c3a13c047|||||||||||||||
 add_louse_covariate|function|0187486f6c81981e|||||||||||||||
-all_make_map_tasks|function|d180d0299dba6fa2|||||||||||||||
+all_make_map_tasks|function|d1daebee92ab0a30|||||||||||||||
 all_scen_lice|object|31d53f3f746bea73|||||||||||||||
 bati_data|stem|32ad82ed00caff35|15cf45363a6e2bf3|852e69043e58a4af|499463961||t19294.9522569986s|7c32e22f5fe8024c|46929|rds|local|vector|||0.07||
 beta_plot|function|ebcea03278c2e238|||||||||||||||
@@ -44,11 +44,11 @@ dfo_file|object|a999c69c8fb5fac0|||||||||||||||
 execute_c_estimate|function|85e8168161548f21|||||||||||||||
 execute_c_estimates|function|bff6bf3c78c118b5|||||||||||||||
 execute_model_predictions|function|23ee51fa0d300ae3|||||||||||||||
-execute_predictions_plot|function|afcb144b032ed9e3|||||||||||||||
+execute_predictions_plot|function|368d23ab57163660|||||||||||||||
 execute_scenario_models|function|da2348d11cd53bfe|||||||||||||||
 execute_sr_data_prep|function|e1933a04905d295a|||||||||||||||
 execute_sr_database|function|390ab609752fba1c|||||||||||||||
-execute_wild_farm_regressions|function|b9743240b40fb95e|||||||||||||||
+execute_wild_farm_regressions|function|eb11e021e0aefa04|||||||||||||||
 exploitation_rate_data_prep|stem|6c0caf3cccf19c97|92904d22f9209382|0c161a379102fffd|-1069593082||t19294.9542397595s|cc252ff0a2013b06|42339|rds|local|vector|||171.274||
 extract_rivers|function|5b6b1dd86e6183df|||||||||||||||
 farm_df|object|027cb1d149586c0b|||||||||||||||
@@ -81,26 +81,26 @@ get_percent_mortality_estimates|function|8a816640291d112d|||||||||||||||
 get_pink_df|function|f55fbb93cbb1e4ef|||||||||||||||
 inpute_all_chal_data|function|40ab655ae4fa4ca6|||||||||||||||
 join_all_farm_data|stem|39e904881612bd8d|28546ad75a920ccb|efa5e879a70d8533|669325057||t19294.9894317981s|d3dcd166ab52b11a|43575|rds|local|vector|||13.437||
-join_all_scenario_predictions|stem|4de2015a63372fd4|605695e44bfb99e6|db3d6be622bf7d9a|-104754300||t19289.029602565s|4b46c1da1f9fdf71|2774|rds|local|vector|||0.482||
-join_c_estimates|stem|97b4d43d9bbb720e|2278835ec4f9acfc|39996393536cee38|-2080984987||t19289.1005534656s|2121fff93fd2a75d|738|rds|local|vector|||0.138||
+join_all_scenario_predictions|stem|d3efa652072c38b1|605695e44bfb99e6|45c298bd614a69e9|-104754300||t19328.2107964617s|dbbd13d548bf0c5b|2775|rds|local|vector|||0.613||
+join_c_estimates|stem|41ff9ca54747ffa0|2278835ec4f9acfc|c11c5f473cfdecf3|-2080984987||t19328.2347676714s|2121fff93fd2a75d|738|rds|local|vector|||0.033||
 join_clean_bati|function|46d58f5f624347a3|||||||||||||||
 join_clean_late|function|c4b0264fa63ab8d3|||||||||||||||
 join_clean_marty|function|8ea5bfce47c5ef95|||||||||||||||
 join_clean_missing|function|06454f058c3084a2|||||||||||||||
 join_farm_data|function|f4b4f0027dace333|||||||||||||||
-join_future_mortality_estimates|stem|05c76dae5292e192|fd86d20822c2daa9|314207fa3c5ab49a|1298382076||t19297.06673227s|893d10384db0434d|5220|rds|local|vector|||0.056||
-join_mortality_estimates|stem|7a70acc57381e343|6a485ba9367706e8|641d0a610b1945a8|-2023238906||t19289.1005542527s|b545d44254cc75be|3777|rds|local|vector|||0.02||
+join_future_mortality_estimates|stem|69577aff9aecbf22|fd86d20822c2daa9|e2fa06ef830f61c7|1298382076||t19328.2347838286s|893d10384db0434d|5220|rds|local|vector|||0.035||
+join_mortality_estimates|stem|36c73edf4735580a|6a485ba9367706e8|9b4af9c189ea8066|-2023238906||t19328.2347741065s|b545d44254cc75be|3777|rds|local|vector|||0.02||
 join_prediction_df|function|c219b5793a5efa0c|||||||||||||||
 lep_mot_regression|function|a62bd526f9c7fc08|||||||||||||||
 lep_regression_cope|function|146aefd0b2c0e4d0|||||||||||||||
 lep_regression_mot|function|52cbfc489ff75f2a|||||||||||||||
 make_all_farm_groupings|stem||d4727b2418f8bfb6|cf3d1333ab4a043b|-773624273||t19253.1704358326s||0|rds|local|vector|||0.029||object all_group_farms not found
-make_c_plot|function|34f2590019375ec2|||||||||||||||
+make_c_plot|function|42a2650ccaf7160c|||||||||||||||
 make_exp_vals_numeric|function|affaac9f25a50dc0|||||||||||||||
-make_farm_groupings|function|1aac9176dc0c329a|||||||||||||||
-make_map|function|8236f4a9f2fc5b8e|||||||||||||||
+make_farm_groupings|function|1e44fff2c70e12e9|||||||||||||||
+make_map|function|53a2a882a2295a1e|||||||||||||||
 make_model_predictions|function|0bceb3021bb4f2ef|||||||||||||||
-make_mortality_plot|function|60b92c956a984a6d|||||||||||||||
+make_mortality_plot|function|9be7d2cc6c110061|||||||||||||||
 make_plot_df|function|4455f8af5d8f5418|||||||||||||||
 make_rivers_helper|function|12e319e68476fd40|||||||||||||||
 make_stock_recruit_data_3_pairs|stem|9137a8b8c6fee91c|0ee98f05219823e5|860c9788c9e20fcc|-140145221||t19254.9590203757s|cf4be3bc14963d13|2795|rds|local|vector|||105.933||
@@ -110,7 +110,7 @@ marty_data|stem|c4ab7ec277269254|15c300f56e5a141a|ba992c2f2d1765c2|-2054066338||
 marty_df|object|3a45d93842d4016a|||||||||||||||
 match_inventory_data|function|3a9235be65c7451b|||||||||||||||
 model|object|7a21a361734d4bf2|||||||||||||||
-model_all_farm_combos_and_scenarios|stem|82695653912fb434|11572e136d4c43e1|62a708ebdd8aa2f0|712436781||t19297.0542498675s|e4b69e0f4d565cd1|1819|rds|local|vector|||29.514||
+model_all_farm_combos_and_scenarios|stem|49bf948be5577553|11572e136d4c43e1|323c1e1b808aae71|712436781||t19328.2194944805s|1416663ce6eb40fb|1821|rds|local|vector|||29.881||
 model_resids|function|8b5fb9b7dd881971|||||||||||||||
 mot_2001_prediction|function|86754cd5d491f619|||||||||||||||
 motile_proportions_logistic_regression|stem|6dbe1d1ca77fb247|6488863b5ff44390|178068d57c44ddf4|1991784082||t19294.9543191106s|2329c4c5fc3455ae|4814758|rds|local|vector|||3.336|noninteger successes in a binomial glm. Removed 36212 rows containing missing values geom_point.|
@@ -127,24 +127,24 @@ pink_exp|stem|8b12c1732f1744cf|a08edc221a1730d1|c3b5fc02cdc369c1|-1601171014|/ho
 pink_helper|stem|f6ccae6d1010f916|c55132471cd8df2e|c3b5fc02cdc369c1|35854130|/home/cole/Github/sea-lice-sr/./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv|t19198.2831485921s|4413ce7c117b3b1c|2164|file|local|vector|||1.919||
 pink_recon|stem|dec350c963e1d51b|9ae41775d0bdac20|c3b5fc02cdc369c1|-747649540|/home/cole/Github/sea-lice-sr/./data/sr-data/dfo-data/clean/pink-reconstructions.csv|t19198.283148407s|1b6fb6dd0f4ac109|79456|file|local|vector|||0||
 plot_df|function|b8c4d08bbf4ed371|||||||||||||||
-plot_predictions|function|4511d5997207f596|||||||||||||||
-plot_timeseries|function|607944dbb0cfd71e|||||||||||||||
+plot_predictions|function|bc95286f41943c94|||||||||||||||
+plot_timeseries|function|0b45e8f0012469e1|||||||||||||||
 predict_future_mortality|function|771194be8d0224b5|||||||||||||||
 predicted_values_copes|function|b85aedecdb5fbf44|||||||||||||||
 predicted_values_mots|function|3f99ac8fa966cdfb|||||||||||||||
 prediction_plot_cope|function|a31a3882ce6b5eb8|||||||||||||||
 prediction_plot_mot|function|05e48b1f365148f1|||||||||||||||
 prep_bootstrap_data|function|af58c6f364ddb04c|||||||||||||||
-prep_bootstrap_data_scen1indiv_20pairs|stem|342e861edd0fa6af|f7b91902e9bd9a46|e73aa8e25ec12aae|1227903145||t19297.0611154155s|7f63024ef9041140|816365|rds|local|vector|||1.533|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-prep_bootstrap_data_scen1indiv_3pairs|stem|e2881f190d2ec19c|c54925b7fd87c32c|6f070fc5bfa5bdf2|-1715861781||t19297.0562036029s|aa3216f36e8c83e8|1134465|rds|local|vector|||3.652|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-prep_bootstrap_data_scen1year_20pairs|stem|3da61a47bfb6e6a6|8241a4341e8c1284|cacfa5753de87427|-1066085025||t19297.0622208235s|2592cd48a58c2d4d|816331|rds|local|vector|||1.555|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-prep_bootstrap_data_scen1year_3pairs|stem|004b5d0dd41289cb|8d558e568c86c8f8|dd4cf7ee7122f440|-1494872973||t19297.0627891061s|98ad7b33e5de915f|1134634|rds|local|vector|||3.761|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-prep_bootstrap_data_scen2_20pairs|stem|55cd1a14cc4a8591|cfc7e8b22bc49719|cd535ee3c323075e|-1261435458||t19297.0562233249s|eb292cbf9c6ebf9f|816190|rds|local|vector|||1.539|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-prep_bootstrap_data_scen2_3pairs|stem|202d63529fe7460f|ede6c9e464db19e2|9f7076d06f5209e0|2132358924||t19297.058657148s|60255dfcdcb9b19c|1134470|rds|local|vector|||3.446|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-prep_bootstrap_data_scen3_20pairs|stem|f05e13d0bd4bdb00|e7cb7be93e2a85fe|3fd902cfcb03342e|779283119||t19297.0616599946s|b47df9a916b2d8f6|816187|rds|local|vector|||1.763|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-prep_bootstrap_data_scen3_3pairs|stem|3ca743c79e3d225a|c29eca7332c106d2|40c5204dd7a56c01|-442514697||t19297.0587030272s|d6df5e9f27c6dee8|1134391|rds|local|vector|||3.709|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-prep_bootstrap_data_scen4_20pairs|stem|7164625b1f2e2584|ab8b971f980316a9|7f9916638ae8e033|1332080295||t19297.0622009625s|3a17015262b67d59|816114|rds|local|vector|||1.571|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-prep_bootstrap_data_scen4_3pairs|stem|bb3211a56ee91ef0|9f2f638575ee3566|7cdbedc999a25799|-1233833111||t19297.0648008034s|883e44b3cb78edf0|1134307|rds|local|vector|||4.095|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+prep_bootstrap_data_scen1indiv_20pairs|stem|a199adbb49f38152|f7b91902e9bd9a46|a00c566493902499|1227903145||t19328.2296022098s|7f63024ef9041140|816365|rds|local|vector|||1.515|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+prep_bootstrap_data_scen1indiv_3pairs|stem|b3d598dd994ee710|c54925b7fd87c32c|51e69db7ac9bc52c|-1715861781||t19328.2249518383s|aa3216f36e8c83e8|1134465|rds|local|vector|||3.542|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+prep_bootstrap_data_scen1year_20pairs|stem|63777aca8f79b6fd|8241a4341e8c1284|e7d3c051eaa75e7c|-1066085025||t19328.2306430797s|2592cd48a58c2d4d|816331|rds|local|vector|||1.542|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+prep_bootstrap_data_scen1year_3pairs|stem|4c3f5570fccf2c36|8d558e568c86c8f8|64bbaf773ea36754|-1494872973||t19328.2311765469s|98ad7b33e5de915f|1134634|rds|local|vector|||3.578|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+prep_bootstrap_data_scen2_20pairs|stem|acad3d4deec8ae5f|cfc7e8b22bc49719|ae8722db83b5245a|-1261435458||t19328.2249714214s|eb292cbf9c6ebf9f|816190|rds|local|vector|||1.527|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+prep_bootstrap_data_scen2_3pairs|stem|28e4487ee66af91d|ede6c9e464db19e2|dfa16ccb4345119f|2132358924||t19328.2272806116s|60255dfcdcb9b19c|1134470|rds|local|vector|||3.44|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+prep_bootstrap_data_scen3_20pairs|stem|a291150d6fd5de6f|e7cb7be93e2a85fe|5defda73a4b8e778|779283119||t19328.2301144272s|b47df9a916b2d8f6|816187|rds|local|vector|||1.782|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+prep_bootstrap_data_scen3_3pairs|stem|2c97cd1456cd7231|c29eca7332c106d2|c136904f03805fcc|-442514697||t19328.2273235278s|d6df5e9f27c6dee8|1134391|rds|local|vector|||3.457|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+prep_bootstrap_data_scen4_20pairs|stem|a2dfdbd1ab37f17a|ab8b971f980316a9|aff87952e59319f5|1332080295||t19328.2306233577s|3a17015262b67d59|816114|rds|local|vector|||1.51|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+prep_bootstrap_data_scen4_3pairs|stem|6efc58b3e89a6006|9f2f638575ee3566|254086e2002a548a|-1233833111||t19328.2329901876s|883e44b3cb78edf0|1134307|rds|local|vector|||3.321|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
 prep_c_estimate|function|1a03dbec82454c14|||||||||||||||
 prep_c_plot_df|function|11ea6f3cfbc48970|||||||||||||||
 prep_data_cope|function|8940d94c415933c3|||||||||||||||
@@ -171,9 +171,9 @@ read_geo_data|function|71ec2e1d8ebb1dc7|||||||||||||||
 read_regression_cope|function|13e2eb5b56340168|||||||||||||||
 read_regression_mot|function|13e2eb5b56340168|||||||||||||||
 reshape_scenario_lice|function|15041aaee710524d|||||||||||||||
-results_focal_plot_mortality|stem|539d42664d6bcc42|fe1a6c2b9b6bcee2|ddd3d38de90ec210|-1721027436||t19297.0667647234s|083ed7cd5fdca87c|132|rds|local|vector|||0.748||
-results_plot_c|stem|06cba52c9d1d641a|af3b4604ecac9508|933814e24180fa73|-570322781||t19289.0672776223s|4956b68a23f9e1fc|122|rds|local|vector|||0.782||
-results_plot_mortality|stem|cb878db0ad3f7ceb|28002d7cc44d841f|dff039e93fccac2d|1213586849||t19297.0667559735s|e92536e5890953e5|126|rds|local|vector|||2.042||
+results_focal_plot_mortality|stem|c665c5a38b3f7282|fe1a6c2b9b6bcee2|1dc0088586abadb9|-1721027436||t19328.2348157728s|083ed7cd5fdca87c|132|rds|local|vector|||0.719||
+results_plot_c|stem|2b72072102bf1cbf|af3b4604ecac9508|3aeba633a404f02c|-570322781||t19328.2347833194s|4956b68a23f9e1fc|122|rds|local|vector|||0.791||
+results_plot_mortality|stem|2e8befa8145ffd54|28002d7cc44d841f|bbf5a7f1459b6813|1213586849||t19328.2348073469s|e92536e5890953e5|126|rds|local|vector|||2.03||
 run_models|function|4ce0c2cbe80aa7bb|||||||||||||||
 save_beta_regression|function|c900dc45e3930c0d|||||||||||||||
 save_data_chalimus_drawn|function|8388601829929641|||||||||||||||
@@ -209,50 +209,50 @@ set_up_catch_data|function|43f743bf3e70f396|||||||||||||||
 set_up_data|function|217778bd3578233f|||||||||||||||
 set_up_full_sr_database|function|07e48e83ceb6c156|||||||||||||||
 shift_legend|function|002eb46cb67816d9|||||||||||||||
-sr_20_pairs_scen1_indiv|stem|0940418b1ffe4ff5|d6d3583a2d891e36|22d1987d00b1e7a8|-861616739||t19289.0307614883s|d35eb81653bd5660|51576|rds|local|vector|||100.102||
-sr_20_pairs_scen1_year|stem|4eea1d2579b5b451|9d74e09468eff74b|22d1987d00b1e7a8|-1782600088||t19289.033075168s|9fc515762e966f0c|51558|rds|local|vector|||99.515||
-sr_20_pairs_scen2|stem|df54267014703f6c|546cb2fb40ac5582|22d1987d00b1e7a8|1890618198||t19289.0541202636s|ad291326d641817f|51494|rds|local|vector|||106.923||
-sr_20_pairs_scen3|stem|0ca134ba94761f10|267f612d850ccbf1|22d1987d00b1e7a8|-956745750||t19289.0528824979s|d21233456e2c000f|51496|rds|local|vector|||106.367||
-sr_20_pairs_scen4|stem|51435bb8c2da4fda|79d69ee3f2c0e53c|22d1987d00b1e7a8|-750530433||t19289.0516511673s|bb19d2d4cd281af4|51491|rds|local|vector|||109.397||
-sr_3_pairs_scen1_indiv|stem|03dac5e7e91bf49c|0ee98f05219823e5|22d1987d00b1e7a8|-944628811||t19289.0553422887s|e99b2345c38729ae|73559|rds|local|vector|||105.57||
-sr_3_pairs_scen1_year|stem|93191b774bcf4cf0|6e56d805943e2703|22d1987d00b1e7a8|1297494443||t19289.0319231892s|ca38ce4fac5679d5|73538|rds|local|vector|||100.359||
-sr_3_pairs_scen2|stem|4fdb05199ca02545|cf4412766323bad0|22d1987d00b1e7a8|-1091294873||t19289.0343067308s|5bcddc294ee9f137|73433|rds|local|vector|||106.391||
-sr_3_pairs_scen3|stem|945af61e8770d912|c7e734f1a17c9c2d|22d1987d00b1e7a8|278154402||t19289.0368314374s|44ce7b8773f02933|73437|rds|local|vector|||112.486||
-sr_3_pairs_scen4|stem|fdd9567acfc51b55|b623418518f1faf1|22d1987d00b1e7a8|-764555174||t19289.0355293164s|98f917b82859fdef|73434|rds|local|vector|||105.613||
-sr_c_estimate_scen1indiv_20pairs|stem|caa7c64d9e3955c6|4e301aae8c6f02bc|44a89fed06de2008|1897944905||t19297.0610958786s|0eb7ad5ce87b6af8|200|rds|local|vector|||44.984|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-sr_c_estimate_scen1indiv_3pairs|stem|3cf9b6d3debb0399|5ad28975129be4a3|d9e1d97a3292abb7|-1439549567||t19297.0561585569s|3c187ffa31a31952|199|rds|local|vector|||164.888|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-sr_c_estimate_scen1year_20pairs|stem|411079b0d7f2c884|545193da599a1d94|97a6f1be42b724cf|489487874||t19297.0627424861s|3c187ffa31a31952|199|rds|local|vector|||45.068|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-sr_c_estimate_scen1year_3pairs|stem|26c29e50c81790ec|04890bf2b5bc8c16|db3e8d2dec777a51|121810084||t19297.0647496001s|3c187ffa31a31952|199|rds|local|vector|||169.384|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-sr_c_estimate_scen2_20pairs|stem|717f32ed8ee6551b|b0f0fe9191ec1523|de134fc39bb2ed76|-1099115659||t19297.0567423949s|3c187ffa31a31952|199|rds|local|vector|||44.841|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-sr_c_estimate_scen2_3pairs|stem|80f1ad22f9da9b1c|b64d92ad60e57447|2475a3429ff8d133|1789590896||t19297.0586143705s|3c187ffa31a31952|199|rds|local|vector|||161.73|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-sr_c_estimate_scen3_20pairs|stem|ee6ddc8f30ea0603|06a9905ba5219a3f|6d13fa7d668581ab|-1070857198||t19297.0616378651s|3c187ffa31a31952|199|rds|local|vector|||45.131|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-sr_c_estimate_scen3_3pairs|stem|557d63a00f4426ab|53ff9a9569a720ca|303cc309befadee1|-1187517452||t19297.0605750957s|3c187ffa31a31952|199|rds|local|vector|||161.743|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-sr_c_estimate_scen4_20pairs|stem|8ce68f6f451247bd|6a28e11746a7e5b0|372bea5c1de15c77|-1223249118||t19297.0621809164s|3c187ffa31a31952|199|rds|local|vector|||44.997|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-sr_c_estimate_scen4_3pairs|stem|841adbd794bf35e1|c2947236f95fcb8d|e0ca9aa6b663b593|462994879||t19297.0667227793s|3c187ffa31a31952|199|rds|local|vector|||166.057|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
-sr_future_mort_scen1indiv_20pairs|stem|bcbd3be5e0e8479d|9000be12ed1001d8|dc6f71c2081a483c|-1510612632||t19297.066728057s|e67fcb7c0715124a|943|rds|local|vector|||0.046||
-sr_future_mort_scen1indiv_3pairs|stem|09fed808d45bf3df|73f268225e4397a7|4f3137e71222dbd1|-245505407||t19297.066725233s|0ec2cb13f9ef3fc4|941|rds|local|vector|||0.114||
-sr_future_mort_scen1year_20pairs|stem|13742852a68281cd|3d1444fce3bd3657|94686de2ccfa5bd6|1854352161||t19297.0667300478s|0ec2cb13f9ef3fc4|941|rds|local|vector|||0.047||
-sr_future_mort_scen1year_3pairs|stem|a21ac4f5a27a2bc1|65a4f71ec680e7ef|d0df141431a3b17f|-897349338||t19297.0667307422s|b45634dea951f9a1|939|rds|local|vector|||0.051||
-sr_future_mort_scen2_20pairs|stem|743b5681e5ff6b73|aba69568c94a1b39|6d6b70c786eecc8a|861954153||t19297.0667258811s|b37304040ca935dd|935|rds|local|vector|||0.049||
-sr_future_mort_scen2_3pairs|stem|6c596d97b1a9fb94|3bf893bfdc799da2|44daa6d7f83336f5|1921502554||t19297.0667266219s|01fe38ffbdbedf96|934|rds|local|vector|||0.053||
-sr_future_mort_scen3_20pairs|stem|636c6b6042b083bf|e5f8d9301ae21b0b|97d758ddc82a047d|-1545900124||t19297.0667286126s|01fe38ffbdbedf96|934|rds|local|vector|||0.044||
-sr_future_mort_scen3_3pairs|stem|990991fcf73ba4bd|659a35fb818c057b|2ef5a2f7a1701348|1526825165||t19297.0667274552s|9639526e9377fc05|937|rds|local|vector|||0.06||
-sr_future_mort_scen4_20pairs|stem|fe1a2dfc7b8c4dda|91b4229beb5d88b3|2f4e356cf3d388d4|-684524639||t19297.0667294459s|311504d275aea254|933|rds|local|vector|||0.054||
-sr_future_mort_scen4_3pairs|stem|4caeb14f5e71fec3|f2341eb7a0c06fa5|d2d98dfbd77a7b7f|167382170||t19297.0667314366s|01fe38ffbdbedf96|934|rds|local|vector|||0.054||
+sr_20_pairs_scen1_indiv|stem|146af88167e1cacb|d6d3583a2d891e36|fc2dc2679abe9dd7|-861616739||t19328.2167614963s|d35eb81653bd5660|51576|rds|local|vector|||103.18||
+sr_20_pairs_scen1_year|stem|5f8d29c83c02e773|9d74e09468eff74b|fc2dc2679abe9dd7|-1782600088||t19328.2207078955s|9fc515762e966f0c|51558|rds|local|vector|||104.826||
+sr_20_pairs_scen2|stem|0edec7c80e56e8a0|546cb2fb40ac5582|fc2dc2679abe9dd7|1890618198||t19328.2131804656s|ad291326d641817f|51494|rds|local|vector|||102.459||
+sr_20_pairs_scen3|stem|6821c86db584f7f9|267f612d850ccbf1|fc2dc2679abe9dd7|-956745750||t19328.2179557908s|d21233456e2c000f|51496|rds|local|vector|||103.177||
+sr_20_pairs_scen4|stem|1089cb0f09106707|79d69ee3f2c0e53c|fc2dc2679abe9dd7|-750530433||t19328.2191485577s|bb19d2d4cd281af4|51491|rds|local|vector|||103.041||
+sr_3_pairs_scen1_indiv|stem|b727cf57a9d7afc5|0ee98f05219823e5|fc2dc2679abe9dd7|-944628811||t19328.2119944588s|e99b2345c38729ae|73559|rds|local|vector|||103.48||
+sr_3_pairs_scen1_year|stem|e1050d07b2ee236f|6e56d805943e2703|fc2dc2679abe9dd7|1297494443||t19328.2219163568s|ca38ce4fac5679d5|73538|rds|local|vector|||104.395||
+sr_3_pairs_scen2|stem|1483e94cb8c6e76d|cf4412766323bad0|fc2dc2679abe9dd7|-1091294873||t19328.2143682781s|5bcddc294ee9f137|73433|rds|local|vector|||102.609||
+sr_3_pairs_scen3|stem|9ee2fb6f86cafdf9|c7e734f1a17c9c2d|fc2dc2679abe9dd7|278154402||t19328.2155671556s|44ce7b8773f02933|73437|rds|local|vector|||103.566||
+sr_3_pairs_scen4|stem|cf0ee7bc5edb367e|b623418518f1faf1|fc2dc2679abe9dd7|-764555174||t19328.2231336608s|98f917b82859fdef|73434|rds|local|vector|||105.16||
+sr_c_estimate_scen1indiv_20pairs|stem|4dc16c5d2c6b6d9c|4e301aae8c6f02bc|deb1ee6f55356799|1897944905||t19328.2295828119s|0eb7ad5ce87b6af8|200|rds|local|vector|||41.848|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+sr_c_estimate_scen1indiv_3pairs|stem|e343f1d120a9b87d|5ad28975129be4a3|9162de6995403ac6|-1439549567||t19328.2249079035s|3c187ffa31a31952|199|rds|local|vector|||153.29|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+sr_c_estimate_scen1year_20pairs|stem|f12ce90a3b8b9b6c|545193da599a1d94|cd64b7bafbeadc62|489487874||t19328.2311321955s|3c187ffa31a31952|199|rds|local|vector|||42.255|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+sr_c_estimate_scen1year_3pairs|stem|d004a2f8a03c705f|04890bf2b5bc8c16|5ad8b4fd75f789fb|121810084||t19328.2329488917s|3c187ffa31a31952|199|rds|local|vector|||153.125|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+sr_c_estimate_scen2_20pairs|stem|ca8d210ed3743eca|b0f0fe9191ec1523|8bf243b87d59c7a4|-1099115659||t19328.2254601665s|3c187ffa31a31952|199|rds|local|vector|||42.223|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+sr_c_estimate_scen2_3pairs|stem|8d388891301d5dc3|b64d92ad60e57447|8278e3b417bd9aeb|1789590896||t19328.2272377416s|3c187ffa31a31952|199|rds|local|vector|||153.575|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+sr_c_estimate_scen3_20pairs|stem|dbbdf9a51fb3b576|06a9905ba5219a3f|2859f69b23f0a625|-1070857198||t19328.2300919737s|3c187ffa31a31952|199|rds|local|vector|||42.313|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+sr_c_estimate_scen3_3pairs|stem|387cab053e87d756|53ff9a9569a720ca|1fb6cdaf39b7e05b|-1187517452||t19328.2290984183s|3c187ffa31a31952|199|rds|local|vector|||153.341|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+sr_c_estimate_scen4_20pairs|stem|ff13f9364802cc08|6a28e11746a7e5b0|245c2346852c2f02|-1223249118||t19328.2306040523s|3c187ffa31a31952|199|rds|local|vector|||42.298|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+sr_c_estimate_scen4_3pairs|stem|201303f0859fde6a|c2947236f95fcb8d|787fce3372ed19bf|462994879||t19328.2347653566s|3c187ffa31a31952|199|rds|local|vector|||153.364|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling|
+sr_future_mort_scen1indiv_20pairs|stem|485766f8fd0df183|9000be12ed1001d8|5cf079943569319d|-1510612632||t19328.2347709121s|e67fcb7c0715124a|943|rds|local|vector|||0.038||
+sr_future_mort_scen1indiv_3pairs|stem|38a34ac977a7f652|73f268225e4397a7|1e0d459498dde922|-245505407||t19328.2347686899s|0ec2cb13f9ef3fc4|941|rds|local|vector|||0.085||
+sr_future_mort_scen1year_20pairs|stem|5ffe3de44d16ac4f|3d1444fce3bd3657|1878be60c0395352|1854352161||t19328.2347723935s|0ec2cb13f9ef3fc4|941|rds|local|vector|||0.037||
+sr_future_mort_scen1year_3pairs|stem|078a41f667b7e958|65a4f71ec680e7ef|d9fdcce5d97ae0f8|-897349338||t19328.2347731806s|b45634dea951f9a1|939|rds|local|vector|||0.061||
+sr_future_mort_scen2_20pairs|stem|6ee3a90530c6102f|aba69568c94a1b39|124ee7e0fb2ea324|861954153||t19328.2347691991s|b37304040ca935dd|935|rds|local|vector|||0.038||
+sr_future_mort_scen2_3pairs|stem|db715a7e5f5d088f|3bf893bfdc799da2|05ce6d9b55ae1130|1921502554||t19328.2347698473s|01fe38ffbdbedf96|934|rds|local|vector|||0.049||
+sr_future_mort_scen3_20pairs|stem|24227875f2031c57|e5f8d9301ae21b0b|6731ed4e301de572|-1545900124||t19328.2347714213s|01fe38ffbdbedf96|934|rds|local|vector|||0.039||
+sr_future_mort_scen3_3pairs|stem|e1b0bc7223ef00ab|659a35fb818c057b|d4f44afe5d4ea349|1526825165||t19328.2347704028s|9639526e9377fc05|937|rds|local|vector|||0.044||
+sr_future_mort_scen4_20pairs|stem|96066dcb94c448bc|91b4229beb5d88b3|aafbc4c9cb5855b5|-684524639||t19328.2347719306s|1dc6e48f1ab93144|931|rds|local|vector|||0.039||
+sr_future_mort_scen4_3pairs|stem|b41408afce14ac66|f2341eb7a0c06fa5|c7353121f640fada|167382170||t19328.2347737824s|01fe38ffbdbedf96|934|rds|local|vector|||0.045||
 sr_percent_mort_scen1_3pairs|stem|73eb8ade56353ae5|ec0548c935529869|be0bcfa6caefe57b|1200062749||t19257.7083617011s|64b4ef739ce53b18|563|rds|local|vector|||0.025||
-sr_percent_mort_scen1indiv_20pairs|stem|774104c6821396e3|a002fa94566142be|a403964c37783b55|-1264080677||t19297.06672352s|f3cf95d7b5806e03|565|rds|local|vector|||0.009||
-sr_percent_mort_scen1indiv_3pairs|stem|73eb8ade56353ae5|ec0548c935529869|0368df4288778b2d|-392218186||t19297.0667232423s|64b4ef739ce53b18|563|rds|local|vector|||0.033||
-sr_percent_mort_scen1year_20pairs|stem|1bd8641474c43699|f574d022bd5e32cf|91a55eeeab5fd95f|1769340749||t19289.0672622057s|f3cf95d7b5806e03|565|rds|local|vector|||0.006||
-sr_percent_mort_scen1year_3pairs|stem|46da39b42eb7104e|76d3c39fde4bc3d2|1546d16a3f38e412|2038175893||t19289.0672620668s|f3cf95d7b5806e03|565|rds|local|vector|||0.006||
-sr_percent_mort_scen2_20pairs|stem|aa1b8689367797d3|9432abbb8b3db928|522ad35069d3f550|-71540879||t19289.0672629928s|f3cf95d7b5806e03|565|rds|local|vector|||0.007||
-sr_percent_mort_scen2_3pairs|stem|8219d1e3dcf18847|1c4d4acf0d8ceb4e|ffbc2089ec7f2407|-1319377220||t19289.0672623446s|69b70c4f5a79833e|566|rds|local|vector|||0.006||
-sr_percent_mort_scen3_20pairs|stem|b2f44304c41ad1cf|1281aab67da3c6d0|105b7c97e0fec2db|1330325059||t19289.0672628539s|49b5fca74495725e|564|rds|local|vector|||0.006||
-sr_percent_mort_scen3_3pairs|stem|af56afc038d3e6c6|ee763a341b6c9b5a|f8accd833c1045b5|2054180767||t19289.0672625761s|69b70c4f5a79833e|566|rds|local|vector|||0.006||
-sr_percent_mort_scen4_20pairs|stem|a096f27acbef5102|4eb4a28e79488a0a|dabe938414b0c7a3|299688062||t19289.067262715s|64b4ef739ce53b18|563|rds|local|vector|||0.006||
-sr_percent_mort_scen4_3pairs|stem|47a9edeb8fba1aa6|24d12d3b182ad241|dce6d06684d3a775|-1195290236||t19289.0672624835s|f3cf95d7b5806e03|565|rds|local|vector|||0.006||
+sr_percent_mort_scen1indiv_20pairs|stem|d7d9f522f133cf41|a002fa94566142be|e3f3ef5a64400f39|-1264080677||t19328.2347663751s|f3cf95d7b5806e03|565|rds|local|vector|||0.008||
+sr_percent_mort_scen1indiv_3pairs|stem|5d6ca102f41f9181|ec0548c935529869|6666d25ff63e866f|-392218186||t19328.2347657269s|64b4ef739ce53b18|563|rds|local|vector|||0.027||
+sr_percent_mort_scen1year_20pairs|stem|59d6e04695cba47c|f574d022bd5e32cf|50f9fd7c8209de88|1769340749||t19328.2347667917s|f3cf95d7b5806e03|565|rds|local|vector|||0.006||
+sr_percent_mort_scen1year_3pairs|stem|81789c811948aa9a|76d3c39fde4bc3d2|419ab53a45b36b90|2038175893||t19328.2347670232s|f3cf95d7b5806e03|565|rds|local|vector|||0.015||
+sr_percent_mort_scen2_20pairs|stem|66e16cbe1afc4e06|9432abbb8b3db928|11acd5613838511d|-71540879||t19328.2347658658s|f3cf95d7b5806e03|565|rds|local|vector|||0.007||
+sr_percent_mort_scen2_3pairs|stem|f0b9c23cd71629ea|1c4d4acf0d8ceb4e|37c772887832047b|-1319377220||t19328.234766051s|69b70c4f5a79833e|566|rds|local|vector|||0.008||
+sr_percent_mort_scen3_20pairs|stem|1f8dd55dcde53012|1281aab67da3c6d0|5923de043e568268|1330325059||t19328.234766514s|49b5fca74495725e|564|rds|local|vector|||0.006||
+sr_percent_mort_scen3_3pairs|stem|b3155cc87f5fa06d|ee763a341b6c9b5a|86acb7e1101fb48d|2054180767||t19328.2347661899s|69b70c4f5a79833e|566|rds|local|vector|||0.008||
+sr_percent_mort_scen4_20pairs|stem|6dd6d6a101e1bbfd|4eb4a28e79488a0a|f567560ffdc0288b|299688062||t19328.2347666529s|64b4ef739ce53b18|563|rds|local|vector|||0.006||
+sr_percent_mort_scen4_3pairs|stem|95fe2c1d4ac22348|24d12d3b182ad241|5a9b802438caa622|-1195290236||t19328.2347671621s|f3cf95d7b5806e03|565|rds|local|vector|||0.007||
 standardize_names|function|df4fc583e60014a9|||||||||||||||
 stock_recruit_model_scen1_3pairs|stem|3cf9b6d3debb0399|dd8a9b1231e7cb3c|5d3a1c33deeb0f40|-1596842110||t19257.6099850913s|3c187ffa31a31952|199|rds|local|vector|||166.938|Some predictor variables are on very different scales consider rescaling. Some predictor variables are on very different scales consider rescaling. Unknown or uninitialised column scenario.. Unknown or uninitialised column min_pop.. Unknown or uninitialised column scenario.. Unknown or uninitialised column min_pop.|
-study_map|stem|3c5871f4b78b38d7|3c8507d8c020f8f5|6b0ecb72a2469c08|934061817||t19294.9944721699s|ebd1054f3f481e45|110|rds|local|vector|||13.292|Removed 3 rows containing missing values geom_text_repel.|
+study_map|stem|3c5871f4b78b38d7|3c8507d8c020f8f5|0a0436205a1e0704|934061817||t19297.1647164081s|ebd1054f3f481e45|110|rds|local|vector|||14.717|Removed 3 rows containing missing values geom_text_repel.|
 summary_columns|function|578d17c11edaec54|||||||||||||||
 temp|object|de6a0928ab3ebb22|||||||||||||||
 test_all_farm_data|stem|fa414575f26f5f5e|9349ea042b3ca24b|578e8c997a2281a1|288979997||t19294.9944729569s|a1c456b03adbfbf8|44|rds|local|vector|||0.061||
@@ -261,11 +261,11 @@ theme_farm_grouping|function|5d2a4b8b075eb5fb|||||||||||||||
 theme_mod_comp|function|3e0c4f4884b44fa3|||||||||||||||
 theme_raw_comp|function|792c6c006c7283ec|||||||||||||||
 theme_small_map|function|2d83776b3178fa9f|||||||||||||||
-timeseries_plots|stem|56ce857830d94dbd|37d5654ea7992ad4|963d02b642a2206e|642728573||t19297.0530779318s|bf0d8caacacad815|112|rds|local|vector|||2.119||
+timeseries_plots|stem|56ce857830d94dbd|37d5654ea7992ad4|67b23dfb5fdbc70a|642728573||t19297.1618802702s|bf0d8caacacad815|112|rds|local|vector|||2.456||
 trim_clean_dfo_open_data|function|c552a623419ba5a0|||||||||||||||
 trim_marty_data|function|96bfe9a521719dbb|||||||||||||||
 trim_nuseds|function|780e273eb24caf14|||||||||||||||
-wild_farm_regression|function|0d0924efa034da05|||||||||||||||
+wild_farm_regression|function|cc66eec816c81bb9|||||||||||||||
 wild_lice_beta_regression|stem|6fcbcb2559ac7b97|bbc132a8ec09079f|48d57c89702595a4|577821677||t19294.9543669806s|6c5716952e947034|12864|rds|local|vector|||4.128||
 wild_lice_nonlinear_regression|stem|19b987db445948e4|f4908d6d0bdaf050|337501f62a5ecc78|183052523||t19294.9544167024s|aaa5182d0103ecdd|13761|rds|local|vector|||4.287||
 write_bound_file|function|7cc1c305cbb7be90|||||||||||||||

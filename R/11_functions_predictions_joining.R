@@ -127,11 +127,8 @@ plot_predictions = function(all_pred_df, path) {
                       values = PNWColors::pnw_palette("Bay", 5, 
                                                       type = "discrete"),
                       labels = c(
-                        "Scenario 1 - Individual",
-                        "Scenario 1 - Year",
-                        "Scenario 2", 
-                        "Scenario 3",
-                        "Scenario 4"
+                        "Scenario 1", "Scenario 2", "Scenario 3", 
+                        "Scenario 4", "Scenario 5"
                       )) +
     ggthemes::theme_base() +
     theme(

@@ -67,8 +67,8 @@ make_c_plot = function(df_c, output_path) {
       axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2)
     ) + 
     scale_x_discrete(
-      labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)", "Scenario 2", 
-                 "Scenario 3", "Scenario 4")
+      labels = c("Scenario 1", "Scenario 2", "Scenario 3", 
+                 "Scenario 4", "Scenario 5")
     )
   
   ggsave(
@@ -112,8 +112,8 @@ make_mortality_plot = function(df_fut, output_path) {
     scale_shape_manual( 
       "Scenario",
       values = c(21:25),
-      labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)",
-                 "Scenario 2", "Scenario 3", "Scenario 4")) +
+      labels = c("Scenario 1", "Scenario 2", "Scenario 3", 
+                 "Scenario 4", "Scenario 5")) +
     scale_fill_manual(
       "Min. # of S-R \npairs per pop'n",
       values = c("purple", "goldenrod2")
@@ -147,12 +147,19 @@ make_mortality_plot = function(df_fut, output_path) {
                size = 4, colour = "black", shape = 21) + 
     scale_x_continuous(breaks = c(2002:2021),
                        labels = c(2002:2021)) +
-    labs(x = "Return Year", y = "Estimated Mortality due to Sea Lice") + 
+    labs(x = "Return Year", y = "Estimated % Mortality due to Sea Lice") + 
+    scale_y_continuous(breaks = seq(0,100,5), 
+                       labels = c("0", rep("", 4), 
+                                  "25", rep("", 4),
+                                  "50", rep("", 4),
+                                  "75", rep("", 4),
+                                  "100")) + 
     ggthemes::theme_base()  + 
     theme(
-      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2)
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2),
+      axis.ticks.y = element_line()
     ) + 
-    scale_fill_manual("Predicted vs. Estimated", values = c("purple", "orange")) +
+    scale_fill_manual("", values = c("purple", "orange")) +
     theme(
       legend.position = c(0.7, 0.7)
     ) 
@@ -398,9 +405,9 @@ plot_timeseries = function(df, output_path) {
     ggthemes::theme_base() + 
     labs(x = "Year", y = "Numbers (millions)") + 
     scale_fill_manual(
-      "Farm Groupings", 
+      "", 
       values = wesanderson::wes_palette("FantasticFox1", 3),
-      labels = c("Farmed Salmon", "Lice on Farmed\nSalmon")
+      labels = c("Farmed Salmon", "Lice on Farmed Salmon")
     ) + 
     scale_x_continuous(breaks = c(2001:2021), labels = c(2001:2021)) +
     theme(
