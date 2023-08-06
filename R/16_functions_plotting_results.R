@@ -67,8 +67,8 @@ make_c_plot = function(df_c, output_path) {
       axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2)
     ) + 
     scale_x_discrete(
-      labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)", "Scenario 2", 
-                 "Scenario 3", "Scenario 4")
+      labels = c("Scenario 1", "Scenario 2", "Scenario 3", 
+                 "Scenario 4", "Scenario 5")
     )
   
   ggsave(
@@ -112,8 +112,8 @@ make_mortality_plot = function(df_fut, output_path) {
     scale_shape_manual( 
       "Scenario",
       values = c(21:25),
-      labels = c("Scenario 1 (Indiv.)", "Scenario 1 (Year)",
-                 "Scenario 2", "Scenario 3", "Scenario 4")) +
+      labels = c("Scenario 1", "Scenario 2", "Scenario 3", 
+                 "Scenario 4", "Scenario 5")) +
     scale_fill_manual(
       "Min. # of S-R \npairs per pop'n",
       values = c("purple", "goldenrod2")
@@ -146,16 +146,23 @@ make_mortality_plot = function(df_fut, output_path) {
     geom_point(aes(x = year, y = MLE, fill = predict),
                size = 4, colour = "black", shape = 21) + 
     scale_x_continuous(breaks = c(2002:2021),
-                       labels = c(2001:2020)) +
-    labs(x = "Return Year", y = "Estimated Mortality") + 
+                       labels = c(2002:2021)) +
+    labs(x = "Return Year", y = "Estimated % Mortality due to Sea Lice") + 
+    scale_y_continuous(breaks = seq(0,100,5), 
+                       labels = c("0", rep("", 4), 
+                                  "25", rep("", 4),
+                                  "50", rep("", 4),
+                                  "75", rep("", 4),
+                                  "100")) + 
     ggthemes::theme_base()  + 
     theme(
-      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2)
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2),
+      axis.ticks.y = element_line()
     ) + 
-    scale_fill_manual("Predicted vs. Estimated", values = c("purple", "orange")) +
+    scale_fill_manual("", values = c("purple", "orange")) +
     theme(
       legend.position = c(0.7, 0.7)
-    )
+    ) 
   
   ggsave(
     paste0(output_path, "focal-mortality-plot.png"),
@@ -207,6 +214,9 @@ focal_plot = function(df_fut, output_path) {
   
 }
 
+#############################
+# prep_df_for_timeseries() function 
+#############################
 prep_df_for_timeseries = function(df) {
   
   #' Take in cleaned joined data from the farms, and plot both inventory and 
@@ -216,31 +226,36 @@ prep_df_for_timeseries = function(df) {
   df = df %>% 
     dplyr::filter(
       year > 2000,
-      year < 2021,
+      # year < 2021,
       month %in% c(3, 4)
     ) %>% 
     dplyr::rowwise() %>% 
     dplyr::mutate(
-      day = 1,
-      date = lubridate::make_date(year, month)
-    ) %>% 
-    dplyr::mutate(
       year = as.factor(year), 
-      month = as.factor(month)
+      month = as.factor(month),
+      farm_name = as.factor(farm_name)
     )
   
   # cut dataframe into pieces according to farm arrangement 
   df_all_farms = df %>% 
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_inventory = mean(inventory, na.rm = TRUE),
+      mean_lice = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      sum_inventory = sum(inventory, na.rm = TRUE),
-      sum_lice = sum(lep_tot, na.rm = TRUE)
+      sum_month_inventory = sum(mean_inventory, na.rm = TRUE),
+      sum_month_lice = sum(mean_lice, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      sum_inventory = mean(sum_inventory, na.rm = TRUE),
-      sum_lice = mean(sum_lice, na.rm = TRUE)
+      # NOTE - make sure this is nan.rm
+      sum_inventory = sum(sum_month_inventory, nan.rm = TRUE, 
+                                na.rm = TRUE),
+      sum_lice = sum(sum_month_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       year = as.numeric(as.character(year)),
@@ -251,16 +266,25 @@ prep_df_for_timeseries = function(df) {
     dplyr::filter(
       ktf == 1
     ) %>% 
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_inventory = mean(inventory, na.rm = TRUE),
+      mean_lice = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      sum_inventory = sum(inventory, na.rm = TRUE),    
-      sum_lice = sum(lep_tot, na.rm = TRUE)
+      # NOTE - make sure this is nan.rm
+      sum_month_inventory = sum(mean_inventory, nan.rm = TRUE, na.rm = TRUE),
+      sum_month_lice = sum(mean_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      sum_inventory = mean(sum_inventory, na.rm = TRUE),
-      sum_lice = mean(sum_lice, na.rm = TRUE)
+      # NOTE - make sure this is nan.rm
+      sum_inventory = sum(sum_month_inventory, nan.rm = TRUE, 
+                                na.rm = TRUE),
+      sum_lice = sum(sum_month_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       year = as.numeric(as.character(year)),
@@ -271,16 +295,25 @@ prep_df_for_timeseries = function(df) {
     dplyr::filter(
       hump_sarg_doc == 1
     ) %>% 
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_inventory = mean(inventory, na.rm = TRUE),
+      mean_lice = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
     dplyr::group_by(year, month) %>% 
     dplyr::summarize(
-      sum_inventory = sum(inventory, na.rm = TRUE),
-      sum_lice = sum(lep_tot, na.rm = TRUE)
+      # NOTE - make sure this is nan.rm
+      sum_month_inventory = sum(mean_inventory, nan.rm = TRUE, na.rm = TRUE),
+      sum_month_lice = sum(mean_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      sum_inventory = mean(sum_inventory, na.rm = TRUE),
-      sum_lice = mean(sum_lice, na.rm = TRUE)
+      # NOTE - make sure this is nan.rm
+      sum_inventory = sum(sum_month_inventory, nan.rm = TRUE, 
+                                na.rm = TRUE),
+      sum_lice = sum(sum_month_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
       year = as.numeric(as.character(year)),
@@ -292,6 +325,9 @@ prep_df_for_timeseries = function(df) {
   return(df_farms)
 }
 
+#############################
+# plot_timeseries() function 
+#############################
 plot_timeseries = function(df, output_path) {
   
   #' Plot the two timeseries 
@@ -307,9 +343,10 @@ plot_timeseries = function(df, output_path) {
     scale_fill_manual(
       "Farm Groupings", 
       values = wesanderson::wes_palette("FantasticFox1", 3),
-      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight Inlet-Tribune Channel-Fife Sound")
+      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", 
+                 "Knight Inlet-Tribune Channel-Fife Sound")
     ) + 
-    scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
+    scale_x_continuous(breaks = c(2001:2021), labels = c(2001:2021)) +
     theme(
       axis.text.x = element_blank(),
       legend.position = c(0.7, 0.7),
@@ -325,9 +362,10 @@ plot_timeseries = function(df, output_path) {
     scale_fill_manual(
       "Farm Groupings", 
       values = wesanderson::wes_palette("FantasticFox1", 3),
-      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", "Knight Inlet-Tribune Channel-Fife Sound")
+      labels = c("All Farms", "Humphrey, Sargeaunt, & Doctors", 
+                 "Knight Inlet-Tribune Channel-Fife Sound")
     ) + 
-    scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
+    scale_x_continuous(breaks = c(2001:2021), labels = c(2001:2021)) +
     theme(
       axis.text.x = element_text(angle = 90),
       legend.position = "none",
@@ -367,29 +405,34 @@ plot_timeseries = function(df, output_path) {
     ggthemes::theme_base() + 
     labs(x = "Year", y = "Numbers (millions)") + 
     scale_fill_manual(
-      "Farm Groupings", 
+      "", 
       values = wesanderson::wes_palette("FantasticFox1", 3),
-      labels = c("Farmed Salmon", "Lice on Farmed\nSalmon")
+      labels = c("Farmed Salmon", "Lice on Farmed Salmon")
     ) + 
-    scale_x_continuous(breaks = c(2001:2020), labels = c(2001:2020)) +
+    scale_x_continuous(breaks = c(2001:2021), labels = c(2001:2021)) +
     theme(
       axis.text.x = element_text(angle = 90)
     ) +
     guides(
       linetype = "none"
+    ) +
+    theme(
+      legend.position = c(0.55, 0.7)
     )
   
   ggsave(
     paste0(output_path, "timeseries-ktf-only.png"),
     ktf_only_plot,
-    height = 7, width = 10, 
+    height = 5, width = 7, 
     dpi = 600
   )
   
 }
 
 
-# 
+# #############################
+# prep_df_for_timeseries() function 
+#############################
 # df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))
 # df_fut = read_csv(here("./outputs/model-outputs/stock-recruit-models/joined-future-mortality-estimates.csv"))
 # 

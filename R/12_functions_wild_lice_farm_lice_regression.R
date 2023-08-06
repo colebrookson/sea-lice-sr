@@ -19,48 +19,89 @@ make_farm_groupings = function(farm_df) {
   #' and the HSD Triangle Farms, return all three of these dataframes 
   #' grouped by years 
   
+  # trim data first 
+  farm_df = farm_df %>% 
+    dplyr::filter( 
+      year > 2000,
+      #year < 2021,
+      month %in% c(3, 4)
+    ) %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+      year = as.factor(year), 
+      month = as.factor(month),
+      farm_name = as.factor(farm_name)
+    )
+  
   all_farms <- farm_df %>% 
-    dplyr::filter(year > 2000) %>% 
-    # keep only months that fish actually migrate through during
-    dplyr::filter(month %in% c(3, 4)) %>% 
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_lice = mean(lep_tot, nan.rm = TRUE, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(year, month) %>% 
+    dplyr::summarize(
+      sum_month_lice = sum(mean_lice, nan.rm = TRUE, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
-      all_leps = mean(lep_tot, na.rm = TRUE)
+      all_leps = mean(sum_month_lice, nan.rm = TRUE, na.rm = TRUE)
     ) %>% 
     dplyr::mutate(
-      log_all_farm_leps = base::log10(all_leps)
+      log_all_farm_leps = base::log10(all_leps),
+      year = as.numeric(as.character(year))
     ) %>% 
-    dplyr::select(-all_leps)
+    dplyr::select(-all_leps) %>% 
+    dplyr::arrange(year)
   
   # make ktf farm df
   ktf_farms <- farm_df %>%
-    dplyr::filter(year > 2000) %>%
-    # keep only months that fish actually migrate through during
-    dplyr::filter(month %in% c(3, 4)) %>%
-    dplyr::filter(ktf == 1) %>%
-    dplyr::group_by(year) %>%
-    dplyr::summarise(
-      ktf_leps = mean(lep_tot, na.rm = TRUE)
-    ) %>%
+    dplyr::filter(ktf == 1) %>% 
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_lice = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(year, month) %>% 
+    dplyr::summarize(
+      sum_month_lice = sum(mean_lice, nan.rm = TRUE, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(year) %>% 
+    dplyr::summarize(
+      ktf_leps = mean(sum_month_lice, nan.rm = TRUE, na.rm = TRUE)
+    ) %>% 
     dplyr::mutate(
-      log_ktf_leps = log10(ktf_leps)
-    ) %>%
-    dplyr::select(-ktf_leps)
+      log_ktf_leps = base::log10(ktf_leps),
+      year = as.numeric(as.character(year))
+    ) %>% 
+    dplyr::select(-ktf_leps) %>% 
+    dplyr::arrange(year)
 
   # make the hsd farms df
   hsd_farms <- farm_df %>%
-    dplyr::filter(year > 2000) %>%
-    # keep only months that fish actually migrate through during
-    dplyr::filter(month %in% c(3, 4)) %>%
     dplyr::filter(hump_sarg_doc == 1) %>%
-    dplyr::group_by(year) %>%
-    dplyr::summarise(
-      hsd_leps = mean(lep_tot, na.rm = TRUE)
-    ) %>%
+    dplyr::group_by(year, month, farm_name) %>% 
+    dplyr::summarize(
+      mean_lice = mean(lep_tot, na.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(year, month) %>% 
+    dplyr::summarize(
+      sum_month_lice = sum(mean_lice, nan.rm = TRUE)
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::group_by(year) %>% 
+    dplyr::summarize(
+      hsd_leps = mean(sum_month_lice, na.rm = TRUE)
+    ) %>% 
     dplyr::mutate(
-      log_hsd_leps = log10(hsd_leps)
-    ) %>%
-    dplyr::select(-hsd_leps)
+      log_hsd_leps = base::log10(hsd_leps),
+      year = as.numeric(as.character(year))
+    ) %>% 
+    dplyr::select(-hsd_leps) %>% 
+    dplyr::arrange(year)
 
   # bind together all farm combos
   all_group_farms <- as_tibble(cbind(
@@ -127,6 +168,7 @@ wild_farm_regression = function(all_group_farms, wide_lice,
     # make a column for which shape to use in the plot 
     num = c(21, 22, 23)
   ))
+  
   wild_cols_matching = dplyr::as_tibble(data.frame(
     variable = wild_cols,
     name = c("Scenario 1 (Individual)", "Scenario 1 (Year)", "Scenario 2", 
@@ -151,19 +193,23 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       farm = farm_cols[i]; wild = wild_cols[j]
       # first put the two columns beside each other 
       mod_df = cbind(
-        all_group_farms[ ,c("year", farm)], wide_lice[, wild])
+        all_group_farms[ ,c("year", farm)], wide_lice[, wild]) 
       names(mod_df) = c("year", "farm", "wild")
       mod_df$wild_scenario = wild
       mod_df$farm_group = farm
+      
+      mod_df = mod_df %>% 
+        dplyr::filter(!is.na(farm), !is.na(wild))
       
       # save df ob
       df_obs[[list_loc]] <- mod_df
       
       # now fit the model
       mod = stats::lm(
-        wild ~ farm, 
+        wild ~ farm,
         data = mod_df
       )
+      
       # save into the list
       mod_obs[[list_loc]] <- mod
       
@@ -192,12 +238,12 @@ wild_farm_regression = function(all_group_farms, wide_lice,
       
       # extract adjusted r-squared to put on plot pane
       rsq = model_vals$adj.r.squared
-      
+
       # make special plot for focal scenario 
       if(wild == "scen1_year" & farm == "log_ktf_leps") {
         
         # make plot for this particular model 
-        plot <- ggplot(data = mod_df, aes(x = 10^(farm), y = 10^(wild))) + 
+        plot <- ggplot(data = mod_df, aes(x = farm, y = wild)) + 
           geom_point(
             # use the shape and colour to denote which are which
             fill = "30D5C8", shape = 21,
@@ -206,12 +252,18 @@ wild_farm_regression = function(all_group_farms, wide_lice,
                       colour = "black", alpha = 0.2) +
           ggthemes::theme_base() +
           labs(
-            x = "Lice on Farmed Fish",
+            x = "Lice on Farmed Fish (millions)",
             y = "Lice on Wild Fish"
           ) + 
+          scale_x_continuous(breaks = c(4.5, 5.0, 5.477121, 6.0, 6.477121), 
+                             labels = c("3e+04", "1e+05", "0.3",
+                                        "1.0", "3.0")) + 
+          scale_y_continuous(breaks = c(-1.0, -0.5, 0.0, 0.5, 1.0),
+                            labels = c(0.1, 0.3, 1, 3, 10)) +
+          #scale_y_manual(labels = (10^(wild))) +
           annotate(geom = "text", 
-                   x = 10^(min(mod_df$farm, na.rm = TRUE)), 
-                   y = 10^(max(mod_df$wild, na.rm = TRUE)), 
+                   x = min(mod_df$farm, na.rm = TRUE), 
+                   y = max(mod_df$wild, na.rm = TRUE), 
                    label = paste("R^2 ==", round(rsq, 2)),
                    size = 7,
                    parse = TRUE,
@@ -277,22 +329,22 @@ wild_farm_regression = function(all_group_farms, wide_lice,
   }
   
   # once loop is done, take all plot objects and stich them together
-  all_farms_plot = plot_obs[[1]] | plot_obs[[2]] | plot_obs[[3]] | plot_obs[[4]] | 
-    plot_obs[[5]]
+   all_farms_plot = plot_obs[[1]] | plot_obs[[2]] | plot_obs[[3]] | 
+     plot_obs[[4]] | plot_obs[[5]]
   ggsave(paste0(
     fig_path, "all_farm_scenario_comparison_regression_plots.png"),
     all_farms_plot,
     dpi = 600)
   
-  ktf_farms_plot = plot_obs[[6]] | plot_obs[[7]] | plot_obs[[8]] | plot_obs[[9]] | 
-    plot_obs[[10]]
+  ktf_farms_plot = plot_obs[[6]] | plot_obs[[7]] | plot_obs[[8]] | 
+    plot_obs[[9]] | plot_obs[[10]]
   ggsave(paste0(
     fig_path, "ktf_farm_scenario_comparison_regression_plots.png"),
     ktf_farms_plot,
     dpi = 600)
   
-  hsd_farms_plot = plot_obs[[11]] | plot_obs[[12]] | plot_obs[[13]] | plot_obs[[14]] | 
-    plot_obs[[15]]
+  hsd_farms_plot = plot_obs[[11]] | plot_obs[[12]] | plot_obs[[13]] |
+    plot_obs[[14]] | plot_obs[[15]]
   ggsave(paste0(
     fig_path, "hsd_farm_scenario_comparison_regression_plots.png"),
     hsd_farms_plot,
@@ -382,7 +434,7 @@ execute_wild_farm_regressions = function(farm_df, all_scen_lice,
 # 
 # library(here)
 # library(tidyverse)
-# library(wesanderson)
+ # library(wesanderson)
 # library(patchwork)
 # 
 # farm_df = read_csv(here("./data/farm-data/clean/all-farms-joined-clean.csv"))

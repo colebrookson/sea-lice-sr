@@ -124,8 +124,7 @@ clean_geo_data = function(geo_data) {
                      aes(x = long, y = lat, 
                          label = farm_num
                      )) +
-     scale_fill_manual("Farm Group", 
-                       values = c("purple", "#078282FF", "orange", "grey70")) +
+     scale_fill_manual("Location", values = c("purple", "#078282FF", "orange", "grey70")) +
      scale_shape_manual("Farm Group",
                        values = c(21, 22)) +
      ggthemes::theme_base() +
