@@ -1,4 +1,4 @@
-########## 
+##########
 ##########
 # Targets file that has all defined targets to be used in this analysis pipeline
 ##########
@@ -31,926 +31,1001 @@ source(here::here("./R/15_functions_joining_sr_data.R"))
 source(here::here("./R/16_functions_plotting_results.R"))
 source(here::here("./R/17_functions_map.R"))
 
-tar_option_set(packages = c("readr", "here", "dplyr", "magrittr", "ggthemes", 
-                            "ggplot2", "betareg", "lubridate", "glmmTMB", 
-                            "DHARMa", "parallel", "gtable", "grid", "cowplot",
-                            "wesanderson", "patchwork", "stringr", "lme4",
-                            "broom.mixed", "tidyr", "ggrepel", "sp"))
+tar_option_set(packages = c(
+  "readr", "here", "dplyr", "magrittr", "ggthemes",
+  "ggplot2", # "betareg",
+  "lubridate", "glmmTMB",
+  "DHARMa", "parallel", "gtable", "grid", "cowplot",
+  "wesanderson", "patchwork", "stringr", "lme4",
+  "broom.mixed", "tidyr", "ggrepel", "sp"
+))
 list(
   ####################
   # files
   ####################
   tar_target(raw_data_file_marty,
-             here::here(
-               "./data/farm-data/raw/marty-2010-data/marty-data-copied.csv"),
-             format = "file"),
+    here::here(
+      "./data/raw-farm/marty-2010-data/sd01.xlsx"
+    ),
+    format = "file"
+  ),
   tar_target(dfo_farm_ref_data,
-             here::here("./data/farm-data/raw/farm-name-reference.csv"),
-             format = "file"),
+    here::here("./data/raw-farm/canadian-gov-open-data/fish-farm-sea-louse-counts-data.csv"),
+    format = "file"
+  ),
   tar_target(raw_data_file_bati,
-             here::here("./data/farm-data/raw/BATI_farm_louse_data_RAW.csv"),
-             format = "file"),
+    here::here("./data/raw-farm/BATI_farm_louse_data_RAW.csv"),
+    format = "file"
+  ),
   tar_target(raw_open_dfo_data,
-             here::here(
-    "./data/farm-data/raw/gov-open-data/fish-farm-sea-louse-counts-data.csv"),
-             format = "file"),
+    here::here(
+      "./data/raw-farm/canadian-gov-open-data/fish-farm-sea-louse-counts-data.csv"
+    ),
+    format = "file"
+  ),
   tar_target(scfs_raw_data_file,
-             here::here(
-               paste0("./data/wild-lice-data/raw/Sea-lice-database-master/",
-                      "Data/BroughtonSeaLice_fishData.csv")),
-             format = "file"),
-  tar_target(raw_nuseds_raw,
-             here::here(
-               "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"),
-             format = "file"),
-  tar_target(raw_psf_exp,
-             here::here(
-               "./data/sr-data/PSF-PSE/dataset1_stream.csv"),
-             format = "file"),
-  tar_target(raw_pink_exp,
-             here::here(
-               "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"
-             ), format = "file"),
-  tar_target(raw_pink_recon,
-             here::here(
-               "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"
-             ), format = "file"),
-  tar_target(raw_pink_helper,
-             here::here(
-               "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"
-             ), format = "file"),
+    here::here(
+      paste0(
+        "data/louse-data/Sea-lice-database-master/Data/",
+        "BroughtonSeaLice_fishData.csv"
+      )
+    ),
+    format = "file"
+  ),
+  # tar_target(raw_nuseds_raw,
+  #   here::here(
+  #     "./data/sr-data/NuSEDS/NuSEDS_20220902.csv"
+  #   ),
+  #   format = "file"
+  # ),
+  # tar_target(raw_psf_exp,
+  #   here::here(
+  #     "./data/sr-data/PSF-PSE/dataset1_stream.csv"
+  #   ),
+  #   format = "file"
+  # ),
+  # tar_target(raw_pink_exp,
+  #   here::here(
+  #     "./data/sr-data/dfo-data/raw/pink/english-report-translated.csv"
+  #   ),
+  #   format = "file"
+  # ),
+  # tar_target(raw_pink_recon,
+  #   here::here(
+  #     "./data/sr-data/dfo-data/clean/pink-reconstructions.csv"
+  #   ),
+  #   format = "file"
+  # ),
+  # tar_target(raw_pink_helper,
+  #   here::here(
+  #     "./data/sr-data/dfo-data/raw/pink/helper-data-river-cu-match.csv"
+  #   ),
+  #   format = "file"
+  # ),
   tar_target(farm_name_location_helper,
-             here::here(
-               "./data/farm-data/raw/farm-name-reference.csv"
-             ), format = "file"),
-  tar_target(geo_spatial_data,
-             here::here(
-               "./data/geo-data/gadm36_CAN_1_sp.rds"
-             ), format = "file"),
+    here::here(
+      "./data/raw-farm/canadian-gov-open-data/fish-farm-sea-louse-counts-data.csv"
+    ),
+    format = "file"
+  ),
+  # tar_target(geo_spatial_data,
+  #   here::here(
+  #     "./data/geo-data/gadm36_CAN_1_sp.rds"
+  #   ),
+  #   format = "file"
+  # ),
   ####################
   # cleaning data
   ####################
-  tar_target(clean_open_dfo_data,
-             clean_dfo_open_data(
-               get_data_dfo_open(raw_open_dfo_data),
-               here::here("./data/farm-data/clean/dfo-open-data-clean.csv")
-             )),
+  tar_target(
+    clean_open_dfo_data,
+    clean_dfo_open_data(
+      get_data_dfo_open(raw_open_dfo_data),
+      here::here("./data/clean-farm/dfo-open-data-clean.csv")
+    )
+  ),
   tar_target(marty_data,
-             clean_data_marty(
-               raw_data_file_marty,
-               get_data_dfo_ref(dfo_farm_ref_data),
-               here::here("./data/farm-data/clean/marty-data-clean.csv")),
-             format = "rds"),
-  tar_target(bati_data,
-             clean_data_bati(
-               raw_data_file_bati,
-               here::here("./data/farm-data/raw/farm-name-reference.csv"),
-               here::here("./data/farm-data/clean/bati-data-clean.csv"))),
-  tar_target(fill_in_missing_inventories,
-             fill_in_missing_inventory_data(
-               clean_open_dfo_data, 
-               get_data_marty_cleaned(
-                 here::here("./data/farm-data/clean/marty-data-clean.csv")),
-               here::here(
-                 "./data/farm-data/clean/missing-inventory-filled-data.csv")
-             )),
-  tar_target(fill_in_late_timeseries_inventories,
-             match_inventory_data(
-               bati_data,
-               clean_open_dfo_data,
-               here::here("./data/farm-data/clean/wakwa-tsaya-inventory.csv")
-             )),
-  tar_target(join_all_farm_data,
-             join_farm_data(
-               bati_data,
-               get_data_marty_cleaned(
-                 here::here("./data/farm-data/clean/marty-data-clean.csv")),
-               fill_in_missing_inventories,
-               fill_in_late_timeseries_inventories,
-               here::here("./data/farm-data/clean/all-farms-joined-clean.csv")
-             )),
-  tar_target(test_all_farm_data,
-             check_lep_tot_values(
-               join_all_farm_data
-             )),
-  tar_target(prepare_wild_lice_data,
-             clean_data_scfs(
-               get_data_scfs(scfs_raw_data_file),
-               here::here("./data/wild-lice-data/clean/scfs-data-clean.csv")
-             )),
+    clean_data_marty(
+      raw_data_file_marty,
+      get_data_dfo_ref(dfo_farm_ref_data),
+      here::here("./data/clean-farm/marty-data-clean.csv")
+    ),
+    format = "rds"
+  ),
+  tar_target(
+    bati_data,
+    clean_data_bati(
+      raw_data_file_bati,
+      here::here("./data/raw-farm/canadian-gov-open-data/fish-farm-sea-louse-counts-data.csv"),
+      here::here("./data/clean-farm/bati-data-clean.csv")
+    )
+  ),
+  tar_target(
+    fill_in_missing_inventories,
+    fill_in_missing_inventory_data(
+      clean_open_dfo_data,
+      get_data_marty_cleaned(
+        here::here("./data/clean-farm/marty-data-clean.csv")
+      ),
+      here::here(
+        "./data/clean-farm/missing-inventory-filled-data.csv"
+      )
+    )
+  ),
+  tar_target(
+    fill_in_late_timeseries_inventories,
+    match_inventory_data(
+      bati_data,
+      clean_open_dfo_data,
+      here::here("./data/clean-farm/wakwa-tsaya-inventory.csv")
+    )
+  ),
+  tar_target(
+    join_all_farm_data,
+    join_farm_data(
+      bati_data,
+      get_data_marty_cleaned(
+        here::here("./data/clean-farm/marty-data-clean.csv")
+      ),
+      fill_in_missing_inventories,
+      fill_in_late_timeseries_inventories,
+      here::here("./data/clean-farm/all-farms-joined-clean.csv")
+    )
+  ),
+  # tar_target(
+  #   test_all_farm_data,
+  #   check_lep_tot_values(
+  #     join_all_farm_data
+  #   )
+  # ),
+  # tar_target(
+  #   prepare_wild_lice_data,
+  #   clean_data_scfs(
+  #     get_data_scfs(scfs_raw_data_file),
+  #     here::here("./data/wild-lice-data/clean/scfs-data-clean.csv")
+  #   )
+  # ),
   ####################
   # wild lice regressions
   ####################
-  tar_target(motile_proportions_logistic_regression,
-             lep_regression_mot(
-               prepare_wild_lice_data,
-               here::here("./outputs/model-outputs/mot-regression/")
-             )),
-  tar_target(cope_proportions_logistic_regression,
-             lep_regression_cope(
-               prepare_wild_lice_data,
-               here::here("./outputs/model-outputs/cope-regression/")
-             )),
-  tar_target(wild_lice_nonlinear_regression,
-             nonlinear_regression_scenario(
-               prepare_wild_lice_data,
-               here::here("./outputs/model-outputs/nonlinear-regression/")
-             )),
-  tar_target(wild_lice_beta_regression,
-             beta_regression_scenario(
-               prepare_wild_lice_data,
-               here::here("./outputs/model-outputs/beta-regression/")
-             )),
-  tar_target(counting_unid_lice_scenarios,
-             count_unidentified_lice(
-               prepare_wild_lice_data,
-               motile_proportions_logistic_regression, 
-               cope_proportions_logistic_regression,
-               wild_lice_nonlinear_regression, 
-               wild_lice_beta_regression,
-               here::here(
-                 "./data/wild-lice-data/clean/prepared-unid-counted-lice.csv")
-             )),
-  ####################
-  # chalimus inputation
-  ####################
-  tar_target(chalimus_inputation,
-             inpute_all_chal_data(
-               counting_unid_lice_scenarios,
-               here::here(
-                 "./data/wild-lice-data/clean/chalimus-counted-lice.csv")
-             )),
-  ####################
-  # lice counting options
-  ####################
-  tar_target(scenario_1_indiv_counts,
-             scenario1_indiv(
-               chalimus_inputation,
-               here::here(
-                 "./data/prepped-data/scfs-regression-scen1-indiv.csv"
-               )
-             )),
-  tar_target(scenario_1_year_counts,
-             scenario1_year(
-               chalimus_inputation,
-               here::here(
-                 "./data/prepped-data/scfs-regression-scen1-year.csv"
-               )
-             )),
-  tar_target(scenario_2_counts,
-             scenario2(
-               chalimus_inputation,
-               here::here(
-                 "./data/prepped-data/scfs-regression-scen2.csv"
-               )
-             )),
-  tar_target(scenario_3_counts,
-             scenario3(
-               chalimus_inputation,
-               here::here(
-                 "./data/prepped-data/scfs-regression-scen3.csv"
-               )
-             )),
-  tar_target(scenario_4_counts,
-             scenario4(
-               chalimus_inputation,
-               here::here(
-                 "./data/prepped-data/scfs-regression-scen4.csv"
-               )
-             )),
+  # tar_target(
+  #   motile_proportions_logistic_regression,
+  #   lep_regression_mot(
+  #     prepare_wild_lice_data,
+  #     here::here("./outputs/model-outputs/mot-regression/")
+  #   )
+  # ),
+  # tar_target(
+  #   cope_proportions_logistic_regression,
+  #   lep_regression_cope(
+  #     prepare_wild_lice_data,
+  #     here::here("./outputs/model-outputs/cope-regression/")
+  #   )
+  # ),
+  # tar_target(
+  #   wild_lice_nonlinear_regression,
+  #   nonlinear_regression_scenario(
+  #     prepare_wild_lice_data,
+  #     here::here("./outputs/model-outputs/nonlinear-regression/")
+  #   )
+  # ),
+  # tar_target(
+  #   wild_lice_beta_regression,
+  #   beta_regression_scenario(
+  #     prepare_wild_lice_data,
+  #     here::here("./outputs/model-outputs/beta-regression/")
+  #   )
+  # ),
+  # tar_target(
+  #   counting_unid_lice_scenarios,
+  #   count_unidentified_lice(
+  #     prepare_wild_lice_data,
+  #     motile_proportions_logistic_regression,
+  #     cope_proportions_logistic_regression,
+  #     wild_lice_nonlinear_regression,
+  #     wild_lice_beta_regression,
+  #     here::here(
+  #       "./data/wild-lice-data/clean/prepared-unid-counted-lice.csv"
+  #     )
+  #   )
+  # ),
+  # ####################
+  # # chalimus inputation
+  # ####################
+  # tar_target(
+  #   chalimus_inputation,
+  #   inpute_all_chal_data(
+  #     counting_unid_lice_scenarios,
+  #     here::here(
+  #       "./data/wild-lice-data/clean/chalimus-counted-lice.csv"
+  #     )
+  #   )
+  # ),
+  # ####################
+  # # lice counting options
+  # ####################
+  # tar_target(
+  #   scenario_1_indiv_counts,
+  #   scenario1_indiv(
+  #     chalimus_inputation,
+  #     here::here(
+  #       "./data/prepped-data/scfs-regression-scen1-indiv.csv"
+  #     )
+  #   )
+  # ),
+  # tar_target(
+  #   scenario_1_year_counts,
+  #   scenario1_year(
+  #     chalimus_inputation,
+  #     here::here(
+  #       "./data/prepped-data/scfs-regression-scen1-year.csv"
+  #     )
+  #   )
+  # ),
+  # tar_target(
+  #   scenario_2_counts,
+  #   scenario2(
+  #     chalimus_inputation,
+  #     here::here(
+  #       "./data/prepped-data/scfs-regression-scen2.csv"
+  #     )
+  #   )
+  # ),
+  # tar_target(
+  #   scenario_3_counts,
+  #   scenario3(
+  #     chalimus_inputation,
+  #     here::here(
+  #       "./data/prepped-data/scfs-regression-scen3.csv"
+  #     )
+  #   )
+  # ),
+  # tar_target(
+  #   scenario_4_counts,
+  #   scenario4(
+  #     chalimus_inputation,
+  #     here::here(
+  #       "./data/prepped-data/scfs-regression-scen4.csv"
+  #     )
+  #   )
+  # ),
   ####################
   # scenario-specific models of lice per fish
   ####################
-  tar_target(scenario_1_indiv_model,
-             execute_scenario_models(
-               scenario_1_indiv_counts,
-               here::here(
-                 paste0("./outputs/model-outputs/lice-per-fish",
-                        "-regression/scenario-1-indiv/")
-               )
-             )),
-  tar_target(scenario_1_year_model,
-             execute_scenario_models(
-               scenario_1_year_counts,
-               here::here(
-                 paste0("./outputs/model-outputs/lice-per-fish",
-                        "-regression/scenario-1-year/")
-                 )
-               )),
-  tar_target(scenario_2_model,
-             execute_scenario_models(
-               scenario_2_counts,
-               here::here(
-                 paste0("./outputs/model-outputs/lice-per-fish",
-                        "-regression/scenario-2/")
-               )
-             )),
-  tar_target(scenario_3_model,
-             execute_scenario_models(
-               scenario_3_counts,
-               here::here(
-                 paste0("./outputs/model-outputs/lice-per-fish",
-                        "-regression/scenario-3/")
-               )
-             )),
-  tar_target(scenario_4_model,
-             execute_scenario_models(
-               scenario_4_counts,
-               here::here(
-                 paste0("./outputs/model-outputs/lice-per-fish",
-                        "-regression/scenario-4/")
-               )
-             )),
-  tar_target(scenario_1_indiv_prediction,
-             execute_model_predictions(
-               scenario_1_indiv_counts,
-               join_all_farm_data,
-               scenario_1_indiv_model,
-               "scen1_indiv",
-               here::here(
-                 paste0("./outputs/model-outputs/lice-per-fish",
-                        "-regression/scenario-1-indiv/")
-               )
-             )),
-  tar_target(scenario_1_year_prediction,
-             execute_model_predictions(
-               scenario_1_year_counts,
-               join_all_farm_data,
-               scenario_1_year_model,
-               "scen1_year",
-               here::here(
-                 paste0("./outputs/model-outputs/lice-per-fish",
-                        "-regression/scenario-1-year/")
-               )
-             )),
-  tar_target(scenario_2_prediction,
-             execute_model_predictions(
-               scenario_2_counts,
-               join_all_farm_data,
-               scenario_2_model,
-               "scen2",
-               here::here(
-                 paste0("./outputs/model-outputs/lice-per-fish",
-                        "-regression/scenario-2/")
-               )
-             )),
-  tar_target(scenario_3_prediction,
-             execute_model_predictions(
-               scenario_3_counts,
-               join_all_farm_data,
-               scenario_3_model,
-               "scen3",
-               here::here(
-                 paste0("./outputs/model-outputs/lice-per-fish",
-                        "-regression/scenario-3/")
-               )
-             )),
-  tar_target(scenario_4_prediction,
-             execute_model_predictions(
-               scenario_4_counts,
-               join_all_farm_data,
-               scenario_4_model,
-               "scen4",
-               here::here(
-                 paste0("./outputs/model-outputs/lice-per-fish",
-                        "-regression/scenario-4/")
-               )
-             )),
-  tar_target(join_all_scenario_predictions,
-             execute_predictions_plot(
-               scenario_1_indiv_prediction,
-               scenario_1_year_prediction,
-               scenario_2_prediction,
-               scenario_3_prediction,
-               scenario_4_prediction,
-               here::here(
-                 paste0("./data/wild-lice-data/clean/",
-                 "all-scenario-yearly-lice-per-fish-estimates.csv")
-               ),
-               here::here(
-                 "./figs/yearly-lice-per-fish/"
-               )
-             )),
+  # tar_target(scenario_1_indiv_model,
+  #            execute_scenario_models(
+  #              scenario_1_indiv_counts,
+  #              here::here(
+  #                paste0("./outputs/model-outputs/lice-per-fish",
+  #                       "-regression/scenario-1-indiv/")
+  #              )
+  #            )),
+  # tar_target(scenario_1_year_model,
+  #            execute_scenario_models(
+  #              scenario_1_year_counts,
+  #              here::here(
+  #                paste0("./outputs/model-outputs/lice-per-fish",
+  #                       "-regression/scenario-1-year/")
+  #                )
+  #              )),
+  # tar_target(scenario_2_model,
+  #            execute_scenario_models(
+  #              scenario_2_counts,
+  #              here::here(
+  #                paste0("./outputs/model-outputs/lice-per-fish",
+  #                       "-regression/scenario-2/")
+  #              )
+  #            )),
+  # tar_target(scenario_3_model,
+  #            execute_scenario_models(
+  #              scenario_3_counts,
+  #              here::here(
+  #                paste0("./outputs/model-outputs/lice-per-fish",
+  #                       "-regression/scenario-3/")
+  #              )
+  #            )),
+  # tar_target(scenario_4_model,
+  #            execute_scenario_models(
+  #              scenario_4_counts,
+  #              here::here(
+  #                paste0("./outputs/model-outputs/lice-per-fish",
+  #                       "-regression/scenario-4/")
+  #              )
+  #            )),
+  # tar_target(scenario_1_indiv_prediction,
+  #            execute_model_predictions(
+  #              scenario_1_indiv_counts,
+  #              join_all_farm_data,
+  #              scenario_1_indiv_model,
+  #              "scen1_indiv",
+  #              here::here(
+  #                paste0("./outputs/model-outputs/lice-per-fish",
+  #                       "-regression/scenario-1-indiv/")
+  #              )
+  #            )),
+  # tar_target(scenario_1_year_prediction,
+  #            execute_model_predictions(
+  #              scenario_1_year_counts,
+  #              join_all_farm_data,
+  #              scenario_1_year_model,
+  #              "scen1_year",
+  #              here::here(
+  #                paste0("./outputs/model-outputs/lice-per-fish",
+  #                       "-regression/scenario-1-year/")
+  #              )
+  #            )),
+  # tar_target(scenario_2_prediction,
+  #            execute_model_predictions(
+  #              scenario_2_counts,
+  #              join_all_farm_data,
+  #              scenario_2_model,
+  #              "scen2",
+  #              here::here(
+  #                paste0("./outputs/model-outputs/lice-per-fish",
+  #                       "-regression/scenario-2/")
+  #              )
+  #            )),
+  # tar_target(scenario_3_prediction,
+  #            execute_model_predictions(
+  #              scenario_3_counts,
+  #              join_all_farm_data,
+  #              scenario_3_model,
+  #              "scen3",
+  #              here::here(
+  #                paste0("./outputs/model-outputs/lice-per-fish",
+  #                       "-regression/scenario-3/")
+  #              )
+  #            )),
+  # tar_target(scenario_4_prediction,
+  #            execute_model_predictions(
+  #              scenario_4_counts,
+  #              join_all_farm_data,
+  #              scenario_4_model,
+  #              "scen4",
+  #              here::here(
+  #                paste0("./outputs/model-outputs/lice-per-fish",
+  #                       "-regression/scenario-4/")
+  #              )
+  #            )),
+  # tar_target(join_all_scenario_predictions,
+  #            execute_predictions_plot(
+  #              scenario_1_indiv_prediction,
+  #              scenario_1_year_prediction,
+  #              scenario_2_prediction,
+  #              scenario_3_prediction,
+  #              scenario_4_prediction,
+  #              here::here(
+  #                paste0("./data/wild-lice-data/clean/",
+  #                "all-scenario-yearly-lice-per-fish-estimates.csv")
+  #              ),
+  #              here::here(
+  #                "./figs/yearly-lice-per-fish/"
+  #              )
+  #            )),
   ####################
   # wild lice vs. farm lice regressions & results plots
   ####################
-  tar_target(model_all_farm_combos_and_scenarios,
-             execute_wild_farm_regressions(
-               join_all_farm_data,
-               join_all_scenario_predictions,
-               here::here(
-                 "./outputs/model-outputs/wild-farm-regressions/"
-               ),
-               here::here(
-                 "./figs/wild-farm-regressions/"
-               ),
-               here::here(
-                 "./data/prepped-data/predicted-lice-abundance.csv"
-               )
-             )),
+  # tar_target(model_all_farm_combos_and_scenarios,
+  #            execute_wild_farm_regressions(
+  #              join_all_farm_data,
+  #              join_all_scenario_predictions,
+  #              here::here(
+  #                "./outputs/model-outputs/wild-farm-regressions/"
+  #              ),
+  #              here::here(
+  #                "./figs/wild-farm-regressions/"
+  #              ),
+  #              here::here(
+  #                "./data/prepped-data/predicted-lice-abundance.csv"
+  #              )
+  #            )),
   ####################
-  # prepare nuseds data 
+  # prepare nuseds data
   ####################
-  tar_target(exploitation_rate_data_prep,
-             execute_sr_data_prep(
-               raw_nuseds_raw, 
-               raw_pink_exp,
-               raw_pink_recon,
-               raw_pink_helper,
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               )
-             )),
-  # scenario 1 - indiv
-  tar_target(sr_3_pairs_scen1_indiv,
-             execute_sr_database(
-               exploitation_rate_data_prep,
-               3,
-               join_all_scenario_predictions,
-               "scen1_indiv",
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               ),
-               here::here(
-                 "./figs/stock-recruit-data/"
-               )
-             )),
-  tar_target(sr_20_pairs_scen1_indiv,
-             execute_sr_database(
-               exploitation_rate_data_prep,
-               20,
-               join_all_scenario_predictions,
-               "scen1_indiv",
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               ),
-               here::here(
-                 "./figs/stock-recruit-data/"
-               )
-             )),
-  # scenario 1 - year
-  tar_target(sr_3_pairs_scen1_year,
-             execute_sr_database(
-               exploitation_rate_data_prep,
-               3,
-               join_all_scenario_predictions,
-               "scen1_year",
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               ),
-               here::here(
-                 "./figs/stock-recruit-data/"
-               )
-             )),
-  tar_target(sr_20_pairs_scen1_year,
-             execute_sr_database(
-               exploitation_rate_data_prep,
-               20,
-               join_all_scenario_predictions,
-               "scen1_year",
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               ),
-               here::here(
-                 "./figs/stock-recruit-data/"
-               )
-             )),
-  # scenario 2
-  tar_target(sr_3_pairs_scen2,
-             execute_sr_database(
-               exploitation_rate_data_prep,
-               3,
-               join_all_scenario_predictions,
-               "scen2",
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               ),
-               here::here(
-                 "./figs/stock-recruit-data/"
-               )
-             )),
-  tar_target(sr_20_pairs_scen2,
-             execute_sr_database(
-               exploitation_rate_data_prep,
-               20,
-               join_all_scenario_predictions,
-               "scen2",
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               ),
-               here::here(
-                 "./figs/stock-recruit-data/"
-               )
-             )),
-  # scenario 3
-  tar_target(sr_3_pairs_scen3,
-             execute_sr_database(
-               exploitation_rate_data_prep,
-               3,
-               join_all_scenario_predictions,
-               "scen3",
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               ),
-               here::here(
-                 "./figs/stock-recruit-data/"
-               )
-             )),
-  tar_target(sr_20_pairs_scen3,
-             execute_sr_database(
-               exploitation_rate_data_prep,
-               20,
-               join_all_scenario_predictions,
-               "scen3",
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               ),
-               here::here(
-                 "./figs/stock-recruit-data/"
-               )
-             )),
-  # scenario 4
-  tar_target(sr_3_pairs_scen4,
-             execute_sr_database(
-               exploitation_rate_data_prep,
-               3,
-               join_all_scenario_predictions,
-               "scen4",
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               ),
-               here::here(
-                 "./figs/stock-recruit-data/"
-               )
-             )),
-  tar_target(sr_20_pairs_scen4,
-             execute_sr_database(
-               exploitation_rate_data_prep,
-               20,
-               join_all_scenario_predictions,
-               "scen4",
-               here::here(
-                 "./data/prepped-data/stock-recruit-data-frames/"
-               ),
-               here::here(
-                 "./figs/stock-recruit-data/"
-               )
-             )),
-  ####################
-  # fit stock recruit models
-  ####################
-  # scenario 1 - indiv - 3 pairs
-  tar_target(prep_bootstrap_data_scen1indiv_3pairs,
-             prep_bootstrap_data(
-               sr_3_pairs_scen1_indiv,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-indiv/three-pairs/"
-               ))
-             )),
-  tar_target(sr_c_estimate_scen1indiv_3pairs,
-             perform_bootstrapping(
-               sr_3_pairs_scen1_indiv,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-indiv/three-pairs/"
-               ))
-             )),
-  tar_target(sr_percent_mort_scen1indiv_3pairs,
-             get_percent_mortality_estimates(
-               prep_bootstrap_data_scen1indiv_3pairs,
-               sr_c_estimate_scen1indiv_3pairs, 
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-indiv/three-pairs/"
-               ))
-             )),
-  tar_target(sr_future_mort_scen1indiv_3pairs,
-             predict_future_mortality(
-               prep_bootstrap_data_scen1indiv_3pairs,
-               sr_percent_mort_scen1indiv_3pairs,
-               join_all_scenario_predictions,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-indiv/three-pairs/"
-               ))
-             )),
-  # scenario 1 - year - 3 pairs
-  tar_target(prep_bootstrap_data_scen1year_3pairs,
-             prep_bootstrap_data(
-               sr_3_pairs_scen1_year,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-year/three-pairs/"
-               ))
-             )),
-  tar_target(sr_c_estimate_scen1year_3pairs,
-             perform_bootstrapping(
-               sr_3_pairs_scen1_year,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-year/three-pairs/"
-               ))
-             )),
-  tar_target(sr_percent_mort_scen1year_3pairs,
-             get_percent_mortality_estimates(
-               prep_bootstrap_data_scen1year_3pairs,
-               sr_c_estimate_scen1year_3pairs, 
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-year/three-pairs/"
-               ))
-             )),
-  tar_target(sr_future_mort_scen1year_3pairs,
-             predict_future_mortality(
-               prep_bootstrap_data_scen1year_3pairs,
-               sr_percent_mort_scen1year_3pairs,
-               join_all_scenario_predictions,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-year/three-pairs/"
-               ))
-             )),
-  # scenario 1 - indiv - 20 pairs
-  tar_target(prep_bootstrap_data_scen1indiv_20pairs,
-             prep_bootstrap_data(
-               sr_20_pairs_scen1_indiv,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-indiv/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_c_estimate_scen1indiv_20pairs,
-             perform_bootstrapping(
-               sr_20_pairs_scen1_indiv,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-indiv/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_percent_mort_scen1indiv_20pairs,
-             get_percent_mortality_estimates(
-               prep_bootstrap_data_scen1indiv_20pairs,
-               sr_c_estimate_scen1indiv_20pairs, 
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-indiv/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_future_mort_scen1indiv_20pairs,
-             predict_future_mortality(
-               prep_bootstrap_data_scen1indiv_20pairs,
-               sr_percent_mort_scen1indiv_20pairs,
-               join_all_scenario_predictions,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-indiv/twenty-pairs/"
-               ))
-             )),
-  # scenario 1 - year - 20 pairs 
-  tar_target(prep_bootstrap_data_scen1year_20pairs,
-             prep_bootstrap_data(
-               sr_20_pairs_scen1_year,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-year/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_c_estimate_scen1year_20pairs,
-             perform_bootstrapping(
-               sr_20_pairs_scen1_year,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-year/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_percent_mort_scen1year_20pairs,
-             get_percent_mortality_estimates(
-               prep_bootstrap_data_scen1year_20pairs,
-               sr_c_estimate_scen1year_20pairs, 
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-year/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_future_mort_scen1year_20pairs,
-             predict_future_mortality(
-               prep_bootstrap_data_scen1year_20pairs,
-               sr_percent_mort_scen1year_20pairs,
-               join_all_scenario_predictions,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen1-year/twenty-pairs/"
-               ))
-             )),
-  # scenario 2 - 3 pairs 
-  tar_target(prep_bootstrap_data_scen2_3pairs,
-             prep_bootstrap_data(
-               sr_3_pairs_scen2,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen2/three-pairs/"
-               ))
-             )),
-  tar_target(sr_c_estimate_scen2_3pairs,
-             perform_bootstrapping(
-               sr_3_pairs_scen2,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen2/three-pairs/"
-               ))
-             )),
-  tar_target(sr_percent_mort_scen2_3pairs,
-             get_percent_mortality_estimates(
-               prep_bootstrap_data_scen2_3pairs,
-               sr_c_estimate_scen2_3pairs, 
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen2/three-pairs/"
-               ))
-             )),
-  tar_target(sr_future_mort_scen2_3pairs,
-             predict_future_mortality(
-               prep_bootstrap_data_scen2_3pairs,
-               sr_percent_mort_scen2_3pairs,
-               join_all_scenario_predictions,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen2/three-pairs/"
-               ))
-             )),
-  # scenario 2 - 20 pairs 
-  tar_target(prep_bootstrap_data_scen2_20pairs,
-             prep_bootstrap_data(
-               sr_20_pairs_scen2,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen2/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_c_estimate_scen2_20pairs,
-             perform_bootstrapping(
-               sr_20_pairs_scen2,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen2/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_percent_mort_scen2_20pairs,
-             get_percent_mortality_estimates(
-               prep_bootstrap_data_scen2_20pairs,
-               sr_c_estimate_scen2_20pairs, 
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen2/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_future_mort_scen2_20pairs,
-             predict_future_mortality(
-               prep_bootstrap_data_scen2_20pairs,
-               sr_percent_mort_scen2_20pairs,
-               join_all_scenario_predictions,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen2/twenty-pairs/"
-               ))
-             )),
-  # scenario 3 - 3 pairs 
-  tar_target(prep_bootstrap_data_scen3_3pairs,
-             prep_bootstrap_data(
-               sr_3_pairs_scen3,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen3/three-pairs/"
-               ))
-             )),
-  tar_target(sr_c_estimate_scen3_3pairs,
-             perform_bootstrapping(
-               sr_3_pairs_scen3,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen3/three-pairs/"
-               ))
-             )),
-  tar_target(sr_percent_mort_scen3_3pairs,
-             get_percent_mortality_estimates(
-               prep_bootstrap_data_scen3_3pairs,
-               sr_c_estimate_scen3_3pairs, 
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen3/three-pairs/"
-               ))
-             )),
-  tar_target(sr_future_mort_scen3_3pairs,
-             predict_future_mortality(
-               prep_bootstrap_data_scen3_3pairs,
-               sr_percent_mort_scen3_3pairs,
-               join_all_scenario_predictions,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen3/three-pairs/"
-               ))
-             )),
-  # scenario 3 - 20 pairs 
-  tar_target(prep_bootstrap_data_scen3_20pairs,
-             prep_bootstrap_data(
-               sr_20_pairs_scen3,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen3/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_c_estimate_scen3_20pairs,
-             perform_bootstrapping(
-               sr_20_pairs_scen3,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen3/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_percent_mort_scen3_20pairs,
-             get_percent_mortality_estimates(
-               prep_bootstrap_data_scen3_20pairs,
-               sr_c_estimate_scen3_20pairs, 
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen3/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_future_mort_scen3_20pairs,
-             predict_future_mortality(
-               prep_bootstrap_data_scen3_20pairs,
-               sr_percent_mort_scen3_20pairs,
-               join_all_scenario_predictions,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen3/twenty-pairs/"
-               ))
-             )),
-  # scenario 4 - 3 pairs 
-  tar_target(prep_bootstrap_data_scen4_3pairs,
-             prep_bootstrap_data(
-               sr_3_pairs_scen4,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen4/three-pairs/"
-               ))
-             )),
-  tar_target(sr_c_estimate_scen4_3pairs,
-             perform_bootstrapping(
-               sr_3_pairs_scen4,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen4/three-pairs/"
-               ))
-             )),
-  tar_target(sr_percent_mort_scen4_3pairs,
-             get_percent_mortality_estimates(
-               prep_bootstrap_data_scen4_3pairs,
-               sr_c_estimate_scen4_3pairs, 
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen4/three-pairs/"
-               ))
-             )),
-  tar_target(sr_future_mort_scen4_3pairs,
-             predict_future_mortality(
-               prep_bootstrap_data_scen4_3pairs,
-               sr_percent_mort_scen4_3pairs,
-               join_all_scenario_predictions,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen4/three-pairs/"
-               ))
-             )),
-  # scenario 4 - 20 pairs 
-  tar_target(prep_bootstrap_data_scen4_20pairs,
-             prep_bootstrap_data(
-               sr_20_pairs_scen4,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen4/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_c_estimate_scen4_20pairs,
-             perform_bootstrapping(
-               sr_20_pairs_scen4,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen4/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_percent_mort_scen4_20pairs,
-             get_percent_mortality_estimates(
-               prep_bootstrap_data_scen4_20pairs,
-               sr_c_estimate_scen4_20pairs, 
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen4/twenty-pairs/"
-               ))
-             )),
-  tar_target(sr_future_mort_scen4_20pairs,
-             predict_future_mortality(
-               prep_bootstrap_data_scen4_20pairs,
-               sr_percent_mort_scen4_20pairs,
-               join_all_scenario_predictions,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "scen4/twenty-pairs/"
-               ))
-             )),
-  ####################
-  # join data
-  ####################
-  tar_target(join_c_estimates,
-             collect_estimates(
-               sr_c_estimate_scen1indiv_20pairs,
-               sr_c_estimate_scen1indiv_3pairs,
-               sr_c_estimate_scen1year_20pairs,
-               sr_c_estimate_scen1year_3pairs,
-               sr_c_estimate_scen2_20pairs,
-               sr_c_estimate_scen2_3pairs,
-               sr_c_estimate_scen3_20pairs,
-               sr_c_estimate_scen3_3pairs,
-               sr_c_estimate_scen4_20pairs,
-               sr_c_estimate_scen4_3pairs,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "joined-c-estimates.csv"
-               ))
-             )),
-  tar_target(join_mortality_estimates,
-             collect_estimates(
-               sr_percent_mort_scen1indiv_20pairs,
-               sr_percent_mort_scen1indiv_3pairs,
-               sr_percent_mort_scen1year_20pairs,
-               sr_percent_mort_scen1year_3pairs,
-               sr_percent_mort_scen2_20pairs,
-               sr_percent_mort_scen2_3pairs,
-               sr_percent_mort_scen3_20pairs,
-               sr_percent_mort_scen3_3pairs,
-               sr_percent_mort_scen4_20pairs,
-               sr_percent_mort_scen4_3pairs,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "joined-mortality-estimates.csv"
-               ))
-             )),
-  tar_target(join_future_mortality_estimates,
-             collect_estimates(
-               sr_future_mort_scen1indiv_20pairs,
-               sr_future_mort_scen1indiv_3pairs,
-               sr_future_mort_scen1year_20pairs,
-               sr_future_mort_scen1year_3pairs,
-               sr_future_mort_scen2_20pairs,
-               sr_future_mort_scen2_3pairs,
-               sr_future_mort_scen3_20pairs,
-               sr_future_mort_scen3_3pairs,
-               sr_future_mort_scen4_20pairs,
-               sr_future_mort_scen4_3pairs,
-               here::here(paste0(
-                 "./outputs/model-outputs/stock-recruit-models/",
-                 "joined-future-mortality-estimates.csv"
-               ))
-             )),
-  ####################
-  # plot results of stock recruit models
-  ####################
-  tar_target(results_plot_c,
-             make_c_plot(
-               join_c_estimates,
-               here::here(
-                 "./figs/stock-recruit-results/"
-               )
-             )),
-  tar_target(results_plot_mortality, 
-             make_mortality_plot(
-               join_future_mortality_estimates,
-               here::here(
-                 "./figs/stock-recruit-results/"
-               )
-             )),
-  tar_target(results_focal_plot_mortality, 
-             focal_plot(
-               join_future_mortality_estimates,
-               here::here(
-                 "./figs/stock-recruit-results/"
-               )
-             )),
-  tar_target(timeseries_plots,
-             plot_timeseries(
-               join_all_farm_data, 
-               here::here(
-                 "./figs/timeseries/"
-               )
-             )),
-  tar_target(study_map,
-             all_make_map_tasks(
-               geo_spatial_data, 
-               farm_name_location_helper, 
-               join_all_farm_data,
-               here::here(
-                 "./figs/maps/study-map-area.png"
-               )
-             ))
+  # tar_target(exploitation_rate_data_prep,
+  #            execute_sr_data_prep(
+  #              raw_nuseds_raw,
+  #              raw_pink_exp,
+  #              raw_pink_recon,
+  #              raw_pink_helper,
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              )
+  #            )),
+  # # scenario 1 - indiv
+  # tar_target(sr_3_pairs_scen1_indiv,
+  #            execute_sr_database(
+  #              exploitation_rate_data_prep,
+  #              3,
+  #              join_all_scenario_predictions,
+  #              "scen1_indiv",
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              ),
+  #              here::here(
+  #                "./figs/stock-recruit-data/"
+  #              )
+  #            )),
+  # tar_target(sr_20_pairs_scen1_indiv,
+  #            execute_sr_database(
+  #              exploitation_rate_data_prep,
+  #              20,
+  #              join_all_scenario_predictions,
+  #              "scen1_indiv",
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              ),
+  #              here::here(
+  #                "./figs/stock-recruit-data/"
+  #              )
+  #            )),
+  # # scenario 1 - year
+  # tar_target(sr_3_pairs_scen1_year,
+  #            execute_sr_database(
+  #              exploitation_rate_data_prep,
+  #              3,
+  #              join_all_scenario_predictions,
+  #              "scen1_year",
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              ),
+  #              here::here(
+  #                "./figs/stock-recruit-data/"
+  #              )
+  #            )),
+  # tar_target(sr_20_pairs_scen1_year,
+  #            execute_sr_database(
+  #              exploitation_rate_data_prep,
+  #              20,
+  #              join_all_scenario_predictions,
+  #              "scen1_year",
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              ),
+  #              here::here(
+  #                "./figs/stock-recruit-data/"
+  #              )
+  #            )),
+  # # scenario 2
+  # tar_target(sr_3_pairs_scen2,
+  #            execute_sr_database(
+  #              exploitation_rate_data_prep,
+  #              3,
+  #              join_all_scenario_predictions,
+  #              "scen2",
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              ),
+  #              here::here(
+  #                "./figs/stock-recruit-data/"
+  #              )
+  #            )),
+  # tar_target(sr_20_pairs_scen2,
+  #            execute_sr_database(
+  #              exploitation_rate_data_prep,
+  #              20,
+  #              join_all_scenario_predictions,
+  #              "scen2",
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              ),
+  #              here::here(
+  #                "./figs/stock-recruit-data/"
+  #              )
+  #            )),
+  # # scenario 3
+  # tar_target(sr_3_pairs_scen3,
+  #            execute_sr_database(
+  #              exploitation_rate_data_prep,
+  #              3,
+  #              join_all_scenario_predictions,
+  #              "scen3",
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              ),
+  #              here::here(
+  #                "./figs/stock-recruit-data/"
+  #              )
+  #            )),
+  # tar_target(sr_20_pairs_scen3,
+  #            execute_sr_database(
+  #              exploitation_rate_data_prep,
+  #              20,
+  #              join_all_scenario_predictions,
+  #              "scen3",
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              ),
+  #              here::here(
+  #                "./figs/stock-recruit-data/"
+  #              )
+  #            )),
+  # # scenario 4
+  # tar_target(sr_3_pairs_scen4,
+  #            execute_sr_database(
+  #              exploitation_rate_data_prep,
+  #              3,
+  #              join_all_scenario_predictions,
+  #              "scen4",
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              ),
+  #              here::here(
+  #                "./figs/stock-recruit-data/"
+  #              )
+  #            )),
+  # tar_target(sr_20_pairs_scen4,
+  #            execute_sr_database(
+  #              exploitation_rate_data_prep,
+  #              20,
+  #              join_all_scenario_predictions,
+  #              "scen4",
+  #              here::here(
+  #                "./data/prepped-data/stock-recruit-data-frames/"
+  #              ),
+  #              here::here(
+  #                "./figs/stock-recruit-data/"
+  #              )
+  #            )),
+  # ####################
+  # # fit stock recruit models
+  # ####################
+  # # scenario 1 - indiv - 3 pairs
+  # tar_target(prep_bootstrap_data_scen1indiv_3pairs,
+  #            prep_bootstrap_data(
+  #              sr_3_pairs_scen1_indiv,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-indiv/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_c_estimate_scen1indiv_3pairs,
+  #            perform_bootstrapping(
+  #              sr_3_pairs_scen1_indiv,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-indiv/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_percent_mort_scen1indiv_3pairs,
+  #            get_percent_mortality_estimates(
+  #              prep_bootstrap_data_scen1indiv_3pairs,
+  #              sr_c_estimate_scen1indiv_3pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-indiv/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_future_mort_scen1indiv_3pairs,
+  #            predict_future_mortality(
+  #              prep_bootstrap_data_scen1indiv_3pairs,
+  #              sr_percent_mort_scen1indiv_3pairs,
+  #              join_all_scenario_predictions,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-indiv/three-pairs/"
+  #              ))
+  #            )),
+  # # scenario 1 - year - 3 pairs
+  # tar_target(prep_bootstrap_data_scen1year_3pairs,
+  #            prep_bootstrap_data(
+  #              sr_3_pairs_scen1_year,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-year/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_c_estimate_scen1year_3pairs,
+  #            perform_bootstrapping(
+  #              sr_3_pairs_scen1_year,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-year/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_percent_mort_scen1year_3pairs,
+  #            get_percent_mortality_estimates(
+  #              prep_bootstrap_data_scen1year_3pairs,
+  #              sr_c_estimate_scen1year_3pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-year/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_future_mort_scen1year_3pairs,
+  #            predict_future_mortality(
+  #              prep_bootstrap_data_scen1year_3pairs,
+  #              sr_percent_mort_scen1year_3pairs,
+  #              join_all_scenario_predictions,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-year/three-pairs/"
+  #              ))
+  #            )),
+  # # scenario 1 - indiv - 20 pairs
+  # tar_target(prep_bootstrap_data_scen1indiv_20pairs,
+  #            prep_bootstrap_data(
+  #              sr_20_pairs_scen1_indiv,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-indiv/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_c_estimate_scen1indiv_20pairs,
+  #            perform_bootstrapping(
+  #              sr_20_pairs_scen1_indiv,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-indiv/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_percent_mort_scen1indiv_20pairs,
+  #            get_percent_mortality_estimates(
+  #              prep_bootstrap_data_scen1indiv_20pairs,
+  #              sr_c_estimate_scen1indiv_20pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-indiv/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_future_mort_scen1indiv_20pairs,
+  #            predict_future_mortality(
+  #              prep_bootstrap_data_scen1indiv_20pairs,
+  #              sr_percent_mort_scen1indiv_20pairs,
+  #              join_all_scenario_predictions,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-indiv/twenty-pairs/"
+  #              ))
+  #            )),
+  # # scenario 1 - year - 20 pairs
+  # tar_target(prep_bootstrap_data_scen1year_20pairs,
+  #            prep_bootstrap_data(
+  #              sr_20_pairs_scen1_year,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-year/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_c_estimate_scen1year_20pairs,
+  #            perform_bootstrapping(
+  #              sr_20_pairs_scen1_year,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-year/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_percent_mort_scen1year_20pairs,
+  #            get_percent_mortality_estimates(
+  #              prep_bootstrap_data_scen1year_20pairs,
+  #              sr_c_estimate_scen1year_20pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-year/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_future_mort_scen1year_20pairs,
+  #            predict_future_mortality(
+  #              prep_bootstrap_data_scen1year_20pairs,
+  #              sr_percent_mort_scen1year_20pairs,
+  #              join_all_scenario_predictions,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen1-year/twenty-pairs/"
+  #              ))
+  #            )),
+  # # scenario 2 - 3 pairs
+  # tar_target(prep_bootstrap_data_scen2_3pairs,
+  #            prep_bootstrap_data(
+  #              sr_3_pairs_scen2,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen2/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_c_estimate_scen2_3pairs,
+  #            perform_bootstrapping(
+  #              sr_3_pairs_scen2,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen2/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_percent_mort_scen2_3pairs,
+  #            get_percent_mortality_estimates(
+  #              prep_bootstrap_data_scen2_3pairs,
+  #              sr_c_estimate_scen2_3pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen2/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_future_mort_scen2_3pairs,
+  #            predict_future_mortality(
+  #              prep_bootstrap_data_scen2_3pairs,
+  #              sr_percent_mort_scen2_3pairs,
+  #              join_all_scenario_predictions,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen2/three-pairs/"
+  #              ))
+  #            )),
+  # # scenario 2 - 20 pairs
+  # tar_target(prep_bootstrap_data_scen2_20pairs,
+  #            prep_bootstrap_data(
+  #              sr_20_pairs_scen2,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen2/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_c_estimate_scen2_20pairs,
+  #            perform_bootstrapping(
+  #              sr_20_pairs_scen2,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen2/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_percent_mort_scen2_20pairs,
+  #            get_percent_mortality_estimates(
+  #              prep_bootstrap_data_scen2_20pairs,
+  #              sr_c_estimate_scen2_20pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen2/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_future_mort_scen2_20pairs,
+  #            predict_future_mortality(
+  #              prep_bootstrap_data_scen2_20pairs,
+  #              sr_percent_mort_scen2_20pairs,
+  #              join_all_scenario_predictions,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen2/twenty-pairs/"
+  #              ))
+  #            )),
+  # # scenario 3 - 3 pairs
+  # tar_target(prep_bootstrap_data_scen3_3pairs,
+  #            prep_bootstrap_data(
+  #              sr_3_pairs_scen3,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen3/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_c_estimate_scen3_3pairs,
+  #            perform_bootstrapping(
+  #              sr_3_pairs_scen3,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen3/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_percent_mort_scen3_3pairs,
+  #            get_percent_mortality_estimates(
+  #              prep_bootstrap_data_scen3_3pairs,
+  #              sr_c_estimate_scen3_3pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen3/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_future_mort_scen3_3pairs,
+  #            predict_future_mortality(
+  #              prep_bootstrap_data_scen3_3pairs,
+  #              sr_percent_mort_scen3_3pairs,
+  #              join_all_scenario_predictions,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen3/three-pairs/"
+  #              ))
+  #            )),
+  # # scenario 3 - 20 pairs
+  # tar_target(prep_bootstrap_data_scen3_20pairs,
+  #            prep_bootstrap_data(
+  #              sr_20_pairs_scen3,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen3/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_c_estimate_scen3_20pairs,
+  #            perform_bootstrapping(
+  #              sr_20_pairs_scen3,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen3/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_percent_mort_scen3_20pairs,
+  #            get_percent_mortality_estimates(
+  #              prep_bootstrap_data_scen3_20pairs,
+  #              sr_c_estimate_scen3_20pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen3/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_future_mort_scen3_20pairs,
+  #            predict_future_mortality(
+  #              prep_bootstrap_data_scen3_20pairs,
+  #              sr_percent_mort_scen3_20pairs,
+  #              join_all_scenario_predictions,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen3/twenty-pairs/"
+  #              ))
+  #            )),
+  # # scenario 4 - 3 pairs
+  # tar_target(prep_bootstrap_data_scen4_3pairs,
+  #            prep_bootstrap_data(
+  #              sr_3_pairs_scen4,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen4/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_c_estimate_scen4_3pairs,
+  #            perform_bootstrapping(
+  #              sr_3_pairs_scen4,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen4/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_percent_mort_scen4_3pairs,
+  #            get_percent_mortality_estimates(
+  #              prep_bootstrap_data_scen4_3pairs,
+  #              sr_c_estimate_scen4_3pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen4/three-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_future_mort_scen4_3pairs,
+  #            predict_future_mortality(
+  #              prep_bootstrap_data_scen4_3pairs,
+  #              sr_percent_mort_scen4_3pairs,
+  #              join_all_scenario_predictions,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen4/three-pairs/"
+  #              ))
+  #            )),
+  # # scenario 4 - 20 pairs
+  # tar_target(prep_bootstrap_data_scen4_20pairs,
+  #            prep_bootstrap_data(
+  #              sr_20_pairs_scen4,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen4/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_c_estimate_scen4_20pairs,
+  #            perform_bootstrapping(
+  #              sr_20_pairs_scen4,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen4/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_percent_mort_scen4_20pairs,
+  #            get_percent_mortality_estimates(
+  #              prep_bootstrap_data_scen4_20pairs,
+  #              sr_c_estimate_scen4_20pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen4/twenty-pairs/"
+  #              ))
+  #            )),
+  # tar_target(sr_future_mort_scen4_20pairs,
+  #            predict_future_mortality(
+  #              prep_bootstrap_data_scen4_20pairs,
+  #              sr_percent_mort_scen4_20pairs,
+  #              join_all_scenario_predictions,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "scen4/twenty-pairs/"
+  #              ))
+  #            )),
+  # ####################
+  # # join data
+  # ####################
+  # tar_target(join_c_estimates,
+  #            collect_estimates(
+  #              sr_c_estimate_scen1indiv_20pairs,
+  #              sr_c_estimate_scen1indiv_3pairs,
+  #              sr_c_estimate_scen1year_20pairs,
+  #              sr_c_estimate_scen1year_3pairs,
+  #              sr_c_estimate_scen2_20pairs,
+  #              sr_c_estimate_scen2_3pairs,
+  #              sr_c_estimate_scen3_20pairs,
+  #              sr_c_estimate_scen3_3pairs,
+  #              sr_c_estimate_scen4_20pairs,
+  #              sr_c_estimate_scen4_3pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "joined-c-estimates.csv"
+  #              ))
+  #            )),
+  # tar_target(join_mortality_estimates,
+  #            collect_estimates(
+  #              sr_percent_mort_scen1indiv_20pairs,
+  #              sr_percent_mort_scen1indiv_3pairs,
+  #              sr_percent_mort_scen1year_20pairs,
+  #              sr_percent_mort_scen1year_3pairs,
+  #              sr_percent_mort_scen2_20pairs,
+  #              sr_percent_mort_scen2_3pairs,
+  #              sr_percent_mort_scen3_20pairs,
+  #              sr_percent_mort_scen3_3pairs,
+  #              sr_percent_mort_scen4_20pairs,
+  #              sr_percent_mort_scen4_3pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "joined-mortality-estimates.csv"
+  #              ))
+  #            )),
+  # tar_target(join_future_mortality_estimates,
+  #            collect_estimates(
+  #              sr_future_mort_scen1indiv_20pairs,
+  #              sr_future_mort_scen1indiv_3pairs,
+  #              sr_future_mort_scen1year_20pairs,
+  #              sr_future_mort_scen1year_3pairs,
+  #              sr_future_mort_scen2_20pairs,
+  #              sr_future_mort_scen2_3pairs,
+  #              sr_future_mort_scen3_20pairs,
+  #              sr_future_mort_scen3_3pairs,
+  #              sr_future_mort_scen4_20pairs,
+  #              sr_future_mort_scen4_3pairs,
+  #              here::here(paste0(
+  #                "./outputs/model-outputs/stock-recruit-models/",
+  #                "joined-future-mortality-estimates.csv"
+  #              ))
+  #            )),
+  # ####################
+  # # plot results of stock recruit models
+  # ####################
+  # tar_target(results_plot_c,
+  #            make_c_plot(
+  #              join_c_estimates,
+  #              here::here(
+  #                "./figs/stock-recruit-results/"
+  #              )
+  #            )),
+  # tar_target(results_plot_mortality,
+  #            make_mortality_plot(
+  #              join_future_mortality_estimates,
+  #              here::here(
+  #                "./figs/stock-recruit-results/"
+  #              )
+  #            )),
+  # tar_target(results_focal_plot_mortality,
+  #            focal_plot(
+  #              join_future_mortality_estimates,
+  #              here::here(
+  #                "./figs/stock-recruit-results/"
+  #              )
+  #            )),
+  tar_target(
+    timeseries_plots,
+    plot_timeseries(
+      join_all_farm_data,
+      here::here(
+        "./figs/timeseries/"
+      )
+    )
+  )
+  # tar_target(
+  #   study_map,
+  #   all_make_map_tasks(
+  #     geo_spatial_data,
+  #     farm_name_location_helper,
+  #     join_all_farm_data,
+  #     here::here(
+  #       "./figs/maps/study-map-area.png"
+  #     )
+  #   )
+  # )
 )
