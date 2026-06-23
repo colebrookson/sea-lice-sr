@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 .Rproj.user
 .Rhistory
 .RData
@@ -8,7 +8,7 @@
 /data/farm-data/raw/BAMP_farm_inventory
 /data/sr-data/NuSEDS/NuSEDS_20220902.csv
 /data/
-=======
+
 # R session artifacts
 .Rhistory
 .RData
@@ -32,4 +32,4 @@ Thumbs.db
 # keep out snakemake stuff
 results/
 .snakemake/
->>>>>>> repo-new/main
+
