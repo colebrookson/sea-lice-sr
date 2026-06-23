@@ -1,0 +1,48 @@
+# config/config.yaml
+#
+# scripts and rules read these via snakemake.config (Python) or 
+# snakemake@config (R)
+
+
+# ---------------------------------------------------------------------------
+# Datasets
+#
+# Each entry becomes a wildcard value {dataset} in the pipeline, and {type} is a 
+# second wildcard that the piepline can use
+# ---------------------------------------------------------------------------
+datasets:
+  type_1:
+    dataset_a:
+      path: resources/type_1/dataset_a.csv
+      date_col: date
+    dataset_b:
+      path: resources/type_1/dataset_b.csv
+      date_col: obs_date
+
+  type_2:
+    dataset_c:
+      path: resources/type_2/dataset_c.csv
+      date_col: report_date
+    dataset_d:
+      path: resources/type_2/dataset_d.csv
+      date_col: date
+
+
+# ---------------------------------------------------------------------------
+# Processing parameters - type-specific parameters live under their own key
+# ---------------------------------------------------------------------------
+processing:
+  type_1:
+    # these are just examples!
+    drop_na: true
+  type_2:
+    drop_na: false
+
+# ---------------------------------------------------------------------------
+# Model parameters - one can imagine what these do
+# ---------------------------------------------------------------------------
+model:
+  iter_warmup: 500
+  iter_sampling: 1000
+  chains: 4
+  seed: 42

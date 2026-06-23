@@ -1,0 +1,23 @@
+Package: myproject
+Type: Project
+Title: My R Project
+Version: 0.0.0.9000
+Authors@R:
+    person(given = "Cole",
+           family = "Brookson",
+           role = c("aut", "cre"),
+           email = "cole.brookson@gmail.com")
+Description: A short description of what this project does.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 4.4)
+Imports:
+    conflicted,
+    here,
+    dplyr,
+    ggplot2,
+    tibble,
+    tidyr,
+    readr,
+    purrr

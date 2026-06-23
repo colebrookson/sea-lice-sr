@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .Rproj.user
 .Rhistory
 .RData
@@ -7,3 +8,28 @@
 /data/farm-data/raw/BAMP_farm_inventory
 /data/sr-data/NuSEDS/NuSEDS_20220902.csv
 /data/
+=======
+# R session artifacts
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+# output and cache directories (add to version control intentionally if needed)
+output/
+figures/
+cache/
+*.qs
+*.qs2
+
+# raw data (usually too large or sensitive to commit)
+data/raw/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# keep out snakemake stuff
+results/
+.snakemake/
+>>>>>>> repo-new/main

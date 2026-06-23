@@ -1,0 +1,40 @@
+{
+  "name": "myproject",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "REditorSupport.r",
+        "ms-azuretools.vscode-docker",
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ],
+      "settings": {
+        "r.rterm.linux": "/usr/local/bin/arf",
+        "r.bracketedPaste": true,
+        "r.sessionWatcher": true,
+        "editor.formatOnSave": false,
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/usr/bin/zsh"
+          }
+        }
+      }
+    }
+  },
+  "remoteUser": "root",
+  // workspaceMount/workspaceFolder set to /workspace so Snakemake's relative
+  // paths (config/, resources/, results/) resolve the same as outside the container
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+  // mount host SSH keys read-only so git push/pull over SSH works inside the container
+  // add project-specific credential mounts here, e.g.:
+  //   "source=${env:HOME}/.cdsapirc,target=/root/.cdsapirc,type=bind,readonly"
+  "mounts": [
+    "source=${env:HOME}/.ssh,target=/root/.ssh,type=bind,readonly"
+  ]
+}

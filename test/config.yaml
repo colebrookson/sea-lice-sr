@@ -1,0 +1,22 @@
+datasets:
+  climate:
+    test_climate:
+      path: test/resources//type_1/test_a.csv
+      date_col: date
+  surveillance:
+    test_surveillance:
+      path: test/resources/type_2/test_b.csv
+      date_col: date
+
+processing:
+  type_1:
+    drop_na: true
+  type_2:
+    drop_na: false
+
+
+model:
+  iter_warmup: 50      # just enough to check it runs
+  iter_sampling: 100
+  chains: 1
+  seed: 42
