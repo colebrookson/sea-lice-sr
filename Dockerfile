@@ -29,16 +29,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Python environment — changes when pyproject.toml changes, nothing all that 
 # special here
 # ---------------------------------------------------------------------------
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-venv \
-    && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     python3 \
+#     python3-venv \
+#     && rm -rf /var/lib/apt/lists/*
 
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+# RUN python3 -m venv /opt/venv
+# ENV PATH="/opt/venv/bin:$PATH"
 
-COPY pyproject.toml /tmp/pyproject.toml
-RUN pip install --no-cache-dir /tmp/pyproject.toml
+# COPY pyproject.toml /tmp/pyproject.toml
+# RUN pip install --no-cache-dir /tmp/pyproject.toml
 
 # ---------------------------------------------------------------------------
 # R packages — changes when DESCRIPTION changes
