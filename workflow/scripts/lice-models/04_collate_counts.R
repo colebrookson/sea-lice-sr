@@ -3,9 +3,8 @@
 #' AUTHOR: Cole Brookson
 #' DATE: 21 January 2026
 
-source(here::here("./R/functions/theme_better.R"))
-source(here::here("./R/functions/global.R"))
-
+source(here::here("./workflow/scripts/functions/theme_better.R"))
+source(here::here("./workflow/scripts/functions/global.R"))
 library(magrittr)
 library(ggplot2)
 
@@ -45,7 +44,7 @@ collated_df$lep_chal <- 0
 collated_df$cal_chal <- 0
 for (i in to_impute_rows) {
     if (collated_df$year[i] == 2001) {
-        # assign probability for 2005
+        # assign probability for 2001
         probs <- c(
             collated_df[[i, "avg_prop_mots"]], # prob of drawing lep (1)
             (1 - collated_df[[i, "avg_prop_mots"]])

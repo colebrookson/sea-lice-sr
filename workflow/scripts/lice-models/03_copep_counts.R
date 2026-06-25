@@ -6,8 +6,8 @@
 #' AUTHOR: Cole
 
 # load things in ---------------------------------------------------------------
-source(here::here("./R/functions/theme_better.R"))
-source(here::here("./R/functions/global.R"))
+source(here::here("./workflow/scripts/functions/theme_better.R"))
+source(here::here("./workflow/scripts/functions/global.R"))
 
 library(magrittr)
 library(ggplot2)
