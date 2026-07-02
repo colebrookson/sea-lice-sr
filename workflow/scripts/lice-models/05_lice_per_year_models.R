@@ -12,32 +12,39 @@ collated_df <- readr::read_csv(
     here::here("./data/scfs-data/clean/lice-counts-for-regression.csv")
 )
 farm_df <- readr::read_csv(
-    here::here("./data/farm-data/clean/clean-farm-data.csv")
+    here::here("./data/broughton-farm-data/all-options-compiled.csv")
 )
 # Part 1 - organize lice data for this -----------------------------------------
 
-#' NOTE FOR LEILA, ignore this part and go ahead and use your wild lice modeled
-#' values here, this is just so the model will fit for you:
-wild_lice_per_year <- data.frame(
-    year = c(2001:2023),
-    mean_wild_lice = c(
-        9.0037313, 3.9539007, 0.6508876, 5.6494940, 2.8152591,
-        0.6557377, 0.6539394, 0.5535181, 0.1416242, 0.6933216, 0.2657576,
-        0.4585431, 0.3129630, 0.2666865, 1.5319379, 0.6037806, 0.7668203,
-        0.2712294, 0.9468723, 0.3640020, 0.9231094, 1.0608016, 0.2303622
-    )
-)
-
 farm_lice_per_year <- farm_df %>%
-    dplyr::filter(year %in% c(2001:2023)) %>%
-    dplyr::filter(month %in% c(3, 4)) %>% # changed to march, april, and may
+    dplyr::filter(year %in% c(2001:max(collated_df$year))) %>%
+    dplyr::filter(month %in% c(3, 4)) %>% # changed to march, april
     dplyr::group_by(year) %>%
+    # make the total louse counts for the various options
+    dplyr::mutate(
+        marty_lep_tot = marty_inventory * marty_mot_lep_per_fish, 
+        bati_lep_tot = bati_inventory * bati_mot_lep_per_fish, 
+        av_lep_tot = my_mean(marty_lep_tot, bati_lep_tot)
+    ) %>%
     dplyr::summarize(
-        mean_farm_lice = my_mean(lep_tot)
+        marty_mean_lep_tot = my_mean(marty_lep_tot), 
+        bati_mean_lep_tot = my_mean(bati_lep_tot),
+        av_mean_lep_tot = my_mean(av_lep_tot)
     ) %>%
     dplyr::mutate(
-        log_farm_lice = log10(mean_farm_lice)
+        log_marty_mean_lep_tot = log10(marty_mean_lep_tot),
+        log_bati_mean_lep_tot = log10(bati_mean_lep_tot),
+        log_av_mean_lep_tot = log10(av_mean_lep_tot)
     )
+
+wild_lice_per_year <- collated_df %>% 
+    dplyr::filter(month %in% c(3,4)) %>% 
+    dplyr::group_by(year) %>% 
+    dplyr::summarize(
+        mean_all_leps = my_mean(all_leps),
+        mean_lep_mots = my_mean(lep_mot)
+    )
+
 
 yearly_lice_data <- cbind(
     farm_lice_per_year[, c("year", "mean_farm_lice")],
