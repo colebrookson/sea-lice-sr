@@ -19,22 +19,25 @@ farm_df <- readr::read_csv(
 farm_lice_per_year <- farm_df %>%
     dplyr::filter(year %in% c(2001:max(collated_df$year))) %>%
     dplyr::filter(month %in% c(3, 4)) %>% # changed to march, april
-    dplyr::group_by(year) %>%
     # make the total louse counts for the various options
     dplyr::mutate(
         marty_lep_tot = marty_inventory * marty_mot_lep_per_fish, 
         bati_lep_tot = bati_inventory * bati_mot_lep_per_fish, 
-        av_lep_tot = my_mean(marty_lep_tot, bati_lep_tot)
+        av_lep_tot = my_mean(marty_lep_tot, bati_lep_tot),
+        best_lep_tot = best_inventory * best_mot_lep_per_fish
     ) %>%
+    dplyr::group_by(year) %>%
     dplyr::summarize(
         marty_mean_lep_tot = my_mean(marty_lep_tot), 
         bati_mean_lep_tot = my_mean(bati_lep_tot),
-        av_mean_lep_tot = my_mean(av_lep_tot)
+        av_mean_lep_tot = my_mean(av_lep_tot),
+        best_mean_lep_tot = my_mean(best_lep_tot)
     ) %>%
     dplyr::mutate(
         log_marty_mean_lep_tot = log10(marty_mean_lep_tot),
         log_bati_mean_lep_tot = log10(bati_mean_lep_tot),
-        log_av_mean_lep_tot = log10(av_mean_lep_tot)
+        log_av_mean_lep_tot = log10(av_mean_lep_tot),
+        log_best_mean_lep_tot = log10(best_mean_lep_tot)
     )
 
 wild_lice_per_year <- collated_df %>% 
@@ -46,13 +49,15 @@ wild_lice_per_year <- collated_df %>%
     )
 
 
-yearly_lice_data <- cbind(
-    farm_lice_per_year[, c("year", "mean_farm_lice")],
-    wild_lice_per_year[, "mean_wild_lice"]
+yearly_lice_data <- dplyr::left_join(
+    farm_lice_per_year, 
+    wild_lice_per_year,
+    by = "year"
 )
-yearly_lice_data$group <- "All Farms with Available Data"
 
-simple_mod <- stats::lm(
+fit_extract_plot <- function(df, wild_lice, farm_lice, 
+wild_choice, farm_choice) {
+    simple_mod <- stats::lm(
     mean_wild_lice ~ mean_farm_lice,
     data = yearly_lice_data
 )
@@ -86,6 +91,9 @@ ggsave(
     dpi = 300,
     height = 8, width = 11
 )
+}
+
+
 
 # try with other relationships -------------------------------------------------
 farm_ktc_lice_per_year <- farm_df %>%
