@@ -176,3 +176,69 @@ fish_df |>
     ) +
     ggplot2::labs(y = "Observations") +
     theme_better()
+
+
+lice_vars   <- c("all_lice", "lep_mot", "all_sp_mot")
+metric_labs <- c(all_lice   = "All lice",
+                 lep_mot    = "Motile Lepeophtheirus",
+                 all_sp_mot = "All motile lice")
+metric_cols <- MoMAColors::moma.colors("Klein", type = "discrete")[c(1, 3, 6)]
+names(metric_cols) <- lice_vars
+
+lice_month_plot <- function(data, intensity = FALSE) {
+    long <- data |>
+        tidyr::pivot_longer(dplyr::all_of(lice_vars),
+                            names_to = "metric", values_to = "count") |>
+        dplyr::filter(!is.na(count))
+
+    if (intensity) long <- dplyr::filter(long, count > 0)
+
+    long <- dplyr::mutate(long, metric = factor(metric, levels = lice_vars))
+
+    ggplot2::ggplot(long, ggplot2::aes(x = factor(month), y = count)) +
+        ggplot2::geom_jitter(
+            width = 0.25, height = 0,
+            colour = "grey75", size = 0.3, alpha = 0.15) +
+        ggplot2::stat_summary(
+            ggplot2::aes(group = metric, colour = metric),
+            fun = mean, geom = "line", linewidth = 0.4) +
+        ggplot2::stat_summary(
+            ggplot2::aes(colour = metric),
+            fun.data = ggplot2::mean_cl_boot,
+            geom = "errorbar", width = 0.2, linewidth = 0.4) +
+        ggplot2::stat_summary(
+            ggplot2::aes(colour = metric),
+            fun = mean, geom = "point", size = 1.8) +
+        ggplot2::scale_colour_manual(values = metric_cols, guide = "none") +
+        ggplot2::facet_wrap(ggplot2::vars(metric), ncol = 1, scales = "free_y",
+            labeller = ggplot2::as_labeller(metric_labs)) +
+        ggplot2::labs(
+            x = "Month",
+            y = if (intensity) "Lice per infested fish" else "Lice per fish") +
+        theme_better()
+}
+
+p_abundance <- lice_month_plot(fish_df, intensity = FALSE)
+p_intensity <- lice_month_plot(fish_df, intensity = TRUE)
+
+save_fig(p_abundance, "lice_by_month_abundance", height = 8,
+    caption = paste(
+        "Monthly mean louse counts across ALL sampled fish, zeros included,",
+        "so each series is mean abundance: the expected load on a randomly",
+        "sampled fish, which folds prevalence and per-fish burden into one",
+        "number. Coloured points are means, error bars are 95% bootstrap CIs",
+        "on the mean (mean_cl_boot, 1000 resamples); faint grey points are",
+        "raw per-fish counts, jittered on month only so the count axis is",
+        "exact. Panels use FREE y scales, so vertical distances are not",
+        "comparable across metrics. Broughton data through 2025."))
+
+save_fig(p_intensity, "lice_by_month_intensity", height = 8,
+    caption = paste(
+        "Monthly mean louse counts across INFESTED fish only, zeros dropped",
+        "per metric, so each series is mean intensity: the typical burden on",
+        "fish that actually carry lice, isolating per-fish load from",
+        "prevalence. A month can rise here while abundance falls if fewer",
+        "fish are infested but those infested carry more, so read this",
+        "alongside the abundance figure rather than instead of it. Means",
+        "with 95% bootstrap CIs; faint grey points are raw counts, month",
+        "jitter only. FREE y scales. Broughton data through 2025."))

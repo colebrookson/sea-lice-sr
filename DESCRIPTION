@@ -20,4 +20,5 @@ Imports:
     tibble,
     tidyr,
     readr,
-    purrr
+    purrr, 
+    Hmisc

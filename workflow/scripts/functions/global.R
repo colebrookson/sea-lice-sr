@@ -169,7 +169,67 @@ standardize_names <- function(df) {
     return(df)
 }
 
-
+#' Save a ggplot with an optional caption and a provenance sidecar
+#'
+#' Writes a figure to disk in up to three coordinated forms from a single
+#' call: a clean image, a caption-annotated image with the note rendered
+#' into a footer band, and a markdown sidecar recording the note alongside
+#' machine provenance (timestamp, git commit, output dimensions). The clean
+#' and captioned images let a figure be viewed either bare or self-documenting,
+#' while the sidecar is the durable, greppable, version-controllable record of
+#' how and when the figure was produced.
+#'
+#' @param plot A ggplot object to be saved.
+#' @param name Character scalar giving the base filename, without directory or
+#'   extension. All emitted files share this stub: `<name>.<device>`,
+#'   `<name>_captioned.<device>`, and `<name>.md`.
+#' @param caption Optional character scalar. When supplied, a captioned image
+#'   is written with the text wrapped into a footer band beneath the panel, and
+#'   the same text is recorded under the sidecar's Notes heading. When `NULL`,
+#'   no captioned image is produced and the sidecar records `none`.
+#' @param dir Output directory. Created recursively if it does not exist.
+#' @param width,height,dpi Passed to [ggplot2::ggsave()]. `height` sizes the
+#'   panel in the clean image; the captioned image adds the footer height on
+#'   top so the panel keeps the same physical dimensions in both versions
+#'   rather than being compressed to make room for the caption.
+#' @param device Character scalar giving the file extension, for example
+#'   `"png"` or `"pdf"`. The output format is chosen by [ggplot2::ggsave()]
+#'   from this extension rather than passed as an explicit device.
+#' @param caption_width Integer wrap width for the caption, in characters. This
+#'   is a character-count heuristic rather than a measured-extent wrap, so very
+#'   wide or very narrow figures may want it adjusted so the footer text spans
+#'   a sensible fraction of the image.
+#' @param sidecar Logical; whether to write the markdown provenance file.
+#'
+#' @details
+#' The footer band is allocated at roughly 0.18 inches per wrapped line and
+#' appended below the panel via [patchwork::wrap_plots()]. Git provenance is
+#' captured through \pkg{gert} when available and degrades quietly to a plain
+#' note when the working directory is not a repository or the package is not
+#' installed, so a missing commit never causes the save itself to fail.
+#'
+#' @section Side effects:
+#' Writes one to three files under `dir` and prints nothing. The captioned
+#' image is written only when `caption` is non-`NULL`; the sidecar only when
+#' `sidecar` is `TRUE`.
+#'
+#' @return The path stub (directory and `name`, without extension) is returned
+#'   invisibly, so calls can be chained or the location captured without
+#'   cluttering the console.
+#'
+#' @section Dependencies:
+#' \pkg{ggplot2}, \pkg{stringr}, and \pkg{patchwork} are required; \pkg{gert}
+#' is optional and used only for git provenance.
+#'
+#' @examples
+#' \dontrun{
+#' save_fig(
+#'   p_abundance, "lice_by_month_abundance", height = 8,
+#'   caption = "Monthly mean louse abundance across all sampled fish; ..."
+#' )
+#' }
+#'
+#' @export
 save_fig <- function(plot, name,
                      caption = NULL,
                      dir = "figs",
