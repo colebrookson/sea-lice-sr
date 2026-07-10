@@ -18,7 +18,7 @@ Clone it locally and open the folder in VS Code.
 Edit **`DESCRIPTION`** — at minimum, change these fields:
 
 ```
-Package: myproject          # <- short snake_case name, no spaces
+Package: bati-sea-lice          # <- short snake_case name, no spaces
 Title: My R Project         # <- human-readable one-liner
 Description: ...            # <- one paragraph
 Version: 0.0.0.9000         # <- reset or keep
@@ -41,13 +41,13 @@ Authors@R:
 Edit **`Makefile`**, first line:
 
 ```makefile
-IMAGE  ?= myproject   # <- match the Package name in DESCRIPTION, or a Docker Hub slug
+IMAGE  ?= bati-sea-lice   # <- match the Package name in DESCRIPTION, or a Docker Hub slug
 ```
 
 Edit **`.devcontainer/devcontainer.json`**, `"name"` field:
 
 ```json
-"name": "myproject"
+"name": "bati-sea-lice"
 ```
 
 ---

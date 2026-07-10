@@ -1,5 +1,5 @@
 {
-  "name": "myproject",
+  "name": "bati-sea-lice",
   "build": {
     "dockerfile": "../Dockerfile",
     "context": ".."

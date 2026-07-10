@@ -5,6 +5,7 @@
 
 source(here::here("./workflow/scripts/functions/theme_better.R"))
 source(here::here("./workflow/scripts/functions/global.R"))
+source(here::here('./workflow/scripts/functions/fit_simple.R'))
 library(magrittr)
 library(ggplot2)
 
@@ -41,7 +42,7 @@ farm_lice_per_year <- farm_df %>%
     )
 
 wild_lice_per_year <- collated_df %>% 
-    dplyr::filter(month %in% c(3,4)) %>% 
+    dplyr::filter(month %in% c(3,4,5)) %>% 
     dplyr::group_by(year) %>% 
     dplyr::summarize(
         mean_all_leps = my_mean(all_leps),
@@ -55,45 +56,29 @@ yearly_lice_data <- dplyr::left_join(
     by = "year"
 )
 
-fit_extract_plot <- function(df, wild_lice, farm_lice, 
-wild_choice, farm_choice) {
-    simple_mod <- stats::lm(
-    mean_wild_lice ~ mean_farm_lice,
-    data = yearly_lice_data
-)
-r2_val <- summary(simple_mod)$r.squared
-plot_lab <- paste("R^2 == ", round(r2_val, 2))
-wild_farm_reg <- ggplot(data = yearly_lice_data) +
-    geom_point(
-        aes(
-            x = mean_farm_lice, y = mean_wild_lice
-        ),
-        size = 4, shape = 21, colour = "black", fill = "#42e4e4"
-    ) +
-    geom_smooth(aes(x = mean_farm_lice, y = mean_wild_lice),
-        formula = y ~ x, method = "lm", level = 0.95
-    ) +
-    labs(x = "Lice on Farmed Fish (millions)", y = "Lice on Wild Fish") +
-    scale_x_log10(
-        breaks = c(3e+05, 1e+06, 3e+06),
-        labels = c("0.3", "1.0", "3.0")
-    ) +
-    scale_y_log10() +
-    theme_better() +
-    annotate("text",
-        x = 0.3e+06, y = 3, label = plot_lab, parse = TRUE,
-        size = 10
+
+### I AM LEAVING OFF HERE:
+#' I'm a bit confused because the numbers that look to be coming out of the farm
+#' lice per year are not what I would expect? they're off by quite some bit, 
+#' and when i was looking at the values (i.e. those ones plotted in retrospective) 
+#' I couldn't figure out what was going on 
+#' ANSWER - oh wait I figured out what was going on. I am just looking at the raw
+#' averaged values per year, which is not what I want. I want to use the values 
+#' that come from fitting the yearly model which is WHY i started this file with 
+#' that name lol 
+
+simple_mod <- stats::lm(log10(mean_all_leps) ~ log10(marty_mean_lep_tot), data = yearly_lice_data)
+summary(simple_mod)
+hist(log(yearly_lice_data$mean_all_leps))
+
+
+
+fit_all_farms_marty <- fit_extract_plot(
+    df = yearly_lice_data, 
+    wild_lice = "mean_all_leps", 
+    farm_lice = "mean_marty_lep_tot", 
+    slug = "-mean-marty-"
     )
-
-ggsave(
-    here::here("./figs/wild-farm-regression.png"),
-    wild_farm_reg,
-    dpi = 300,
-    height = 8, width = 11
-)
-}
-
-
 
 # try with other relationships -------------------------------------------------
 farm_ktc_lice_per_year <- farm_df %>%

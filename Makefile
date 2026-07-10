@@ -1,4 +1,4 @@
-IMAGE  ?= myproject
+IMAGE  ?= bati-sea-lice
 TAG    ?= latest
 
 .PHONY: build shell run
