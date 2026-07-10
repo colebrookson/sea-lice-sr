@@ -73,9 +73,106 @@ fish_df <- readr::read_csv(
         # proportion of copepodids that are leps
         prop_lep_cope = lep_cope / all_sp_cope
     )
-# add in unique identifier to make life easier later
-fish_df$obs_id <- c(1:nrow(fish_df))
+
 readr::write_csv(
     fish_df,
     here::here("./data/scfs-data/clean/standardized-fish-data.csv")
 )
+
+
+# some plotting stuff just for fun
+# add in unique identifier to make life easier later
+fish_df$obs_id <- c(1:nrow(fish_df))
+fish_march_april <- fish_df %>% dplyr::filter(month %in% c(3,4))
+ggplot(data = fish_df) + 
+    geom_point(aes(x = year, y = all_lice, fill = month), position = 
+    position_jitter(), colour = "black", shape = 21, size = 0.5) + 
+    scale_x_continuous(
+        breaks = unique(fish_df$year), labels = unique(fish_df$year)) + 
+    scale_fill_manual(values = MoMAColors::moma.)
+    theme_better()
+
+focal_months <- c("3", "4", "5", "6")
+
+fish_df <- fish_df |>
+    dplyr::mutate(
+        is_zero = all_lice == 0,
+        month_focal = factor(
+            dplyr::if_else(
+                as.character(month) %in% focal_months,
+                as.character(month), NA_character_
+            ),
+            levels = focal_months
+        )
+    )
+
+panel_levels <- c("Month 3", "Month 4", "Month 5", "Month 6", "All months")
+
+plot_df <- fish_df |>
+    tidyr::expand_grid(panel = factor(panel_levels, levels = panel_levels)) |>
+    dplyr::mutate(
+        is_zero = all_lice == 0,
+        m = as.character(month),
+        highlight = factor(
+            dplyr::case_when(
+                panel == "Month 3" & m == "3" ~ "3",
+                panel == "Month 4" & m == "4" ~ "4",
+                panel == "Month 5" & m == "5" ~ "5",
+                panel == "Month 6" & m == "6" ~ "6",
+                panel == "All months" & m %in% focal_months ~ m,
+                .default = NA_character_
+            ),
+            levels = focal_months
+        )
+    )
+
+pal <- MoMAColors::moma.colors("Klein", type = "discrete")
+focal_cols <- c("3" = pal[1], "4" = pal[3], "5" = pal[2], "6" = pal[5])
+
+ggplot2::ggplot(plot_df, ggplot2::aes(x = year, y = all_lice)) +
+    ggplot2::geom_point(
+        data = \(d) dplyr::filter(d, is_zero),
+        position = ggplot2::position_jitter(width = 0.3, height = 0, seed = 1),
+        shape = 16, colour = "grey75", size = 0.3, alpha = 0.2
+    ) +
+    ggplot2::geom_point(
+        data = \(d) dplyr::filter(d, !is_zero, is.na(highlight)),
+        position = ggplot2::position_jitter(width = 0.3, height = 0, seed = 1),
+        shape = 16, colour = "grey65", size = 0.6, alpha = 0.3
+    ) +
+    ggplot2::geom_point(
+        data = \(d) dplyr::filter(d, !is_zero, !is.na(highlight)),
+        ggplot2::aes(fill = highlight),
+        position = ggplot2::position_jitter(width = 0.3, height = 0, seed = 1),
+        shape = 21, colour = "grey20", stroke = 0.15, size = 0.9, alpha = 0.85
+    ) +
+    ggplot2::scale_fill_manual(values = focal_cols, name = "Month") +
+    ggplot2::scale_x_continuous(
+        breaks = seq(min(fish_df$year), max(fish_df$year), by = 5)
+    ) +
+    ggplot2::facet_wrap(ggplot2::vars(panel), ncol = 2) +
+    ggplot2::guides(fill = ggplot2::guide_legend(
+        override.aes = list(size = 3, alpha = 1))) +
+    theme_better()
+
+
+fish_df |>
+    dplyr::mutate(
+        m = as.character(month),
+        month_grp = factor(
+            dplyr::if_else(m %in% focal_months, m, "Other"),
+            levels = c("Other", focal_months)
+        )
+    ) |>
+    ggplot2::ggplot(ggplot2::aes(x = year, fill = month_grp)) +
+    ggplot2::geom_bar() +
+    ggplot2::scale_fill_manual(
+        values = c(focal_cols, Other = "grey80"),
+        breaks = c(focal_months, "Other"),
+        name = "Month"
+    ) +
+    ggplot2::scale_x_continuous(
+        breaks = seq(min(fish_df$year), max(fish_df$year), by = 5)
+    ) +
+    ggplot2::labs(y = "Observations") +
+    theme_better()

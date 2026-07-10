@@ -168,3 +168,62 @@ standardize_names <- function(df) {
     # return dataframe renamed
     return(df)
 }
+
+
+save_fig <- function(plot, name,
+                     caption = NULL,
+                     dir = "figs",
+                     width = 8, height = 6, dpi = 300,
+                     device = "png",
+                     caption_width = 100,
+                     sidecar = TRUE) {
+
+    dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+    stub <- file.path(dir, name)
+    ext  <- paste0(".", device)
+
+    # clean version (just the fig)
+    ggplot2::ggsave(paste0(stub, ext), plot,
+                    width = width, height = height, dpi = dpi)
+
+    # captioned version (footer band)
+    if (!is.null(caption)) {
+        wrapped <- stringr::str_wrap(caption, width = caption_width)
+        n_lines <- stringr::str_count(wrapped, "\n") + 1L
+        cap_h   <- n_lines * 0.18
+
+        cap_panel <- ggplot2::ggplot() +
+            ggplot2::annotate("text", x = 0, y = 1, label = wrapped,
+                              hjust = 0, vjust = 1, size = 3,
+                              colour = "grey30") +
+            ggplot2::scale_x_continuous(limits = c(0, 1)) +
+            ggplot2::scale_y_continuous(limits = c(0, 1)) +
+            ggplot2::theme_void()
+
+        combined <- patchwork::wrap_plots(
+            plot, cap_panel, ncol = 1, heights = c(height, cap_h)
+        )
+        ggplot2::ggsave(paste0(stub, "_captioned", ext), combined,
+                        width = width, height = height + cap_h, dpi = dpi)
+    }
+
+    # sidecar provenance (so to speak)
+    if (sidecar) {
+        git_sha <- tryCatch({
+            if (requireNamespace("gert", quietly = TRUE))
+                substr(gert::git_commit_info()$id, 1, 10) else NA_character_
+        }, error = function(e) NA_character_)
+
+        meta <- c(
+            paste0("# ", name), "",
+            paste0("- saved: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S")),
+            paste0("- git: ", if (is.na(git_sha)) "not a git repo" else git_sha),
+            paste0("- size: ", width, " x ", height, " in @ ", dpi, " dpi"),
+            "", "## Notes", "",
+            if (is.null(caption)) "_none_" else caption
+        )
+        writeLines(meta, paste0(stub, ".md"))
+    }
+
+    invisible(stub)
+}
