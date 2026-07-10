@@ -24,8 +24,8 @@ glmm_mod <- nimble::nimbleCode({
     r ~ dgamma(shape = 0.01, rate = 0.01) # must be > 0
 
     # prior for random effects -------------------------------------------------
-    sigma_week ~ dhalfnorm(scale = 2) # trying to shrink week 9 (3 obs)
-    sigma_location ~ dhalfnorm(scale = 1) # regularizing because only 3 groups
+    sigma_week ~ dunif(0, 5) # trying to shrink week 9 (3 obs)
+    sigma_location ~ dunif(0, 2) # regularizing because only 3 groups
 
     # loop for the random effects
     for(i in 1:W) {
@@ -38,7 +38,7 @@ glmm_mod <- nimble::nimbleCode({
     # the likelihood -----------------------------------------------------------
     for (i in 1:N) {
         # get the linear predictor on the log scale 
-        log(mu[i]) <- beta_0 + inprod(beta_1, X[i]) +
+        log(mu[i]) <- beta_0 + inprod(beta_1, X[i, P]) +
                           b_week[week_idx[i]] + b_location[location_idx[i]]
 
         # convert expected count (mu) to probability parameter
@@ -57,7 +57,7 @@ glmm_mod <- nimble::nimbleCode({
 # define the constants 
 constants <- list(
     N = nrow(collated_df), 
-    P = ncol(X_matrix), # just one here
+    P = ncol(collated_df[, "year"]), # just one here
     W = length(unique(collated_df$week)),
     L = length(unique(collated_df$location)),
     week_idx = as.numeric(as.factor(collated_df$week)),
@@ -80,7 +80,7 @@ inits <- list(
     b_location = rnorm(0, 0.1)
 )
 
-nb_model <- nimble::nimbleCode(
+nb_model <- nimble::nimbleModel(
     code = glmm_mod, 
     constants = constants, 
     inits = inits, 
