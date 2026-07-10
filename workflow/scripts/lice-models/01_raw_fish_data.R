@@ -79,57 +79,45 @@ readr::write_csv(
     here::here("./data/scfs-data/clean/standardized-fish-data.csv")
 )
 
-
-# some plotting stuff just for fun
-# add in unique identifier to make life easier later
-fish_df$obs_id <- c(1:nrow(fish_df))
-fish_march_april <- fish_df %>% dplyr::filter(month %in% c(3,4))
-ggplot(data = fish_df) + 
-    geom_point(aes(x = year, y = all_lice, fill = month), position = 
-    position_jitter(), colour = "black", shape = 21, size = 0.5) + 
-    scale_x_continuous(
-        breaks = unique(fish_df$year), labels = unique(fish_df$year)) + 
-    scale_fill_manual(values = MoMAColors::moma.)
-    theme_better()
+# some plotting stuff just for fun ---------------------------------------------
+# shared config of the below plotting stuff
+fish_df$obs_id <- seq_len(nrow(fish_df))
 
 focal_months <- c("3", "4", "5", "6")
 
-fish_df <- fish_df |>
-    dplyr::mutate(
-        is_zero = all_lice == 0,
-        month_focal = factor(
-            dplyr::if_else(
-                as.character(month) %in% focal_months,
-                as.character(month), NA_character_
-            ),
-            levels = focal_months
-        )
-    )
+pal <- MoMAColors::moma.colors("Klein", type = "discrete")
+focal_cols <- c("3" = pal[1], "4" = pal[3], "5" = pal[2], "6" = pal[5])
 
+lice_vars <- c("all_lice", "lep_mot", "all_sp_mot")
+metric_labs <- c(all_lice   = "All lice",
+                 lep_mot    = "Motile Lepeophtheirus",
+                 all_sp_mot = "All motile lice")
+metric_cols <- pal[c(1, 3, 6)]
+names(metric_cols) <- lice_vars
+
+fish_df <- dplyr::mutate(fish_df, is_zero = all_lice == 0)
+
+# Figure 1: focal-month highlight
 panel_levels <- c("Month 3", "Month 4", "Month 5", "Month 6", "All months")
 
 plot_df <- fish_df |>
     tidyr::expand_grid(panel = factor(panel_levels, levels = panel_levels)) |>
     dplyr::mutate(
-        is_zero = all_lice == 0,
         m = as.character(month),
         highlight = factor(
             dplyr::case_when(
-                panel == "Month 3" & m == "3" ~ "3",
-                panel == "Month 4" & m == "4" ~ "4",
-                panel == "Month 5" & m == "5" ~ "5",
-                panel == "Month 6" & m == "6" ~ "6",
-                panel == "All months" & m %in% focal_months ~ m,
+                panel == "Month 3"    & m == "3"               ~ "3",
+                panel == "Month 4"    & m == "4"               ~ "4",
+                panel == "Month 5"    & m == "5"               ~ "5",
+                panel == "Month 6"    & m == "6"               ~ "6",
+                panel == "All months" & m %in% focal_months    ~ m,
                 .default = NA_character_
             ),
             levels = focal_months
         )
     )
 
-pal <- MoMAColors::moma.colors("Klein", type = "discrete")
-focal_cols <- c("3" = pal[1], "4" = pal[3], "5" = pal[2], "6" = pal[5])
-
-ggplot2::ggplot(plot_df, ggplot2::aes(x = year, y = all_lice)) +
+p_facet <- ggplot2::ggplot(plot_df, ggplot2::aes(x = year, y = all_lice)) +
     ggplot2::geom_point(
         data = \(d) dplyr::filter(d, is_zero),
         position = ggplot2::position_jitter(width = 0.3, height = 0, seed = 1),
@@ -148,15 +136,25 @@ ggplot2::ggplot(plot_df, ggplot2::aes(x = year, y = all_lice)) +
     ) +
     ggplot2::scale_fill_manual(values = focal_cols, name = "Month") +
     ggplot2::scale_x_continuous(
-        breaks = seq(min(fish_df$year), max(fish_df$year), by = 5)
-    ) +
+        breaks = seq(min(fish_df$year), max(fish_df$year), by = 5)) +
     ggplot2::facet_wrap(ggplot2::vars(panel), ncol = 2) +
     ggplot2::guides(fill = ggplot2::guide_legend(
         override.aes = list(size = 3, alpha = 1))) +
     theme_better()
 
+save_fig(p_facet, "scfs-raw-data/lice_focal_month_facets",
+    width = 9, height = 10,
+    caption = paste(
+        "Focal-month highlight small-multiple, March through June. Each of the",
+        "first four panels shows one focal month in colour against the full",
+        "grey cloud of every other month; the fifth panel overlays all four",
+        "focal months together. Points are jittered on year only so the y axis",
+        "(lice per fish) stays exact; zeros are drawn small and behind as a",
+        "faint baseline; non-focal months are mid-grey context. Focal colours",
+        "from MoMAColors Klein. Broughton data through 2025."))
 
-fish_df |>
+# Figure 2: sampling effort by year 
+p_bar <- fish_df |>
     dplyr::mutate(
         m = as.character(month),
         month_grp = factor(
@@ -169,24 +167,26 @@ fish_df |>
     ggplot2::scale_fill_manual(
         values = c(focal_cols, Other = "grey80"),
         breaks = c(focal_months, "Other"),
-        name = "Month"
+        name   = "Month"
     ) +
     ggplot2::scale_x_continuous(
-        breaks = seq(min(fish_df$year), max(fish_df$year), by = 5)
-    ) +
+        breaks = seq(min(fish_df$year), max(fish_df$year), by = 5)) +
     ggplot2::labs(y = "Observations") +
     theme_better()
 
+save_fig(p_bar, "scfs-raw-data/obs_by_year_stacked",
+    width = 9, height = 5,
+    caption = paste(
+        "Sampling effort by year. geom_bar counts records, not lice, so a",
+        "zero-lice fish and a row with a missing count each add to bar height",
+        "exactly as an infested fish does; this is a denominator for the",
+        "abundance and intensity figures, not a count of infested fish. Focal",
+        "months (March through June) are coloured and anchored to the axis for",
+        "year-to-year comparison, with all remaining months collapsed into a",
+        "grey 'Other' segment stacked on top. Broughton data through 2025."))
 
-lice_vars   <- c("all_lice", "lep_mot", "all_sp_mot")
-metric_labs <- c(all_lice   = "All lice",
-                 lep_mot    = "Motile Lepeophtheirus",
-                 all_sp_mot = "All motile lice")
-metric_cols <- MoMAColors::moma.colors("Klein", type = "discrete")[c(1, 3, 6)]
-names(metric_cols) <- lice_vars
-
+# Figures 3 and 4: monthly abundance vs intensity 
 lice_month_plot <- function(data, intensity = FALSE) {
-    data <- fish_df
     long <- data |>
         tidyr::pivot_longer(dplyr::all_of(lice_vars),
                             names_to = "metric", values_to = "count") |>
@@ -200,9 +200,6 @@ lice_month_plot <- function(data, intensity = FALSE) {
         ggplot2::geom_jitter(
             width = 0.1, height = 0,
             colour = "grey75", size = 0.3, alpha = 0.15) +
-        # ggplot2::stat_summary(
-        #     ggplot2::aes(group = metric, colour = metric),
-        #     fun = mean, geom = "line", linewidth = 0.4) +
         ggplot2::stat_summary(
             ggplot2::aes(colour = metric),
             fun.data = ggplot2::mean_cl_boot,
