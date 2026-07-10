@@ -186,6 +186,7 @@ metric_cols <- MoMAColors::moma.colors("Klein", type = "discrete")[c(1, 3, 6)]
 names(metric_cols) <- lice_vars
 
 lice_month_plot <- function(data, intensity = FALSE) {
+    data <- fish_df
     long <- data |>
         tidyr::pivot_longer(dplyr::all_of(lice_vars),
                             names_to = "metric", values_to = "count") |>
@@ -197,15 +198,15 @@ lice_month_plot <- function(data, intensity = FALSE) {
 
     ggplot2::ggplot(long, ggplot2::aes(x = factor(month), y = count)) +
         ggplot2::geom_jitter(
-            width = 0.25, height = 0,
+            width = 0.1, height = 0,
             colour = "grey75", size = 0.3, alpha = 0.15) +
-        ggplot2::stat_summary(
-            ggplot2::aes(group = metric, colour = metric),
-            fun = mean, geom = "line", linewidth = 0.4) +
+        # ggplot2::stat_summary(
+        #     ggplot2::aes(group = metric, colour = metric),
+        #     fun = mean, geom = "line", linewidth = 0.4) +
         ggplot2::stat_summary(
             ggplot2::aes(colour = metric),
             fun.data = ggplot2::mean_cl_boot,
-            geom = "errorbar", width = 0.2, linewidth = 0.4) +
+            geom = "errorbar", width = 0, linewidth = 0.4) +
         ggplot2::stat_summary(
             ggplot2::aes(colour = metric),
             fun = mean, geom = "point", size = 1.8) +
@@ -221,7 +222,7 @@ lice_month_plot <- function(data, intensity = FALSE) {
 p_abundance <- lice_month_plot(fish_df, intensity = FALSE)
 p_intensity <- lice_month_plot(fish_df, intensity = TRUE)
 
-save_fig(p_abundance, "lice_by_month_abundance", height = 8,
+save_fig(p_abundance, "scfs-raw-data/lice_by_month_abundance", height = 8,
     caption = paste(
         "Monthly mean louse counts across ALL sampled fish, zeros included,",
         "so each series is mean abundance: the expected load on a randomly",
@@ -232,7 +233,7 @@ save_fig(p_abundance, "lice_by_month_abundance", height = 8,
         "exact. Panels use FREE y scales, so vertical distances are not",
         "comparable across metrics. Broughton data through 2025."))
 
-save_fig(p_intensity, "lice_by_month_intensity", height = 8,
+save_fig(p_intensity, "scfs-raw-data/lice_by_month_intensity", height = 8,
     caption = paste(
         "Monthly mean louse counts across INFESTED fish only, zeros dropped",
         "per metric, so each series is mean intensity: the typical burden on",

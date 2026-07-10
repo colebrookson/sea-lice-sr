@@ -21,4 +21,6 @@ Imports:
     tidyr,
     readr,
     purrr, 
-    Hmisc
+    Hmisc, 
+    patchwork,
+    colebrookson/MoMAColors
