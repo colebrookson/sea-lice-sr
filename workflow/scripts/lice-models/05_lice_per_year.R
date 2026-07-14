@@ -125,4 +125,12 @@ nb_mcmc <- nimble::buildMCMC(nb_mcmc_config)
 C_nb_mcmc <- nimble::compileNimble(nb_mcmc, project = nb_model)
 
 # run and sample this thang
-samples <- nimble::runMCMC(C_nb_mcmc, niter = 10000, nburnin = 2000, thin = 5)
+samples <- nimble::runMCMC(
+    C_nb_mcmc, 
+    niter = 10000, 
+    nburnin = 2000, 
+    thin = 5,
+    nchains = 4)
+
+# overall diagnostics ----------------------------------------------------------
+coda::gelman.diag(samples)
