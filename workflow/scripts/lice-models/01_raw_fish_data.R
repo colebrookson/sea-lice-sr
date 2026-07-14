@@ -18,6 +18,7 @@ fish_df <- readr::read_csv(
         chal_unid, lep_pamale, lep_male, lep_nongravid, lep_gravid,
         lep_pafemale, cal_mot, cal_gravid, unid_adult, unid_pa
     ) %>%
+    dplyr::mutate(obs_id = dplyr::row_number()) %>% 
     dplyr::rowwise() %>%
     dplyr::mutate(
         # all motile leps
@@ -80,8 +81,6 @@ readr::write_csv(
 )
 
 # some plotting stuff just for fun ---------------------------------------------
-# shared config of the below plotting stuff
-fish_df$obs_id <- seq_len(nrow(fish_df))
 
 focal_months <- c("3", "4", "5", "6")
 

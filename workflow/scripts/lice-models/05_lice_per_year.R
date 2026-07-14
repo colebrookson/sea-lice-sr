@@ -15,6 +15,23 @@ collated_df <- readr::read_csv(
 table(collated_df$week)
 table(collated_df$location)
 
+# a couple quick data checks ---------------------------------------------------
+collated_df |>
+    dplyr::group_by(year) |>
+    dplyr::summarise(
+        n = dplyr::n(),
+        cope_obs = my_sum(!is.na(lep_cope)),
+        mean_cope = my_mean(lep_cope),
+        mean_chal = my_mean(lep_chal),
+        mean_mot = my_mean(lep_mot)
+    ) |>
+    print(n = Inf)
+
+# put this in the right form for what we want here: 
+long_df <- collated_df %>% 
+    dplyr::select(obs_id, year, week, location, lep_cope, lep_chal, lep_mot) %>%
+
+
 # super quick PPC on the gamma
 # r_draws <- rgamma(n = 2000, shape = 1, rate = 0.5)
 # sim <- rnbinom(n = 2000, size = r_draws, mu = mean(collated_df$all_leps))
@@ -131,6 +148,38 @@ samples <- nimble::runMCMC(
     nburnin = 2000, 
     thin = 5,
     nchains = 4)
+samples_mcmc <- coda::as.mcmc.list(lapply(samples, coda::as.mcmc))
 
-# overall diagnostics ----------------------------------------------------------
-coda::gelman.diag(samples)
+# convergence ------------------------------------------------------------------
+rhat <- coda::gelman.diag(samples_mcmc, multivariate = FALSE)
+ess  <- coda::effectiveSize(samples_mcmc)
+psrf <- rhat$psrf
+ess  <- coda::effectiveSize(samples_mcmc)
+
+diag_tbl <- tibble::tibble(
+    param = rownames(psrf),
+    rhat  = psrf[, "Point est."],
+    ess   = ess[rownames(psrf)]
+) |>
+    dplyr::arrange(dplyr::desc(rhat))
+print(diag_tbl, n = Inf)
+# anything that needs a second look
+dplyr::filter(diag_tbl, rhat > 1.01 | ess < 400)
+
+# posterior summary ------------------------------------------------------------
+summary(samples_mcmc)
+
+# traces -----------------------------------------------------------------------
+key <- c("r", "sigma_week", "sigma_location")
+plot(samples_mcmc[, key])   # trace + density, all four chains overlaid
+
+# year effects on the count scale ----------------------------------------------
+post <- as.matrix(samples_mcmc)   # fine here: pooling chains for summaries
+yr_cols <- grep("^beta_year", colnames(post), value = TRUE)
+
+year_tbl <- tibble::tibble(
+    year  = levels(as.factor(collated_df$year)),
+    med   = apply(exp(post[, yr_cols]), 2, median),
+    lower = apply(exp(post[, yr_cols]), 2, quantile, 0.025),
+    upper = apply(exp(post[, yr_cols]), 2, quantile, 0.975)
+)
