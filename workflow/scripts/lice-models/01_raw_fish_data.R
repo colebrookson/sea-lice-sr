@@ -65,20 +65,20 @@ fish_df <- fish_df %>%
     dplyr::mutate(
         lep_cope_obs = lep_cope, 
         cal_cope_obs = cal_cope, 
-        sp_cope = my_sum(lep_cope, cal_cope), 
+        sp_cope = lep_cope + cal_cope, 
         unid_cope_n = unid_cope, 
-        all_cope = my_sum(sp_cope, unid_cope), 
+        all_cope = sp_cope + unid_cope, 
         
         # now the motiles 
-        lep_mot_obs = my_sum(lep_pamale, lep_pafemale, lep_male, lep_nongravid,
-        lep_gravid, lep_pa_unsexed), 
-        cal_mot_obs = my_sum(cal_mot, cal_gravid),
-        sp_mot = my_sum(lep_mot_obs, cal_mot_obs),
-        unid_mot_n = my_sum(unid_adult, unid_pa_sp), 
-        all_mot = my_sum(sp_mot, unid_mot_n), 
+        lep_mot_obs = lep_pamale + lep_pafemale + lep_male +  lep_nongravid +
+            lep_gravid + lep_pa_unsexed, 
+        cal_mot_obs = cal_mot + cal_gravid,
+        sp_mot = lep_mot_obs + cal_mot_obs,
+        unid_mot_n = unid_adult + unid_pa_sp, 
+        all_mot = sp_mot + unid_mot_n, 
 
         # now the chalimus, all unid
-        unid_chal_n = my_sum(chala, chalb, chal_unid), 
+        unid_chal_n = chala + chalb + chal_unid, 
         all_chal = unid_chal_n, 
 
         # all lice, any stage/species (in 2001 the copes were classified as 

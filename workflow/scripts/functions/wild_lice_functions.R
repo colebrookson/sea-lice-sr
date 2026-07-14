@@ -102,12 +102,14 @@ draw_leps <- function(size, prob) {
 #' @param pooled = TRUE
 empirical_prop <- function(lep, spec, pooled = TRUE) { 
     if(pooled) { 
-        denom <- my_sum(spec)
-        if(denom == 0) reutnr(NA_real_)
-        my_sum(lep) / denom 
+        denom <- sum(spec, na.rm = TRUE)
+        if(denom == 0) {
+            return(NA_real_)
+        }
+        sum(lep, na.rm = TRUE) / denom 
     } else { 
-        my_mean(dplyr::if_else(
+        mean(dplyr::if_else(
             spec > 0, lep / spec, NA_real_   
-            ))
+            ), na.rm = TRUE)
     }
 }
