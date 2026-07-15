@@ -68,26 +68,25 @@ fill_counted_stages <- function(df) {
 #' prob NA with size > 0 -> doesn't r87n. 
 #' @param size the number of draws 
 #' @param prob the probability needed 
-draw_leps <- function(size, prob) { 
+draw_leps <- function(size, prob) {
     out <- rep(NA_real_, length(size))
 
     is_zero <- !is.na(size) & size == 0
     out[is_zero] <- 0
 
-    needs <- !is.na(size) & size == 0
+    needs <- !is.na(size) & size > 0
     if (any(needs & is.na(prob))) {
         stop(
-            "draw_leps(): ", sum(nees & is.na(prob)),
+            "draw_leps(): ", sum(needs & is.na(prob)),
             " fish have unidentified lice but no L. salmonis proportion. ",
             "Check the proportion table."
         )
     }
     out[needs] <- stats::rbinom(
-        sum(needs), 
-        size = size[needs], 
+        sum(needs),
+        size = size[needs],
         prob = prob[needs]
     )
-
     return(out)
 }
 

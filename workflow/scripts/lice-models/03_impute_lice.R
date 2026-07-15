@@ -74,11 +74,6 @@ readr::write_csv(
 
 
 
-
-#' FIX THIS!!!!!!!!
-
-
-
 chk <- replicates %>%
     dplyr::filter(rep == 1) %>%
     dplyr::mutate(
@@ -98,33 +93,11 @@ if (nrow(chk) > 0) {
     stop(nrow(chk), " fish fail per-stage conservation.")
 }
 
-
-
-
-
-r1 <- replicates %>% dplyr::filter(rep == 1) %>%
-    dplyr::mutate(
-        recovered = rowSums(cbind(
-            lep_mot, cal_mot_tot, lep_cope, cal_cope_tot, lep_chal, cal_chal
-        ), na.rm = TRUE),
-        diff = recovered - all_lice
-    )
-
-# where do the mismatches live?
-r1 %>% dplyr::filter(abs(diff) > 1e-8) %>% dplyr::count(year)
-
-# and pull one to inspect the components
-r1 %>% dplyr::filter(abs(diff) > 1e-8) %>%
-    dplyr::select(year, all_lice, recovered, diff,
-                  lep_mot, cal_mot_tot, all_mot,
-                  lep_cope, cal_cope_tot, all_cope,
-                  lep_chal, cal_chal, all_chal) %>%
-    dplyr::slice_head(n = 5) %>%
-    as.data.frame()
-
-r1 %>%
-    dplyr::filter(year == 2001, all_mot > 0, is.na(lep_mot)) %>%
-    dplyr::select(year, all_mot, unid_mot_n, lep_mot_obs, cal_mot_obs,
-                  p_mot, lep_mot_imp) %>%
-    dplyr::slice_head(n = 5) %>%
-    as.data.frame()
+replicates %>%
+    dplyr::filter(rep == 1) %>%
+    dplyr::filter(
+        (!is.na(all_mot)  & !dplyr::near(lep_mot + cal_mot_tot,  all_mot)) |
+        (!is.na(all_cope) & !dplyr::near(lep_cope + cal_cope_tot, all_cope)) |
+        (!is.na(all_chal) & !dplyr::near(lep_chal + cal_chal,     all_chal))
+    ) %>%
+    nrow()
