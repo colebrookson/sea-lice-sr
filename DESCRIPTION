@@ -26,4 +26,5 @@ Imports:
     colebrookson/MoMAColors, 
     nimble, 
     coda, 
-    lubridate
+    lubridate,
+    betareg
