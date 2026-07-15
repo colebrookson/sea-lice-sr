@@ -6,6 +6,8 @@
 source(here::here("./workflow/scripts/functions/theme_better.R"))
 source(here::here("./workflow/scripts/functions/global.R"))
 source(here::here("./workflow/scripts/functions/wild_lice_functions.R"))
+
+library(ggplot2)
 library(magrittr)
 
 fish_df <- readr::read_csv(
@@ -77,6 +79,17 @@ p_cope_0204 <- fish_df %>%
     )) %>% 
     dplyr::ungroup()
 
+d01 <- fish_df %>% dplyr::filter(year == 2001)
+
+# old predictor, old averaging population (should land near 0.639)
+m_old <- glm(cbind(lep_mot_obs, cal_mot_obs) ~ all_mot,
+             binomial, data = mot_fit_df)
+mean(predict(m_old, d01, type = "response"))
+
+range(mot_fit_df$all_lice)                        # fitted support
+quantile(d01$all_lice[d01$all_mot > 0], c(0.5, 0.9, 0.99, 1))
+mean(d01$all_lice[d01$all_mot > 0] > max(mot_fit_df$all_lice))  # 
+
 # put proportions together -----------------------------------------------------
 #' now, chalimus is the average of the lep proportions for copepodites and for 
 #' mots, but note that in 2001 chalimus in that year uses only mots as the 
@@ -104,10 +117,96 @@ readr::write_csv(props,
     here::here("./data/scfs-data/clean/lep-proportions.csv")
 )
 
+# make some supplementary figures ----------------------------------------------
+#' get CIs on the link scale and back-transform them (fit +/- 1.96 * se)
+pred_ribbon <- function(model, xvar, xmax) { 
+    nd <- tibble::tibble(!!xvar := seq(0, xmax, length.out = 500))
+    p <- stats::predict(model, newdata = nd, type = "link", se.fit = TRUE)
+    inv <- model$family$linkinv
+
+    nd %>% 
+        dplyr::mutate(
+            fit = inv(p$fit), 
+            lower = inv(p$fit - 1.96 * p$se.fit),
+            upper = inv(p$fit + 1.96 * p$se.fit)
+        )
+}
+
+plot_stage <- function(fit_df, model, xvar, lep, spec, xlab, fill) { 
+    rib <- pred_ribbon(model, xvar, max(fit_df[[xvar]]))
+    points <- fit_df %>% 
+        dplyr::filter(.data[[spec]] > 0) %>% 
+        dplyr::mutate(obs_prop = .data[[lep]] / .data[[spec]])
+    
+    ggplot() + 
+        geom_point(data = points, aes(x = .data[[xvar]], y = obs_prop), 
+        shape = 21, colour = "black", fill = fill, 
+        alpha = 0.1, size = 3, position = position_jitter(height = 0)) + 
+        geom_ribbon(
+            data = rib, 
+            aes(x = .data[[xvar]], ymin = lower, ymax = upper), 
+            fill = "grey80", alpha = 0.7
+        ) + 
+        geom_line(
+            data = rib, aes(x = .data[[xvar]], y = fit), linewidth = 1.2
+        ) + 
+        coord_cartesian(ylim = c(0, 1)) + 
+        labs(x = xlab, y = "Proportion L. salmonis") + 
+        theme_better()
+}
+
+# make / save the figures (for the SI) -----------------------------------------
+mot_extrap <- mean(
+    fish_df$all_lice[fish_df$year == 2001 & fish_df$all_mot > 0] >
+        max(mot_fit_df$all_lice)
+)
 
 
-ggplot2::ggsave(
-    here::here("./figs/count-regressions/motile-model-predictions.png"),
+save_fig(
     plot_stage(mot_fit_df, mot_model, "all_lice", "lep_mot_obs", "sp_mot",
-               "Total lice on fish", "red2")
+               "Total lice on fish", "red2"),
+    name = "motile-model-predictions",
+    dir = here::here("./figs/count-regressions"),
+    width = 8, height = 6,
+    caption = paste(
+        "Fig. S2. Proportion of motile sea lice that were L. salmonis as a",
+        "function of the total number of lice (all stages, all species) on an",
+        "individual fish. Points are the observed proportion among speciated",
+        "motiles for each fish carrying at least one motile louse in a year in",
+        "which motiles were speciated (2002-present); jittered horizontally",
+        "only. Line is a binomial GLM with a logit link, Lep motiles as",
+        "successes and Caligus motiles as failures, so each fish is weighted by",
+        "the number of motile lice it carries. Ribbon is a 95% interval built",
+        "on the link scale and back-transformed, so it cannot exceed [0, 1].",
+        "This model supplies the L. salmonis proportion for 2001, the only year",
+        "in which motiles were counted but never speciated; the mean predicted",
+        "proportion across 2001 fish carrying motiles is",
+        sprintf("%.3f.", p_mot_2001),
+        sprintf("Fitted support spans %g-%g total lice;",
+                min(mot_fit_df$all_lice), max(mot_fit_df$all_lice)),
+        sprintf("%.1f%% of 2001 fish fall outside it.", 100 * mot_extrap)
+    )
+)
+
+save_fig(
+    plot_stage(cope_fit_df, cope_model, "all_lice", "lep_cope_obs", "sp_cope",
+               "Total lice on fish", "blue2"),
+    name = "cope-model-predictions",
+    dir  = here::here("./figs/count-regressions"),
+    width = 8, height = 6,
+    caption = paste(
+        "Fig. S1. Proportion of copepodite sea lice that were L. salmonis as a",
+        "function of the total number of lice (all stages, all species) on an",
+        "individual fish. Points are the observed proportion among speciated",
+        "copepodites for each fish carrying at least one copepodite in a year",
+        "in which copepodites were speciated (2005-present). Line is a binomial",
+        "GLM with a logit link, Lep copepodites as successes and Caligus",
+        "copepodites as failures. Ribbon is a 95% interval built on the link",
+        "scale and back-transformed. This model supplies the L. salmonis",
+        "proportion for 2002-2004, the years in which copepodites were counted",
+        "but never speciated; the mean predicted proportions are",
+        paste(sprintf("%d: %.3f", p_cope_0204$year, p_cope_0204$p_cope_model),
+              collapse = ", "),
+        ". Both panels share an x-axis, so S1 and S2 are directly comparable."
+    )
 )

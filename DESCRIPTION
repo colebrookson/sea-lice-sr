@@ -25,4 +25,5 @@ Imports:
     patchwork,
     colebrookson/MoMAColors, 
     nimble, 
-    coda
+    coda, 
+    lubridate
