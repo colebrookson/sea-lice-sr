@@ -12,8 +12,7 @@ collated_df <- readr::read_csv(
 ) |> 
     dplyr::filter(month %in% c(4, 5, 6))
 
-table(collated_df$week)
-table(collated_df$location)
+str(collated_df)
 
 # a couple quick data checks ---------------------------------------------------
 collated_df |>
