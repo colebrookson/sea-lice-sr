@@ -60,3 +60,6 @@ readr::write_csv(
     replicates, 
     here::here("./data/scfs-data/clean/lice-counts-imputed-replicates.csv")
 )
+
+# get a single point-estimate value --------------------------------------------
+#' I think the best way to do this is to fit to all M and pool the answer... 
