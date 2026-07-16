@@ -1,5 +1,7 @@
-#' DESCRIPTION: here I'm going to write out the relatively simple GLMM that 
-#' we've used before for these data so I can fit the model 
+#' DESCRIPTION: here I'm going to write out the relatively simple GLMM that
+#' we've used before for these data so I can fit the model. Both week and
+#' location-year random effects are now DIAGONAL stage-specific:
+#' each stage gets its own variance and its own per-column sum-to-zero.
 
 source(here::here("./workflow/scripts/functions/theme_better.R"))
 source(here::here("./workflow/scripts/functions/global.R"))
@@ -27,23 +29,26 @@ glmm_mod <- nimble::nimbleCode({
     # overdispersion (confirmed via prior predictive check)
     r ~ dgamma(shape = 1, rate = 0.5)
 
-    # week RE scale ------------------------------------------------------------
-    sigma_week_raw ~ dnorm(0, sd = 0.5)
-    sigma_week <- abs(sigma_week_raw)
-
-    # week RE ------------------------------------------------------------------
-    for (i in 1:W) {
-        z_week_raw[i] ~ dnorm(0, sd = 1)
-    }
-    z_week_mean <- sum(z_week_raw[1:W]) / W
-    for (i in 1:W) {
-        b_week[i] <- sigma_week * (z_week_raw[i] - z_week_mean)
-    }
-
-    # location-year RE: DIAGONAL stage-specific (E16) --------------------------
-    # one sigma per stage which should be one sum-to-zero per stage column
+    # week RE: DIAGONAL stage-specific  ----------------------------------------
+    # motile week SD ~2.1, so sigma prior widened from 0.5 to 3 to admit it
     for (s in 1:S) {
-        sigma_ly_raw[s] ~ dnorm(0, sd = 0.5)
+        sigma_week_raw[s] ~ dnorm(0, sd = 1.5)
+        sigma_week[s] <- abs(sigma_week_raw[s])
+    }
+    for (s in 1:S) {
+        for (i in 1:W) {
+            z_week_raw[i, s] ~ dnorm(0, sd = 1)
+        }
+        z_week_mean[s] <- sum(z_week_raw[1:W, s]) / W
+        for (i in 1:W) {
+            b_week[i, s] <- sigma_week[s] * (z_week_raw[i, s] - z_week_mean[s])
+        }
+    }
+
+    # location-year RE: DIAGONAL stage-specific --------------------------------
+    # one sigma per stage, one sum-to-zero per stage column; prior widened to 1
+    for (s in 1:S) {
+        sigma_ly_raw[s] ~ dnorm(0, sd = 1)
         sigma_ly[s] <- abs(sigma_ly_raw[s])
     }
     for (s in 1:S) {
@@ -59,14 +64,15 @@ glmm_mod <- nimble::nimbleCode({
     # likelihood ---------------------------------------------------------------
     for (i in 1:N) {
         log(mu[i]) <- beta_year[year_idx[i]] + beta_stage[stage_idx[i]] +
-            b_week[week_idx[i]] + b_ly[ly_idx[i], stage_idx[i]] #stage-indexed
+            b_week[week_idx[i], stage_idx[i]] +
+            b_ly[ly_idx[i], stage_idx[i]] # both REs stage-indexed
         p[i] <- r / (r + mu[i])
         Y[i] ~ dnegbin(p[i], r)
     }
 })
 
 # data ! -----------------------------------------------------------------------
-# level counts 
+# level counts
 Yr <- nlevels(collated_df_long$year_f)
 S <- nlevels(collated_df_long$stage)
 W <- nlevels(collated_df_long$week_f)
@@ -91,6 +97,8 @@ consts <- list(
 data_list <- list(Y = collated_df_long$count)
 
 # ok now do a ppc --------------------------------------------------------------
+#' Updated to the DIAGONAL structure: stage-specific week/ly sigmas at the new
+#' prior widths with per-stage centered RE draws
 prior_predictive <- function(n_sim = 500, dat = collated_df_long) {
     obs_zero <- mean(dat$count == 0)
     obs_q <- quantile(dat$count, c(0.5, 0.9, 0.99, 1))
@@ -101,17 +109,25 @@ prior_predictive <- function(n_sim = 500, dat = collated_df_long) {
         r_s <- rgamma(1, shape = 1, rate = 0.5)
         by <- rnorm(Yr, 0, 1)
         bs <- c(0, rnorm(S - 1, 0, 1.5))
-        sig_wk <- abs(rnorm(1, 0, 0.5))
-        sig_ly <- abs(rnorm(1, 0, 0.5))
-        zw <- rnorm(W)
-        bw <- sig_wk * (zw - mean(zw))
-        zl <- rnorm(L)
-        bl <- sig_ly * (zl - mean(zl))
-        mu <- exp(
-            by[dat$year_idx] + bs[dat$stage_idx] +
-                bw[dat$week_idx] + bl[dat$ly_idx]
-        )
-        y <- rnbinom(length(mu), size = r_s, mu = mu)
+
+        # stage-specific week + ly sigmas at the NEW prior widths
+        sig_wk <- abs(rnorm(S, 0, 1.5))
+        sig_ly <- abs(rnorm(S, 0, 1))
+
+        # per-stage RE draws, centered (redundant sum-to-zero)
+        bw <- sapply(seq_len(S), \(st) {
+            z <- rnorm(W)
+            sig_wk[st] * (z - mean(z))
+        }) # W x S
+        bl <- sapply(seq_len(S), \(st) {
+            z <- rnorm(L)
+            sig_ly[st] * (z - mean(z))
+        }) # L x S
+
+        eta <- by[dat$year_idx] + bs[dat$stage_idx] +
+            bw[cbind(dat$week_idx, dat$stage_idx)] +
+            bl[cbind(dat$ly_idx, dat$stage_idx)]
+        y <- rnbinom(length(eta), size = r_s, mu = exp(eta))
         sim_zero[s] <- mean(y == 0)
         sim_max[s] <- max(y)
     }
@@ -123,16 +139,20 @@ prior_predictive <- function(n_sim = 500, dat = collated_df_long) {
     )
 }
 
-# ppc <- prior_predictive()
-# print(ppc)
+ppc <- prior_predictive()
+print(ppc)
+#' watch sim_max: widening week sigma to 3 pushes the tail up. If sim_max blows
+#' past ~1e4-1e5, back week sigma down to 2 (still admits the motile ~2.1 at
+#' ~1 SD). Want sim_prop_zero to bracket observed 0.86 and sim_max in the
+#' thousands, not millions.
 
 # set up the config/compile ----------------------------------------------------
 make_inits <- function() list(
     beta_year = rnorm(Yr, 0, 1),
     beta_stage = c(0, rnorm(S - 1, 0, 1)),
     r = rgamma(1, 2, 1),
-    sigma_week_raw = rnorm(1, 0, 0.5),
-    z_week_raw = rnorm(W, 0, 0.5),
+    sigma_week_raw = rnorm(S, 0, 0.5),
+    z_week_raw = matrix(rnorm(W * S, 0, 0.5), nrow = W, ncol = S),
     sigma_ly_raw = rnorm(S, 0, 0.5),
     z_ly_raw = matrix(rnorm(L * S, 0, 0.5), nrow = L, ncol = S)
 )
@@ -160,24 +180,25 @@ cmcmc <- compileNimble(mcmc, project = model)
 
 # parallelized version! --------------------------------------------------------
 run_one_chain <- function(seed, glmm_mod, consts, data, monitors, dims) {
-    library(nimble); library(nimbleHMC)
+    library(nimble)
+    library(nimbleHMC)
     Yr <- dims$Yr; S <- dims$S; W <- dims$W; L <- dims$L
     make_inits <- function() list(
         beta_year = rnorm(Yr, 0, 1),
         beta_stage = c(0, rnorm(S - 1, 0, 1)),
         r = rgamma(1, 2, 1),
-        sigma_week_raw = rnorm(1, 0, 0.5),
-        z_week_raw = rnorm(W, 0, 0.5),
+        sigma_week_raw = rnorm(S, 0, 0.5),
+        z_week_raw = matrix(rnorm(W * S, 0, 0.5), nrow = W, ncol = S),
         sigma_ly_raw = rnorm(S, 0, 0.5),
         z_ly_raw = matrix(rnorm(L * S, 0, 0.5), nrow = L, ncol = S)
     )
     nimbleOptions(buildModelDerivs = TRUE)
     m <- nimbleModel(glmm_mod, constants = consts, data = data,
-                     inits = make_inits(), buildDerivs = TRUE, 
+                     inits = make_inits(), buildDerivs = TRUE,
                      calculate = FALSE)
     cm <- compileNimble(m)
-    conf <- configureHMC(m, monitors = monitors, 
-    control = list(maxTreeDepth = 7))
+    conf <- configureHMC(m, monitors = monitors,
+                         control = list(maxTreeDepth = 7))
     mcmc <- buildMCMC(conf)
     cmcmc <- compileNimble(mcmc, project = m)
     t0 <- Sys.time()
@@ -200,10 +221,12 @@ parallel::stopCluster(cl)
 samples <- coda::as.mcmc.list(samples_list)
 coda::gelman.diag(samples, multivariate = FALSE)
 coda::effectiveSize(samples)
-summary(samples[, "r"])  # should center ~0.55 per glmmTMB
+summary(samples[, "r"]) # should center ~0.55 per glmmTMB
+#' also check sigma_week[1] (motile) lands near 2.1 — if the prior shrank it
+#' toward 0.5, the fix didn't take and the bias is back.
 
 #  subsample for fast iteration ------------------------------------------------
-#' Draw a row-fraction of the long frame and rebuild ALL  objects from
+#' Draw a row-fraction of the long frame and rebuild ALL objects from
 #' the subsample
 build_nimble_inputs <- function(df_long, frac = 1, seed = 1) {
     set.seed(seed)
@@ -294,9 +317,6 @@ sapply(samples_list, \(x) as.numeric(attr(x, "elapsed"), units = "mins"))
 
 coda::gelman.diag(samples, multivariate = FALSE)
 coda::effectiveSize(samples)
-summary(samples[, "r"])   # ~0.55
-
-
-
+summary(samples[, "r"]) # ~0.55
 
 # full set of diagnostics ------------------------------------------------------

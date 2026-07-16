@@ -143,12 +143,12 @@ f_wk_unstr <- glmmTMB::glmmTMB(
 lapply(list(shared = f_wk_shared, diag = f_wk_diag, unstr = f_wk_unstr),
        \(m) m$sdr$pdHess)
 
-# CHECK 1: between-stage WEEK correlations (the decisive number)
+# between-stage WEEK correlations 
 print(glmmTMB::VarCorr(f_wk_unstr)$cond$week_f)
 attr(glmmTMB::VarCorr(f_wk_unstr)$cond$week_f, "correlation")
 sqrt(diag(glmmTMB::VarCorr(f_wk_unstr)$cond$week_f)) # stage-specific week SDs
 
-# CHECK 2: do motile year estimates/SEs move?
+# do motile year estimates/SEs move?
 yr_s <- glmmTMB::fixef(f_wk_shared)$cond[grep("^year_f", names(glmmTMB::fixef(f_wk_shared)$cond))]
 yr_u <- glmmTMB::fixef(f_wk_unstr)$cond[grep("^year_f", names(glmmTMB::fixef(f_wk_unstr)$cond))]
 yr_d <- glmmTMB::fixef(f_wk_diag)$cond[grep("^year_f", names(glmmTMB::fixef(f_wk_diag)$cond))]
@@ -174,3 +174,153 @@ cat("SE ratio wk diag/shared — range:",
     round(range(se(f_wk_diag) / se(f_wk_shared)), 3), "\n")
 
 AIC(f_wk_shared, f_wk_diag, f_wk_unstr)
+
+#  six fits predict plotted ----------------------------------------------------
+# note: tmb_fit and f_wk_shared are the SAME model (shared week, and ly differs:
+# tmb_fit has shared ly, f_wk_shared has diagonal ly). Label precisely.
+fits <- list(
+    `ly:shared  wk:shared`  = tmb_fit,      # (1|ly) + (1|week)
+    `ly:unstr   wk:shared`  = fit_slope,    # (0+stage|ly) + (1|week)
+    `ly:diag    wk:shared`  = fit_diag,     # (0+stage||ly) + (1|week)
+    `ly:diag    wk:shared2` = f_wk_shared,  # same as fit_diag structurally
+    `ly:diag    wk:diag`    = f_wk_diag,    # both diagonal  <- the candidate
+    `ly:diag    wk:unstr`   = f_wk_unstr    # week unstructured
+)
+
+stage_levels <- levels(collated_df_long$stage)   # mot, cope, chal
+year_levels  <- levels(collated_df_long$year_f)
+
+# per-model, per-stage total RE variance (week + ly) for the sigma^2/2 term -----
+#' Pulls the variance contributed by each RE for each stage. Shared RE: one
+#' variance applied to all stages. Diagonal/unstructured: the stage-specific
+#' diagonal entry of that RE's covariance matrix. Returns a named vec by stage.
+re_var_by_stage <- function(fit, stages) {
+    vc <- glmmTMB::VarCorr(fit)$cond
+    # helper: variance this RE contributes to a given stage
+    grp_var <- function(mat, stage) {
+        if (is.null(mat)) return(0)
+        d <- diag(as.matrix(mat))
+        nm <- rownames(as.matrix(mat))
+        if (length(d) == 1L && (is.null(nm) || !any(grepl("stage", nm)))) {
+            # shared scalar intercept: one variance for all stages
+            return(unname(d[1]))
+        }
+        # stage-specific: match the "stage<level>" diagonal entry
+        key <- paste0("stage", stage)
+        if (key %in% nm) return(unname(d[key]))
+        # fallback: reference stage (motile) is the bare intercept in some
+        # parameterizations — if absent, treat as the first diagonal
+        return(unname(d[1]))
+    }
+    vapply(stages, function(s) {
+        v_wk <- grp_var(vc$week_f, s)
+        v_ly <- grp_var(vc$ly_f, s)
+        v_wk + v_ly
+    }, numeric(1))
+}
+
+# build predictions for one fit ------------------------------------------------
+predict_one <- function(fit, label, stages, years) {
+    grid <- expand.grid(
+            year_f = factor(years, levels = years),
+            stage = factor(stages, levels = stages),
+            week_f = NA,   # NA => population-level for this grouping var (docs)
+            ly_f = NA
+        )
+    pr <- predict(fit, newdata = grid, se.fit = TRUE, type = "link")
+    pr <- predict(fit, newdata = grid, se.fit = TRUE,
+                  re.form = NA, type = "link")  # population-level, link scale
+    rev <- re_var_by_stage(fit, stages)         # sigma^2 total per stage
+
+    grid$eta <- pr$fit
+    grid$se  <- pr$se.fit
+    grid$half_s2 <- rev[as.character(grid$stage)] / 2   # sigma^2 / 2 per stage
+
+    # mean on response scale: exp(eta + sigma^2/2); CI from fixed-effect SE only
+    grid$mean <- exp(grid$eta + grid$half_s2)
+    grid$lo   <- exp(grid$eta - 1.96 * grid$se + grid$half_s2)
+    grid$hi   <- exp(grid$eta + 1.96 * grid$se + grid$half_s2)
+    grid$model <- label
+    grid$year  <- as.integer(as.character(grid$year_f))
+    grid[, c("model", "year", "stage", "mean", "lo", "hi")]
+}
+
+pred_all <- do.call(rbind, Map(
+    predict_one, fits, names(fits),
+    MoreArgs = list(stages = stage_levels, years = year_levels)
+))
+
+sapply(list(orig = tmb_fit, best = f_wk_diag),
+       \(f) re_var_by_stage(f, stage_levels))
+
+# plot: facet by stage, colour by model ---------------------------------------
+pd <- position_dodge(width = 0.6)
+
+p <- ggplot(pred_all, aes(year, mean, colour = model)) +
+    geom_errorbar(
+        aes(ymin = lo, ymax = hi),
+        width = 0, linewidth = 0.5, position = pd
+    ) +
+    geom_point(size = 1.6, position = pd) +
+    facet_wrap(~ stage, scales = "free_y", ncol = 1) +
+    labs(
+        x = "Year", y = "Mean predicted lice per fish",
+        colour = "RE structure"
+    ) +
+    theme_better()
+
+save_fig(
+    p,
+    name = "predicted-lice-per-fish-by-model",
+    dir = here::here("./figs/model-comparison"),
+    width = 9, height = 10,
+    caption = paste(
+        "Mean predicted lice per fish per year (population-level, random",
+        "effects integrated out via exp(eta + sigma^2/2)) for six random-effect",
+        "structures, faceted by louse stage. Ribbons are 95% CIs from",
+        "fixed-effect (year x stage) uncertainty only; the sigma^2/2 mean",
+        "correction is applied at the point estimate of the variance",
+        "components and its uncertainty is NOT propagated. Motile is the",
+        "reported stage. The 'ly:diag wk:diag' model is the candidate",
+        "(both REs stage-specific); 'ly:shared wk:shared' is the original."
+    )
+)
+
+pred_two <- pred_all[pred_all$model %in%
+    c("ly:shared  wk:shared", "ly:diag    wk:diag"), ]
+
+# relabel for a clean two-panel header, and order original -> best
+pred_two$panel <- factor(
+    ifelse(grepl("shared  wk:shared", pred_two$model),
+           "Original (both shared)", "Best (both stage-specific)"),
+    levels = c("Original (both shared)", "Best (both stage-specific)")
+)
+
+p2 <- ggplot(pred_two, aes(year, mean, colour = stage)) +
+    geom_errorbar(aes(ymin = lo, ymax = hi), width = 0, linewidth = 0.5) +
+    geom_point(size = 1.6) +
+    facet_grid(stage ~ panel, scales = "free_y") +
+    labs(
+        x = "Year", y = "Mean predicted lice per fish",
+        colour = "Stage"
+    ) +
+    theme_better()
+
+save_fig(
+    p2,
+    name = "predicted-lice-original-vs-best",
+    dir = here::here("./figs/model-comparison"),
+    width = 10, height = 9,
+    caption = paste(
+        "Mean predicted lice per fish per year (population-level, random",
+        "effects integrated out via exp(eta + sigma^2/2)), comparing the",
+        "original model (shared week and location-year random effects) with the",
+        "best-supported model (stage-specific diagonal week and location-year",
+        "REs; see decisions E16/E17). Rows are louse stages, columns are the two",
+        "models. Points are yearly means; bars are 95% CIs from fixed-effect",
+        "(year x stage) uncertainty only, with the sigma^2/2 mean correction",
+        "applied at the point estimate of the variance components (its",
+        "uncertainty not propagated). The motile row (top) is the reported stage:",
+        "note the downward shift and widened intervals in the best model."
+    )
+)

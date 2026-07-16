@@ -360,6 +360,17 @@ Downstream: the widened/re-sized motile W uncertainty feeds the Ricker
 predicted-mortality bounds; central c expected stable (point estimates barely
 moved). Re-run Ricker on the new W series after refit.
 
+### E17 downstream (CORRECTION): 
+the stage-specific week RE moves mean motile W
+*upward*, not down. The -0.8 median (eta) shift is real but the much larger
+motile week variance (SD ~2.1 vs shared ~0.4) dominates on the MEAN scale
+(exp(eta + sigma^2/2)), which is what the Ricker consumes. Net: better model =
+MORE mean motile lice per fish = higher inferred infection pressure. Final W
+series to be computed from the NIMBLE posterior averaged over OBSERVED
+week/site cells per year (not the closed-form sigma^2/2, which averages over the
+full RE Gaussian rather than the realized sampling design). Expect higher
+predicted mortality, not lower.
+
 ---
 
 ## F. Abundance-model open items / deferred
