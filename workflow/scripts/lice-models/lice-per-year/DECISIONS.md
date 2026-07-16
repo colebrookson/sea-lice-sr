@@ -306,6 +306,57 @@ brms/Stan idiom, better-conditioned for HMC, and all K elements are symmetric
 N(0,1) before centering (so the hard form's Kth-element variance asymmetry never
 arises). Statistical intent (kill the E5 ridge) is unchanged.
 
+### E14. maxTreeDepth capped at 7 (2026-01)
+Uncapped NUTS (default maxTreeDepth = 10) saturated depth every iteration —
+1024 leapfrog steps × full-data gradient — giving ~19h for 600×4 on full data.
+configureHMC(..., control = list(maxTreeDepth = 7)) cut this to ~9 min/chain on
+a 25% subsample (est. ~40 min/chain full data, 4-way parallel ≈ 40 min wall-
+clock) with NO loss of mixing: R-hat ≤ 1.03, ESS ~2000 (year) / ~450 (sigmas),
+r = 0.55 unchanged. Cap is a stated performance choice; verified it does not
+degrade R-hat/ESS, so trajectories weren't being truncated below what
+decorrelation needs.
+
+### E15. Runtime path: subsample for iteration, full data for production
+Development/iteration fits use build_nimble_inputs(frac = 0.25); the production
+fit is the same builder at frac = 1. Per-row HMC cost scales ~linearly, so the
+subsample gives a faithful preview of mixing and runtime at ~1/4 the wall-clock.
+
+### E16. Location-year RE must be stage-specific and correlated (narrows E3)
+A glmmTMB tester (frequentist analogue of the abundance model, same long
+frame) shows the shared scalar `(1 | location:year)` — which forces all three
+stages to the SAME site-year deviation — is both a worse fit and
+anti-conservative on the reported motile year means.
+- **Fit.** Unstructured stage-specific `(0 + stage | ly)` beats the shared
+  intercept by ΔAIC ≈ 1450 (32 vs 30 params). The nested LRT is valid — shared
+  `(1 | ly)` is the rank-1 equicorrelation boundary of the unstructured 3×3 —
+  boundary-conservative, and agrees.
+- **Inference on what we report.** Motile year-coefficient SEs inflate under
+  the unstructured fit in *every* year (ratio 1.04–1.48), worst at thin/imputed
+  years (2008: 1.48, SE 0.20→0.30; 2017: 1.36). 2008 also moves most in the
+  point estimate (−2.22 → −2.52 on the link, ≈28% on the response). So the
+  shared model understates uncertainty on the motile year means — the Bell
+  et al. (2019) random-slope anti-conservatism, in our own model.
+- **The diagonal `(0 + stage || ly)` is a trap — do NOT use it.** Forcing
+  between-stage correlation to zero denies motile the corroboration of cope/chal
+  in the same cell, artificially shrinks the motile ly variance, and returns SE
+  ratios *below* 1 (~0.91) — falsely reassuring. Only the correlated
+  (unstructured) form is both nested with the baseline and biologically sensible
+  (a hot cell is hot for all stages at once).
+- **Consequence for E3.** The "week AND location-year effects are common across
+  stages" assumption is FALSIFIED for location-year. The borrowing-strength
+  rationale survives in softer form — stages still inform each other through the
+  estimated between-stage correlation rather than being forced identical — so we
+  keep fitting all three stages and reporting motile, but the ly RE becomes a
+  stage-indexed 3-vector, not a scalar. E3's stated assumption is narrowed to
+  week only (see F7).
+
+Decision: in NIMBLE, replace the scalar ly random intercept with
+`b_ly[cell, 1:3] ~ MVN(0, Σ_ly)`, `Σ_ly` unstructured 3×3, non-centered via
+Cholesky (LKJ prior on the correlation, folded-normal SDs per E12). Motile
+column is the reported one. Gate on tester cleanliness first: `pdHess` TRUE, no
+singular fit, correlations not pinned at ±1, and 2008/2017 cell counts sane —
+if those are shaky the SE inflation is partly numerical.
+
 ---
 
 ## F. Abundance-model open items / deferred
@@ -351,3 +402,39 @@ Fit the glmmTMB analogue (E1) and compare year coefficients and `r`. Close
 agreement validates the NIMBLE code; disagreement on `sigma_week` / `sigma_ly`
 is expected (priors); disagreement on year effects means a bug and is faster to
 find this way than by re-reading model code.
+
+### E14. Location-year RE must be stage-specific and correlated (narrows E3)
+A glmmTMB tester (frequentist analogue of the abundance model, same long
+frame) shows the shared scalar `(1 | location:year)` — which forces all three
+stages to the SAME site-year deviation — is both a worse fit and
+anti-conservative on the reported motile year means.
+- **Fit.** Unstructured stage-specific `(0 + stage | ly)` beats the shared
+  intercept by ΔAIC ≈ 1450 (32 vs 30 params). The nested LRT is valid — shared
+  `(1 | ly)` is the rank-1 equicorrelation boundary of the unstructured 3×3 —
+  boundary-conservative, and agrees.
+- **Inference on what we report.** Motile year-coefficient SEs inflate under
+  the unstructured fit in *every* year (ratio 1.04–1.48), worst at thin/imputed
+  years (2008: 1.48, SE 0.20→0.30; 2017: 1.36). 2008 also moves most in the
+  point estimate (−2.22 → −2.52 on the link, ≈28% on the response). So the
+  shared model understates uncertainty on the motile year means — the Bell
+  et al. (2019) random-slope anti-conservatism, in our own model.
+- **The diagonal `(0 + stage || ly)` is a trap — do NOT use it.** Forcing
+  between-stage correlation to zero denies motile the corroboration of cope/chal
+  in the same cell, artificially shrinks the motile ly variance, and returns SE
+  ratios *below* 1 (~0.91) — falsely reassuring. Only the correlated
+  (unstructured) form is both nested with the baseline and biologically sensible
+  (a hot cell is hot for all stages at once).
+- **Consequence for E3.** The "week AND location-year effects are common across
+  stages" assumption is FALSIFIED for location-year. The borrowing-strength
+  rationale survives in softer form — stages still inform each other through the
+  estimated between-stage correlation rather than being forced identical — so we
+  keep fitting all three stages and reporting motile, but the ly RE becomes a
+  stage-indexed 3-vector, not a scalar. E3's stated assumption is narrowed to
+  week only (see F7).
+
+Decision: in NIMBLE, replace the scalar ly random intercept with
+`b_ly[cell, 1:3] ~ MVN(0, Σ_ly)`, `Σ_ly` unstructured 3×3, non-centered via
+Cholesky (LKJ prior on the correlation, folded-normal SDs per E12). Motile
+column is the reported one. Gate on tester cleanliness first: `pdHess` TRUE, no
+singular fit, correlations not pinned at ±1, and 2008/2017 cell counts sane —
+if those are shaky the SE inflation is partly numerical.

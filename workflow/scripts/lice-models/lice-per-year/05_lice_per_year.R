@@ -8,77 +8,14 @@ library(ggplot2)
 library(nimble)
 library(nimbleHMC)
 
-collated_df <- readr::read_csv(
-    here::here("./data/scfs-data/clean/lice-counts-for-regression.csv")
+collated_df_long <- readr::read_csv(
+    paste0(here::here("./data/scfs-data/clean/"),
+    "lice-counts-long-form-for-regression.csv")
 )
-
-# get rid of the weeks we don't want here
-collated_df_long <- collated_df %>%
-    dplyr::filter(week %notin% c(9, 28, 33)) %>%
-    tidyr::pivot_longer(
-        cols = c(lep_mot, lep_cope, lep_chal),
-        names_to = "stage",
-        names_prefix = "lep_", # so values are mot/cope/chal
-        values_to = "count"
-    ) %>%
-    # drop the 2001 cope NA rows (only NA cell, per the audit)
-    dplyr::filter(!is.na(count)) %>%
-    dplyr::select(obs_id, count, stage, year, week, location) %>%
-    dplyr::mutate(
-        # motile first so stage_idx == 1 is the reference 
-        stage = factor(stage, levels = c("mot", "cope", "chal")),
-        # location-year from observed combinations only 
-        ly = factor(paste(location, year, sep = "_")),
-        # factor the grouping vars AFTER 
-        year_f = droplevels(factor(year)),
-        week_f = droplevels(factor(week)),
-        ly_f = droplevels(ly)
-    )
-
-# integer index vectors for NIMBLE
-collated_df_long <- collated_df_long %>%
-    dplyr::mutate(
-        year_idx = as.integer(year_f),
-        week_idx = as.integer(week_f),
-        stage_idx = as.integer(stage),
-        ly_idx = as.integer(ly_f)
-    )
-
-# level maps — idx -> label, so posteriors map back
-year_levels <- tibble::tibble(
-    idx = seq_len(nlevels(collated_df_long$year_f)),
-    year = levels(collated_df_long$year_f)
-)
-week_levels <- tibble::tibble(
-    idx = seq_len(nlevels(collated_df_long$week_f)),
-    week = levels(collated_df_long$week_f)
-)
-stage_levels <- tibble::tibble(
-    idx = seq_len(nlevels(collated_df_long$stage)),
-    stage = levels(collated_df_long$stage)
-)
-ly_levels <- tibble::tibble(
-    idx = seq_len(nlevels(collated_df_long$ly_f)),
-    ly = levels(collated_df_long$ly_f)
-)
-# a couple quick data checks ---------------------------------------------------
-
-# check this has all been done right with the following: 
-# collated_df_long %>% dplyr::count(stage) # no NAs
-# collated_df_long %>% dplyr::count(year, stage) %>% # only 2001 is empty at cope
-#     tidyr::pivot_wider(names_from = stage, values_from = n, values_fill = 0)
-# collated_df_long %>% dplyr::count(ly_f) %>% dplyr::arrange(n) # how many loc-yr?
-# # how many distinct locations, and are any suspiciously near-duplicates?
-# collated_df_long %>% dplyr::distinct(location) %>% dplyr::arrange(location)
-
-# # and the site x year grid — is 75 a clean function of sites x years-observed?
-# collated_df_long %>% dplyr::count(location, year) %>%
-#     tidyr::pivot_wider(names_from = year, values_from = n, values_fill = 0) %>%
-#     print(width = Inf)
 
 # make the model itself --------------------------------------------------------
 glmm_mod <- nimble::nimbleCode({
-    # year as cell means, no intercept -----------------------------------------
+    # year as cell means -------------------------------------------------------
     for (k in 1:Yr) {
         beta_year[k] ~ dnorm(0, sd = 1)
     }
@@ -87,16 +24,14 @@ glmm_mod <- nimble::nimbleCode({
         beta_stage[s] ~ dnorm(0, sd = 1.5)
     }
 
-    # overdispersion (confirm via prior predictive check) 
+    # overdispersion (confirmed via prior predictive check)
     r ~ dgamma(shape = 1, rate = 0.5)
 
-    # RE scales: half-normal(0,1) via folded normal 
+    # week RE scale ------------------------------------------------------------
     sigma_week_raw ~ dnorm(0, sd = 0.5)
     sigma_week <- abs(sigma_week_raw)
-    sigma_ly_raw ~ dnorm(0, sd = 0.5)
-    sigma_ly <- abs(sigma_ly_raw)
 
-    # week RE: non-centered + redundant sum-to-zero  
+    # week RE ------------------------------------------------------------------
     for (i in 1:W) {
         z_week_raw[i] ~ dnorm(0, sd = 1)
     }
@@ -105,19 +40,26 @@ glmm_mod <- nimble::nimbleCode({
         b_week[i] <- sigma_week * (z_week_raw[i] - z_week_mean)
     }
 
-    # location-year RE: non-centered 
-    for (j in 1:L) {
-        z_ly_raw[j] ~ dnorm(0, sd = 1)
+    # location-year RE: DIAGONAL stage-specific (E16) --------------------------
+    # one sigma per stage which should be one sum-to-zero per stage column
+    for (s in 1:S) {
+        sigma_ly_raw[s] ~ dnorm(0, sd = 0.5)
+        sigma_ly[s] <- abs(sigma_ly_raw[s])
     }
-    z_ly_mean <- sum(z_ly_raw[1:L]) / L
-    for (j in 1:L) {
-        b_ly[j] <- sigma_ly * (z_ly_raw[j] - z_ly_mean)
+    for (s in 1:S) {
+        for (j in 1:L) {
+            z_ly_raw[j, s] ~ dnorm(0, sd = 1)
+        }
+        z_ly_mean[s] <- sum(z_ly_raw[1:L, s]) / L
+        for (j in 1:L) {
+            b_ly[j, s] <- sigma_ly[s] * (z_ly_raw[j, s] - z_ly_mean[s])
+        }
     }
 
     # likelihood ---------------------------------------------------------------
     for (i in 1:N) {
         log(mu[i]) <- beta_year[year_idx[i]] + beta_stage[stage_idx[i]] +
-            b_week[week_idx[i]] + b_ly[ly_idx[i]]
+            b_week[week_idx[i]] + b_ly[ly_idx[i], stage_idx[i]] #stage-indexed
         p[i] <- r / (r + mu[i])
         Y[i] ~ dnegbin(p[i], r)
     }
@@ -190,9 +132,9 @@ make_inits <- function() list(
     beta_stage = c(0, rnorm(S - 1, 0, 1)),
     r = rgamma(1, 2, 1),
     sigma_week_raw = rnorm(1, 0, 0.5),
-    sigma_ly_raw = rnorm(1, 0, 0.5),
     z_week_raw = rnorm(W, 0, 0.5),
-    z_ly_raw = rnorm(L, 0, 0.5)
+    sigma_ly_raw = rnorm(S, 0, 0.5),
+    z_ly_raw = matrix(rnorm(L * S, 0, 0.5), nrow = L, ncol = S)
 )
 
 nimbleOptions(buildModelDerivs = TRUE)
@@ -225,9 +167,9 @@ run_one_chain <- function(seed, glmm_mod, consts, data, monitors, dims) {
         beta_stage = c(0, rnorm(S - 1, 0, 1)),
         r = rgamma(1, 2, 1),
         sigma_week_raw = rnorm(1, 0, 0.5),
-        sigma_ly_raw = rnorm(1, 0, 0.5),
         z_week_raw = rnorm(W, 0, 0.5),
-        z_ly_raw = rnorm(L, 0, 0.5)
+        sigma_ly_raw = rnorm(S, 0, 0.5),
+        z_ly_raw = matrix(rnorm(L * S, 0, 0.5), nrow = L, ncol = S)
     )
     nimbleOptions(buildModelDerivs = TRUE)
     m <- nimbleModel(glmm_mod, constants = consts, data = data,
@@ -354,52 +296,7 @@ coda::gelman.diag(samples, multivariate = FALSE)
 coda::effectiveSize(samples)
 summary(samples[, "r"])   # ~0.55; subsample widens the SD but mean should hold
 
-# Metropolis comparison (subsample) --------------------------------------------
-Yr <- sub$dims$Yr; S <- sub$dims$S; W <- sub$dims$W; L <- sub$dims$L
 
-make_inits <- function() list(
-    beta_year = rnorm(Yr, 0, 1),
-    beta_stage = c(0, rnorm(S - 1, 0, 1)),
-    r = rgamma(1, 2, 1),
-    sigma_week_raw = rnorm(1, 0, 0.5),
-    sigma_ly_raw = rnorm(1, 0, 0.5),
-    z_week_raw = rnorm(W, 0, 0.5),
-    z_ly_raw = rnorm(L, 0, 0.5)
-)
 
-m <- nimbleModel(glmm_mod, constants = sub$consts, data = sub$data_list,
-                 inits = make_inits(), calculate = FALSE)
-cm <- compileNimble(m)
-conf <- configureMCMC(m, monitors = monitors) # default RW samplers
-mcmc <- buildMCMC(conf)
-cmcmc <- compileNimble(mcmc, project = m)
-
-samples_rw <- runMCMC(
-    cmcmc,
-    niter = 600, nburnin = 300, nchains = 4,
-    inits = replicate(4, make_inits(), simplify = FALSE),
-    samplesAsCodaMCMC = TRUE, setSeed = 1:4,
-    progressBar = TRUE
-)
-
-coda::gelman.diag(samples_rw, multivariate = FALSE)
-coda::effectiveSize(samples_rw)
-summary(samples_rw[, "r"])
-
-# comparison to frequentist ----------------------------------------------------
-# same data, same structure — factors straight from the long frame
-tmb_fit <- glmmTMB::glmmTMB(
-    count ~ 0 + year_f + stage + (1 | week_f) + (1 | ly_f),
-    family = glmmTMB::nbinom2,
-    data = collated_df_long
-)
-
-summary(tmb_fit)
-
-# pull the pieces to compare against NIMBLE
-glmmTMB::fixef(tmb_fit)$cond # year_f coefs = beta_year; stage = beta_stage
-sigma(tmb_fit) # this is glmmTMB's phi = r (nbinom2 dispersion)
-# RE sds
-print(glmmTMB::VarCorr(tmb_fit))
 
 # full set of diagnostics ------------------------------------------------------
