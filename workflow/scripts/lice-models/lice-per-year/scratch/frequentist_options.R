@@ -9,9 +9,9 @@ library(ggplot2)
 library(nimble)
 library(nimbleHMC)
 
-collated_df_long <- readr::read_csv(
+collated_df_long <- qs2::qs_read(
     paste0(here::here("./data/scfs-data/clean/"),
-    "lice-counts-long-form-for-regression.csv")
+    "lice-counts-long-form-for-regression.qs2")
 )
 
 # comparison to frequentist ----------------------------------------------------
@@ -124,3 +124,53 @@ cat("SE ratio diag/shared — range:",
     round(range(se_diag / se_shared), 3), "\n")
 
 AIC(tmb_fit, fit_diag, fit_slope)
+
+# is week RE shared or stage-specific? -----------------------------------------
+f_wk_shared <- glmmTMB::glmmTMB(
+    count ~ 0 + year_f + stage + (1 | week_f) + (0 + stage || ly_f),
+    family = glmmTMB::nbinom2, data = collated_df_long
+)
+f_wk_diag <- glmmTMB::glmmTMB(
+    count ~ 0 + year_f + stage + (0 + stage || week_f) + (0 + stage || ly_f),
+    family = glmmTMB::nbinom2, data = collated_df_long
+)
+f_wk_unstr <- glmmTMB::glmmTMB(
+    count ~ 0 + year_f + stage + (0 + stage | week_f) + (0 + stage || ly_f),
+    family = glmmTMB::nbinom2, data = collated_df_long
+)
+
+# converged?
+lapply(list(shared = f_wk_shared, diag = f_wk_diag, unstr = f_wk_unstr),
+       \(m) m$sdr$pdHess)
+
+# CHECK 1: between-stage WEEK correlations (the decisive number)
+print(glmmTMB::VarCorr(f_wk_unstr)$cond$week_f)
+attr(glmmTMB::VarCorr(f_wk_unstr)$cond$week_f, "correlation")
+sqrt(diag(glmmTMB::VarCorr(f_wk_unstr)$cond$week_f)) # stage-specific week SDs
+
+# CHECK 2: do motile year estimates/SEs move?
+yr_s <- glmmTMB::fixef(f_wk_shared)$cond[grep("^year_f", names(glmmTMB::fixef(f_wk_shared)$cond))]
+yr_u <- glmmTMB::fixef(f_wk_unstr)$cond[grep("^year_f", names(glmmTMB::fixef(f_wk_unstr)$cond))]
+yr_d <- glmmTMB::fixef(f_wk_diag)$cond[grep("^year_f", names(glmmTMB::fixef(f_wk_diag)$cond))]
+
+se <- function(m) {
+    v <- sqrt(diag(vcov(m)$cond))
+    v[grep("^year_f", names(glmmTMB::fixef(m)$cond))]
+}
+wk_compare <- data.frame(
+    year = sub("year_f", "", names(yr_s)),
+    est_shared = round(yr_s, 3),
+    est_diff_unstr = round(yr_u - yr_s, 3),
+    se_ratio_unstr = round(se(f_wk_unstr) / se(f_wk_shared), 3),
+    se_ratio_diag = round(se(f_wk_diag) / se(f_wk_shared), 3)
+)
+print(wk_compare, row.names = FALSE)
+
+cat("\nmax |year point shift| (wk unstr vs shared):",
+    round(max(abs(yr_u - yr_s)), 3), "\n")
+cat("SE ratio wk unstr/shared — range:",
+    round(range(se(f_wk_unstr) / se(f_wk_shared)), 3), "\n")
+cat("SE ratio wk diag/shared — range:",
+    round(range(se(f_wk_diag) / se(f_wk_shared)), 3), "\n")
+
+AIC(f_wk_shared, f_wk_diag, f_wk_unstr)

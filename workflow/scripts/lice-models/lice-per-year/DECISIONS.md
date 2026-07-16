@@ -202,8 +202,7 @@ legitimate ONLY under the assumption that week and location-year effects are
 **common across stages** (a site-year is high/low for all stages together; a
 week is high/low for all stages together); stage shifts only the overall
 level. State this assumption explicitly in the methods — it is what makes the
-pooling valid. Report motile row only. NOTE (E16): the "common across stages" assumption is retained for the LEVEL
-(stage as a borrowing-strength fixed effect) but REJECTED for the ly random
+pooling valid. Report motile row only. NOTE (E16): the "common across stages" assumption is retained for the LEVEL (stage as a borrowing-strength fixed effect) but REJECTED for the ly random
 effect — stages need their own ly variances. See E16.
 
 ### E4. Year as factor (cell means), stage with a reference level

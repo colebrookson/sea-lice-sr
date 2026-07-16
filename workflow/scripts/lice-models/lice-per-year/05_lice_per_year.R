@@ -8,9 +8,9 @@ library(ggplot2)
 library(nimble)
 library(nimbleHMC)
 
-collated_df_long <- readr::read_csv(
+collated_df_long <- qs2::qs_read(
     paste0(here::here("./data/scfs-data/clean/"),
-    "lice-counts-long-form-for-regression.csv")
+    "lice-counts-long-form-for-regression.qs2")
 )
 
 # make the model itself --------------------------------------------------------
@@ -123,8 +123,8 @@ prior_predictive <- function(n_sim = 500, dat = collated_df_long) {
     )
 }
 
-ppc <- prior_predictive()
-print(ppc)
+# ppc <- prior_predictive()
+# print(ppc)
 
 # set up the config/compile ----------------------------------------------------
 make_inits <- function() list(
