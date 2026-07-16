@@ -30,4 +30,5 @@ Imports:
     lubridate,
     betareg, 
     glmmTMB, 
-    parallel
+    parallel, 
+    qs2

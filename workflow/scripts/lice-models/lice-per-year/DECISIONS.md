@@ -202,7 +202,9 @@ legitimate ONLY under the assumption that week and location-year effects are
 **common across stages** (a site-year is high/low for all stages together; a
 week is high/low for all stages together); stage shifts only the overall
 level. State this assumption explicitly in the methods — it is what makes the
-pooling valid. Report motile row only.
+pooling valid. Report motile row only. NOTE (E16): the "common across stages" assumption is retained for the LEVEL
+(stage as a borrowing-strength fixed effect) but REJECTED for the ly random
+effect — stages need their own ly variances. See E16.
 
 ### E4. Year as factor (cell means), stage with a reference level
 Year is categorical (one coefficient per year), consistent with prior work.
@@ -321,41 +323,43 @@ Development/iteration fits use build_nimble_inputs(frac = 0.25); the production
 fit is the same builder at frac = 1. Per-row HMC cost scales ~linearly, so the
 subsample gives a faithful preview of mixing and runtime at ~1/4 the wall-clock.
 
-### E16. Location-year RE must be stage-specific and correlated (narrows E3)
-A glmmTMB tester (frequentist analogue of the abundance model, same long
-frame) shows the shared scalar `(1 | location:year)` — which forces all three
-stages to the SAME site-year deviation — is both a worse fit and
-anti-conservative on the reported motile year means.
-- **Fit.** Unstructured stage-specific `(0 + stage | ly)` beats the shared
-  intercept by ΔAIC ≈ 1450 (32 vs 30 params). The nested LRT is valid — shared
-  `(1 | ly)` is the rank-1 equicorrelation boundary of the unstructured 3×3 —
-  boundary-conservative, and agrees.
-- **Inference on what we report.** Motile year-coefficient SEs inflate under
-  the unstructured fit in *every* year (ratio 1.04–1.48), worst at thin/imputed
-  years (2008: 1.48, SE 0.20→0.30; 2017: 1.36). 2008 also moves most in the
-  point estimate (−2.22 → −2.52 on the link, ≈28% on the response). So the
-  shared model understates uncertainty on the motile year means — the Bell
-  et al. (2019) random-slope anti-conservatism, in our own model.
-- **The diagonal `(0 + stage || ly)` is a trap — do NOT use it.** Forcing
-  between-stage correlation to zero denies motile the corroboration of cope/chal
-  in the same cell, artificially shrinks the motile ly variance, and returns SE
-  ratios *below* 1 (~0.91) — falsely reassuring. Only the correlated
-  (unstructured) form is both nested with the baseline and biologically sensible
-  (a hot cell is hot for all stages at once).
-- **Consequence for E3.** The "week AND location-year effects are common across
-  stages" assumption is FALSIFIED for location-year. The borrowing-strength
-  rationale survives in softer form — stages still inform each other through the
-  estimated between-stage correlation rather than being forced identical — so we
-  keep fitting all three stages and reporting motile, but the ly RE becomes a
-  stage-indexed 3-vector, not a scalar. E3's stated assumption is narrowed to
-  week only (see F7).
+### E16. Location-year RE is diagonal stage-specific, not shared scalar (2026-01)
+E3 assumed a site-year is high/low for all stages together, licensing a single
+shared scalar b_ly across stages. Tested this with glmmTMB on the full long
+frame (shared (1|ly) vs. unstructured (0+stage|ly) vs. diagonal (0+stage||ly)):
 
-Decision: in NIMBLE, replace the scalar ly random intercept with
-`b_ly[cell, 1:3] ~ MVN(0, Σ_ly)`, `Σ_ly` unstructured 3×3, non-centered via
-Cholesky (LKJ prior on the correlation, folded-normal SDs per E12). Motile
-column is the reported one. Gate on tester cleanliness first: `pdHess` TRUE, no
-singular fit, correlations not pinned at ±1, and 2008/2017 cell counts sane —
-if those are shaky the SE inflation is partly numerical.
+- The shared assumption is FALSE: between-stage ly correlations are low
+  (motile-cope 0.14, motile-chal 0.17, cope-chal 0.38), nowhere near the ~1 the
+  shared model implies.
+- Stage-specific VARIANCES matter a lot: dAIC shared->diagonal = 1446. Motile
+  has the LARGEST ly SD (0.548 vs cope 0.462, chal 0.398), so the shared model
+  was under-sizing motile's ly variance by pooling.
+- Stage-specific CORRELATIONS do NOT matter: dAIC diagonal->unstructured = 4.4
+  across 3 extra params. The ~0.15 motile correlations buy essentially nothing.
+- Motile YEAR point estimates barely move across structures (max shift 0.297,
+  most < 0.1) — this is a CI-width question, not a bias question. Under the
+  unstructured fit motile year SEs inflate (1.04-1.48, worst in thin/imputed
+  2008/2017) but that inflation comes from poorly-determined correlation params
+  in data-poor years; under the diagonal fit those same years are ~0.95-0.99.
+
+Decision: DIAGONAL structure. b_ly becomes [L, S], one sigma_ly[s] per stage,
+one redundant sum-to-zero per stage COLUMN (E13 applied per column). Correlations
+fixed at 0 — captures the entire real effect (1446 of 1450 dAIC) without the
+LKJ/Cholesky machinery the unstructured form needs. The discarded motile
+correlations (0.14-0.17) don't affect the motile marginal variance we report.
+
+Identifiability (extends E5): the year-vs-RE-mean ridge now exists per stage
+column. The three per-column sum-to-zeros pin all three. Because motile is the
+E4 reference (beta_stage[1] <- 0), the motile column pins against beta_year
+directly, so exp(beta_year[k]) still reads as the motile expectation with no
+contrast arithmetic. This clean interaction depends on motile being the reference.
+
+Week RE left as shared scalar (1|week) — same test not yet run, lower priority
+(F7). Do not extend to week without testing.
+
+Downstream: the widened/re-sized motile W uncertainty feeds the Ricker
+predicted-mortality bounds; central c expected stable (point estimates barely
+moved). Re-run Ricker on the new W series after refit.
 
 ---
 
@@ -403,38 +407,9 @@ agreement validates the NIMBLE code; disagreement on `sigma_week` / `sigma_ly`
 is expected (priors); disagreement on year effects means a bug and is faster to
 find this way than by re-reading model code.
 
-### E14. Location-year RE must be stage-specific and correlated (narrows E3)
-A glmmTMB tester (frequentist analogue of the abundance model, same long
-frame) shows the shared scalar `(1 | location:year)` — which forces all three
-stages to the SAME site-year deviation — is both a worse fit and
-anti-conservative on the reported motile year means.
-- **Fit.** Unstructured stage-specific `(0 + stage | ly)` beats the shared
-  intercept by ΔAIC ≈ 1450 (32 vs 30 params). The nested LRT is valid — shared
-  `(1 | ly)` is the rank-1 equicorrelation boundary of the unstructured 3×3 —
-  boundary-conservative, and agrees.
-- **Inference on what we report.** Motile year-coefficient SEs inflate under
-  the unstructured fit in *every* year (ratio 1.04–1.48), worst at thin/imputed
-  years (2008: 1.48, SE 0.20→0.30; 2017: 1.36). 2008 also moves most in the
-  point estimate (−2.22 → −2.52 on the link, ≈28% on the response). So the
-  shared model understates uncertainty on the motile year means — the Bell
-  et al. (2019) random-slope anti-conservatism, in our own model.
-- **The diagonal `(0 + stage || ly)` is a trap — do NOT use it.** Forcing
-  between-stage correlation to zero denies motile the corroboration of cope/chal
-  in the same cell, artificially shrinks the motile ly variance, and returns SE
-  ratios *below* 1 (~0.91) — falsely reassuring. Only the correlated
-  (unstructured) form is both nested with the baseline and biologically sensible
-  (a hot cell is hot for all stages at once).
-- **Consequence for E3.** The "week AND location-year effects are common across
-  stages" assumption is FALSIFIED for location-year. The borrowing-strength
-  rationale survives in softer form — stages still inform each other through the
-  estimated between-stage correlation rather than being forced identical — so we
-  keep fitting all three stages and reporting motile, but the ly RE becomes a
-  stage-indexed 3-vector, not a scalar. E3's stated assumption is narrowed to
-  week only (see F7).
-
-Decision: in NIMBLE, replace the scalar ly random intercept with
-`b_ly[cell, 1:3] ~ MVN(0, Σ_ly)`, `Σ_ly` unstructured 3×3, non-centered via
-Cholesky (LKJ prior on the correlation, folded-normal SDs per E12). Motile
-column is the reported one. Gate on tester cleanliness first: `pdHess` TRUE, no
-singular fit, correlations not pinned at ±1, and 2008/2017 cell counts sane —
-if those are shaky the SE inflation is partly numerical.
+### F7. Week RE structure untested
+b_week is still a shared scalar (1|week) across stages, same assumption E16
+rejected for ly. Not yet tested. Lower priority than ly (week soaks seasonal
+signal that's more plausibly common across stages), but run the same glmmTMB
+shared-vs-diagonal check before finalizing. If diagonal wins, the E16 pattern
+ports directly (b_week becomes [W, S], per-column sum-to-zero).

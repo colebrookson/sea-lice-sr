@@ -203,8 +203,8 @@ coda::effectiveSize(samples)
 summary(samples[, "r"])  # should center ~0.55 per glmmTMB
 
 #  subsample for fast iteration ------------------------------------------------
-#' Draw a row-fraction of the long frame and rebuild ALL downstream objects from
-#' the subsample. Returns everything the parallel fit needs
+#' Draw a row-fraction of the long frame and rebuild ALL  objects from
+#' the subsample
 build_nimble_inputs <- function(df_long, frac = 1, seed = 1) {
     set.seed(seed)
 
@@ -294,7 +294,7 @@ sapply(samples_list, \(x) as.numeric(attr(x, "elapsed"), units = "mins"))
 
 coda::gelman.diag(samples, multivariate = FALSE)
 coda::effectiveSize(samples)
-summary(samples[, "r"])   # ~0.55; subsample widens the SD but mean should hold
+summary(samples[, "r"])   # ~0.55
 
 
 

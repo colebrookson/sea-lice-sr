@@ -74,8 +74,8 @@ ly_levels <- tibble::tibble(
 #     tidyr::pivot_wider(names_from = year, values_from = n, values_fill = 0) %>%
 #     print(width = Inf)
 
-readr::write_csv(
+qs2::qs_save(
     collated_df_long, 
     paste0(here::here("./data/scfs-data/clean/"),
-    "lice-counts-long-form-for-regression.csv")
+    "lice-counts-long-form-for-regression.qs2")
 )
