@@ -253,6 +253,19 @@ pred_all <- do.call(rbind, Map(
 sapply(list(orig = tmb_fit, best = f_wk_diag),
        \(f) re_var_by_stage(f, stage_levels))
 
+# reproduce the exact subsample rows the builder used (seed = 1)
+# set.seed(1)
+# keep <- sort(sample.int(nrow(collated_df_long),
+#                         floor(0.25 * nrow(collated_df_long))))
+# sub_df <- collated_df_long[keep, ] |>
+#     droplevels()
+
+# f_sub <- glmmTMB::glmmTMB(
+#     count ~ 0 + year_f + stage + (0 + stage || week_f) + (0 + stage || ly_f),
+#     family = glmmTMB::nbinom2, data = sub_df
+# )
+# sqrt(diag(glmmTMB::VarCorr(f_sub)$cond$week_f))  # motile week SD, no prior
+
 # plot: facet by stage, colour by model ---------------------------------------
 pd <- position_dodge(width = 0.6)
 
