@@ -6,5 +6,11 @@ As this work has been made possible by the Broughton Aquaculture Transition Init
 
 Please use (but do not steal) my code: [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
  
+## Repo structure
 
+- `workflow/` — the active pipeline (functions, lice-models, cleaning, stock-recruit-pairing)
+- `data/` — raw and processed data
+- `config/` — pipeline/tooling config
+- `docs/lab-notebook.md` — running notes and decisions, something of a lab notebook 
+- `archive/` — legacy code, outputs, and docs kept for reference. Not maintained!
 
