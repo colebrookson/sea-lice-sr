@@ -1,0 +1,1 @@
+Legacy code, outputs, and docs kept for reference only. Not maintained. See `pre-restructure-2026-08-19` git tag for full pre-archive repo state.
