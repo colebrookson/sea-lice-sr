@@ -1,0 +1,43 @@
+nimble version 1.4.2 is loaded.
+For more information on NIMBLE and a User Manual,
+please visit https://R-nimble.org.
+
+Attaching package: ‘nimble’
+
+The following object is masked from ‘package:stats’:
+
+    simulate
+
+The following object is masked from ‘package:base’:
+
+    declare
+
+17:44:02 building model 
+Defining model
+Building model
+Setting data and initial values
+Checking model sizes and dimensions
+  [Note] This model is not fully initialized. This is not an error.
+         To see which variables are not initialized, use model$initializeInfo().
+         For more information on model initialization, see help(modelInitialization).
+17:44:30 compiling model 
+Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
+===== Monitors =====
+thin = 1: beta_stage, beta_year, r, sigma_ly, sigma_week
+===== Samplers =====
+NUTS sampler (1)
+  - beta_year[1], beta_year[2], beta_year[3], beta_year[4], beta_year[5], beta_year[6], beta_year[7], beta_year[8], beta_year[9], beta_year[10], beta_year[11], beta_year[12], beta_year[13], beta_year[14], beta_year[15], beta_year[16], beta_year[17], beta_year[18], beta_year[19], beta_year[20], beta_year[21], beta_year[22], beta_year[23], beta_year[24], beta_year[25], beta_stage[2], beta_stage[3], r, sigma_week_raw[1], sigma_week_raw[2], sigma_week_raw[3], z_week_raw[1, 1], z_week_raw[2, 1], z_week_raw[3, 1], z_week_raw[4, 1], z_week_raw[5, 1], z_week_raw[6, 1], z_week_raw[7, 1], z_week_raw[8, 1], z_week_raw[9, 1], z_week_raw[10, 1], z_week_raw[11, 1], z_week_raw[12, 1], z_week_raw[13, 1], z_week_raw[14, 1], z_week_raw[15, 1], z_week_raw[16, 1], z_week_raw[17, 1], z_week_raw[18, 1], z_week_raw[19, 1], z_week_raw[20, 1], z_week_raw[21, 1], z_week_raw[1, 2], z_week_raw[2, 2], z_week_raw[3, 2], z_week_raw[4, 2], z_week_raw[5, 2], z_week_raw[6, 2], z_week_raw[7, 2], z_week_raw[8, 2], z_week_raw[9, 2], z_week_raw[10, 2], z_week_raw[11, 2], z_week_raw[12, 2], z_week_raw[13, 2], z_week_raw[14, 2], z_week_raw[15, 2], z_week_raw[16, 2], z_week_raw[17, 2], z_week_raw[18, 2], z_week_raw[19, 2], z_week_raw[20, 2], z_week_raw[21, 2], z_week_raw[1, 3], z_week_raw[2, 3], z_week_raw[3, 3], z_week_raw[4, 3], z_week_raw[5, 3], z_week_raw[6, 3], z_week_raw[7, 3], z_week_raw[8, 3], z_week_raw[9, 3], z_week_raw[10, 3], z_week_raw[11, 3], z_week_raw[12, 3], z_week_raw[13, 3], z_week_raw[14, 3], z_week_raw[15, 3], z_week_raw[16, 3], z_week_raw[17, 3], z_week_raw[18, 3], z_week_raw[19, 3], z_week_raw[20, 3], z_week_raw[21, 3], sigma_ly_raw[1], sigma_ly_raw[2], sigma_ly_raw[3], z_ly_raw[1, 1], z_ly_raw[2, 1], z_ly_raw[3, 1], z_ly_raw[4, 1], z_ly_raw[5, 1], z_ly_raw[6, 1], z_ly_raw[7, 1], z_ly_raw[8, 1], z_ly_raw[9, 1], z_ly_raw[10, 1], z_ly_raw[11, 1], z_ly_raw[12, 1], z_ly_raw[13, 1], z_ly_raw[14, 1], z_ly_raw[15, 1], z_ly_raw[16, 1], z_ly_raw[17, 1], z_ly_raw[18, 1], z_ly_raw[19, 1], z_ly_raw[20, 1], z_ly_raw[21, 1], z_ly_raw[22, 1], z_ly_raw[23, 1], z_ly_raw[24, 1], z_ly_raw[25, 1], z_ly_raw[26, 1], z_ly_raw[27, 1], z_ly_raw[28, 1], z_ly_raw[29, 1], z_ly_raw[30, 1], z_ly_raw[31, 1], z_ly_raw[32, 1], z_ly_raw[33, 1], z_ly_raw[34, 1], z_ly_raw[35, 1], z_ly_raw[36, 1], z_ly_raw[37, 1], z_ly_raw[38, 1], z_ly_raw[39, 1], z_ly_raw[40, 1], z_ly_raw[41, 1], z_ly_raw[42, 1], z_ly_raw[43, 1], z_ly_raw[44, 1], z_ly_raw[45, 1], z_ly_raw[46, 1], z_ly_raw[47, 1], z_ly_raw[48, 1], z_ly_raw[49, 1], z_ly_raw[50, 1], z_ly_raw[51, 1], z_ly_raw[52, 1], z_ly_raw[53, 1], z_ly_raw[54, 1], z_ly_raw[55, 1], z_ly_raw[56, 1], z_ly_raw[57, 1], z_ly_raw[58, 1], z_ly_raw[59, 1], z_ly_raw[60, 1], z_ly_raw[61, 1], z_ly_raw[62, 1], z_ly_raw[63, 1], z_ly_raw[64, 1], z_ly_raw[65, 1], z_ly_raw[66, 1], z_ly_raw[67, 1], z_ly_raw[68, 1], z_ly_raw[69, 1], z_ly_raw[70, 1], z_ly_raw[71, 1], z_ly_raw[72, 1], z_ly_raw[73, 1], z_ly_raw[74, 1], z_ly_raw[75, 1], z_ly_raw[1, 2], z_ly_raw[2, 2], z_ly_raw[3, 2], z_ly_raw[4, 2], z_ly_raw[5, 2], z_ly_raw[6, 2], z_ly_raw[7, 2], z_ly_raw[8, 2], z_ly_raw[9, 2], z_ly_raw[10, 2], z_ly_raw[11, 2], z_ly_raw[12, 2], z_ly_raw[13, 2], z_ly_raw[14, 2], z_ly_raw[15, 2], z_ly_raw[16, 2], z_ly_raw[17, 2], z_ly_raw[18, 2], z_ly_raw[19, 2], z_ly_raw[20, 2], z_ly_raw[21, 2], z_ly_raw[22, 2], z_ly_raw[23, 2], z_ly_raw[24, 2], z_ly_raw[25, 2], z_ly_raw[26, 2], z_ly_raw[27, 2], z_ly_raw[28, 2], z_ly_raw[29, 2], z_ly_raw[30, 2], z_ly_raw[31, 2], z_ly_raw[32, 2], z_ly_raw[33, 2], z_ly_raw[34, 2], z_ly_raw[35, 2], z_ly_raw[36, 2], z_ly_raw[37, 2], z_ly_raw[38, 2], z_ly_raw[39, 2], z_ly_raw[40, 2], z_ly_raw[41, 2], z_ly_raw[42, 2], z_ly_raw[43, 2], z_ly_raw[44, 2], z_ly_raw[45, 2], z_ly_raw[46, 2], z_ly_raw[47, 2], z_ly_raw[48, 2], z_ly_raw[49, 2], z_ly_raw[50, 2], z_ly_raw[51, 2], z_ly_raw[52, 2], z_ly_raw[53, 2], z_ly_raw[54, 2], z_ly_raw[55, 2], z_ly_raw[56, 2], z_ly_raw[57, 2], z_ly_raw[58, 2], z_ly_raw[59, 2], z_ly_raw[60, 2], z_ly_raw[61, 2], z_ly_raw[62, 2], z_ly_raw[63, 2], z_ly_raw[64, 2], z_ly_raw[65, 2], z_ly_raw[66, 2], z_ly_raw[67, 2], z_ly_raw[68, 2], z_ly_raw[69, 2], z_ly_raw[70, 2], z_ly_raw[71, 2], z_ly_raw[72, 2], z_ly_raw[73, 2], z_ly_raw[74, 2], z_ly_raw[75, 2], z_ly_raw[1, 3], z_ly_raw[2, 3], z_ly_raw[3, 3], z_ly_raw[4, 3], z_ly_raw[5, 3], z_ly_raw[6, 3], z_ly_raw[7, 3], z_ly_raw[8, 3], z_ly_raw[9, 3], z_ly_raw[10, 3], z_ly_raw[11, 3], z_ly_raw[12, 3], z_ly_raw[13, 3], z_ly_raw[14, 3], z_ly_raw[15, 3], z_ly_raw[16, 3], z_ly_raw[17, 3], z_ly_raw[18, 3], z_ly_raw[19, 3], z_ly_raw[20, 3], z_ly_raw[21, 3], z_ly_raw[22, 3], z_ly_raw[23, 3], z_ly_raw[24, 3], z_ly_raw[25, 3], z_ly_raw[26, 3], z_ly_raw[27, 3], z_ly_raw[28, 3], z_ly_raw[29, 3], z_ly_raw[30, 3], z_ly_raw[31, 3], z_ly_raw[32, 3], z_ly_raw[33, 3], z_ly_raw[34, 3], z_ly_raw[35, 3], z_ly_raw[36, 3], z_ly_raw[37, 3], z_ly_raw[38, 3], z_ly_raw[39, 3], z_ly_raw[40, 3], z_ly_raw[41, 3], z_ly_raw[42, 3], z_ly_raw[43, 3], z_ly_raw[44, 3], z_ly_raw[45, 3], z_ly_raw[46, 3], z_ly_raw[47, 3], z_ly_raw[48, 3], z_ly_raw[49, 3], z_ly_raw[50, 3], z_ly_raw[51, 3], z_ly_raw[52, 3], z_ly_raw[53, 3], z_ly_raw[54, 3], z_ly_raw[55, 3], z_ly_raw[56, 3], z_ly_raw[57, 3], z_ly_raw[58, 3], z_ly_raw[59, 3], z_ly_raw[60, 3], z_ly_raw[61, 3], z_ly_raw[62, 3], z_ly_raw[63, 3], z_ly_raw[64, 3], z_ly_raw[65, 3], z_ly_raw[66, 3], z_ly_raw[67, 3], z_ly_raw[68, 3], z_ly_raw[69, 3], z_ly_raw[70, 3], z_ly_raw[71, 3], z_ly_raw[72, 3], z_ly_raw[73, 3], z_ly_raw[74, 3], z_ly_raw[75, 3] 
+17:45:03 compiling mcmc 
+Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
+17:46:07 sampling start 
+running chain 1...
+  [Note] NUTS sampler (nodes: beta_year[1], beta_year[2], beta_year[3], beta_year[4], beta_year[5], beta_year[6], beta_year[7],...) is using 1000 warmup iterations.
+         Since `warmupMode` is 'default' and `nburnin` > 0,
+         the number of warmup iterations is equal to `nburnin`.
+         The burnin samples will be discarded, and all samples returned will be post-warmup.
+|-------------|-------------|-------------|-------------|
+|------------------------------------------

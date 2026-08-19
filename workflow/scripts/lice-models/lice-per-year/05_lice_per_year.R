@@ -189,7 +189,31 @@ make_inits <- function() {
 # )
 
 # parallelized version! --------------------------------------------------------
-run_one_chain <- function(seed, glmm_mod, consts, data, monitors, dims) {
+run_one_chain <- function(
+  seed,
+  glmm_mod,
+  consts,
+  data,
+  monitors,
+  dims,
+  log_dir
+) {
+  # open a per-chain log; capture BOTH stdout (progress bar) and messages
+  log_file <- file.path(log_dir, paste0("chain_", seed, ".log"))
+  con <- file(log_file, open = "wt")
+  sink(con, split = FALSE)
+  sink(con, type = "message")
+  on.exit(
+    {
+      sink(type = "message")
+      sink()
+      close(con)
+    },
+    add = TRUE
+  )
+
+  ts <- function(msg) cat(format(Sys.time(), "%H:%M:%S"), msg, "\n")
+
   library(nimble)
   library(nimbleHMC)
   Yr <- dims$Yr
@@ -208,6 +232,8 @@ run_one_chain <- function(seed, glmm_mod, consts, data, monitors, dims) {
     )
   }
   nimbleOptions(buildModelDerivs = TRUE)
+
+  ts("building model")
   m <- nimbleModel(
     glmm_mod,
     constants = consts,
@@ -216,23 +242,25 @@ run_one_chain <- function(seed, glmm_mod, consts, data, monitors, dims) {
     buildDerivs = TRUE,
     calculate = FALSE
   )
+  ts("compiling model")
   cm <- compileNimble(m)
-  conf <- configureHMC(
-    m,
-    monitors = monitors,
-    control = list(maxTreeDepth = 7)
-  )
+  conf <- configureHMC(m, monitors = monitors, control = list(maxTreeDepth = 7))
   mcmc <- buildMCMC(conf)
+  ts("compiling mcmc")
   cmcmc <- compileNimble(mcmc, project = m)
+
+  ts("sampling start")
   t0 <- Sys.time()
   out <- runMCMC(
     cmcmc,
     niter = 2000,
     nburnin = 1000,
     setSeed = seed,
-    samplesAsCodaMCMC = TRUE
+    samplesAsCodaMCMC = TRUE,
+    progressBar = TRUE
   )
   attr(out, "elapsed") <- Sys.time() - t0
+  ts("sampling done")
   return(out)
 }
 
@@ -358,10 +386,11 @@ samples_list <- parallel::parLapply(
   1:4,
   run_one_chain,
   glmm_mod = glmm_mod,
-  consts = sub$consts,
-  data = sub$data_list,
+  consts = consts,
+  data = data_list,
   monitors = monitors,
-  dims = sub$dims
+  dims = list(Yr = Yr, S = S, W = W, L = L),
+  log_dir = log_dir
 )
 parallel::stopCluster(cl)
 
@@ -373,6 +402,13 @@ qs2::qs_save(
     "glmm-diagonal-full-samples.qs2"
   )
 )
+samples_list <- qs2::qs_read(
+  paste0(
+    here::here("./data/scfs-data/clean/"),
+    "glmm-diagonal-full-samples.qs2"
+  )
+)
+
 
 # per-chain wall-clock (the whole point of this run)
 sapply(samples_list, \(x) as.numeric(attr(x, "elapsed"), units = "mins"))
