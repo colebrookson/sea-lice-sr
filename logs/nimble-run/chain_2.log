@@ -40,4 +40,4 @@ running chain 1...
          the number of warmup iterations is equal to `nburnin`.
          The burnin samples will be discarded, and all samples returned will be post-warmup.
 |-------------|-------------|-------------|-------------|
-|-----------------------------------------
+|------------------------------------------------------

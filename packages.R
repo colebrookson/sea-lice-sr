@@ -1,12 +1,12 @@
 ## packages.R
 ## Source this file at the top of any script to load all project dependencies.
-## Packages are declared in DESCRIPTION; add new ones there, not here.
+## Packages are declared in DESCRIPTION, add new ones there pls!
+## Dependency resolution goes through pak::local_deps(), not hand-parsed
+## DESCRIPTION text
 
-d <- read.dcf("DESCRIPTION", c("Depends", "Imports"))
-pkgs <- unlist(strsplit(paste(d[1, ], collapse = ","), ","))
-pkgs <- trimws(gsub("\\(.*\\)", "", pkgs)) # strip version specs like (>= 4.4)
-pkgs <- setdiff(pkgs, "R") # drop the R pseudo-package
+deps <- pak::local_deps(root = ".")
+pkgs <- unique(deps$package[deps$package != "R"])
 
 invisible(lapply(pkgs, function(p) {
-    library(p, character.only = TRUE)
+  library(p, character.only = TRUE)
 }))

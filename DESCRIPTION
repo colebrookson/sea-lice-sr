@@ -25,7 +25,7 @@ Imports:
     patchwork,
     colebrookson/MoMAColors, 
     nimble, 
-    nimbelHMC,
+    nimbleHMC,
     coda, 
     lubridate,
     betareg, 
