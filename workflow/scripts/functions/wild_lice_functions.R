@@ -163,3 +163,66 @@ impute_once <- function(fish_df, props, seed, by = "year") {
       week = lubridate::isoweek(lubridate::make_date(year, month, day))
     )
 }
+
+#' mean_pred
+#'
+#' @description We want to average the individual predictions on the fish that
+#' carry lice of a given stage
+#'
+#' @param model the fitted model
+#' @param newdata what to predict onto
+#'
+#' @returns the response we want
+mean_pred <- function(model, newdata) {
+  if (nrow(newdata) == 0) {
+    return(NA_real_)
+  }
+  mean(stats::predict(model, newdata = newdata, type = "response"))
+}
+
+
+pred_ribbon <- function(model, xvar, xmax) {
+  nd <- tibble::tibble(!!xvar := seq(0, xmax, length.out = 500))
+  p <- stats::predict(model, newdata = nd, type = "link", se.fit = TRUE)
+  inv <- model$family$linkinv
+
+  nd |>
+    dplyr::mutate(
+      fit = inv(p$fit),
+      lower = inv(p$fit - 1.96 * p$se.fit),
+      upper = inv(p$fit + 1.96 * p$se.fit)
+    )
+}
+
+plot_stage <- function(fit_df, model, xvar, lep, spec, xlab, fill) {
+  rib <- pred_ribbon(model, xvar, max(fit_df[[xvar]]))
+  points <- fit_df |>
+    dplyr::filter(.data[[spec]] > 0) |>
+    dplyr::mutate(obs_prop = .data[[lep]] / .data[[spec]])
+
+  ggplot() +
+    geom_point(
+      data = points,
+      aes(x = .data[[xvar]], y = obs_prop),
+      shape = 21,
+      colour = "black",
+      fill = fill,
+      alpha = 0.1,
+      size = 3,
+      position = position_jitter(height = 0)
+    ) +
+    geom_ribbon(
+      data = rib,
+      aes(x = .data[[xvar]], ymin = lower, ymax = upper),
+      fill = "grey80",
+      alpha = 0.7
+    ) +
+    geom_line(
+      data = rib,
+      aes(x = .data[[xvar]], y = fit),
+      linewidth = 1.2
+    ) +
+    coord_cartesian(ylim = c(0, 1)) +
+    labs(x = xlab, y = "Proportion L. salmonis") +
+    theme_better()
+}
