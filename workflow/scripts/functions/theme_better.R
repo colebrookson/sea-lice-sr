@@ -20,21 +20,22 @@
 #' @export
 #' @importFrom ggplot2 theme_grey
 theme_foundation <- function(base_size = 20, base_family = "") {
-    thm <- theme_grey(base_size = base_size, base_family = base_family)
-    for (i in names(thm)) {
-        if ("colour" %in% names(thm[[i]])) {
-            thm[[i]]["colour"] <- list(NULL)
-        }
-        if ("fill" %in% names(thm[[i]])) {
-            thm[[i]]["fill"] <- list(NULL)
-        }
+  thm <- theme_grey(base_size = base_size, base_family = base_family)
+  for (i in names(thm)) {
+    if ("colour" %in% names(thm[[i]])) {
+      thm[[i]]["colour"] <- list(NULL)
     }
-    thm + theme(
-        panel.border = element_rect(fill = NA),
-        legend.background = element_rect(colour = NA),
-        line = element_line(colour = "black"),
-        rect = element_rect(fill = "white", colour = "black"),
-        text = element_text(colour = "black")
+    if ("fill" %in% names(thm[[i]])) {
+      thm[[i]]["fill"] <- list(NULL)
+    }
+  }
+  thm +
+    theme(
+      panel.border = element_rect(fill = NA),
+      legend.background = element_rect(colour = NA),
+      line = element_line(colour = "black"),
+      rect = element_rect(fill = "white", colour = "black"),
+      text = element_text(colour = "black")
     )
 }
 
@@ -47,57 +48,62 @@ theme_foundation <- function(base_size = 20, base_family = "") {
 #' @family themes
 #' @example inst/examples/ex-theme_base.R
 theme_better <- function(base_size = 20, base_family = "") {
-    theme_foundation() +
-        theme(
-            line = element_line(
-                colour = "black",
-                lineend = "round",
-                linetype = "solid"
-            ),
-            rect = element_rect(
-                fill = "white",
-                colour = "black",
-                linetype = "solid"
-            ),
-            text = element_text(
-                colour = "black",
-                face = "plain",
-                family = "Helvetica",
-                size = base_size,
-                vjust = 0.5,
-                hjust = 0.5,
-                lineheight = 1
-            ),
-            panel.grid = element_blank(),
-            strip.background = element_rect(colour = NA),
-            legend.key = element_rect(colour = NA),
-            title = element_text(size = rel(1)),
-            plot.title = element_text(
-                size = rel(1.4), face = "bold",
-                hjust = 0.5
-            ),
-            axis.title = element_text(
-                size = rel(1.15),
-                face = "bold"
-            ),
-            axis.text = element_text(
-                size = rel(1)
-            ),
-            strip.text = element_text(),
-            axis.ticks.length = unit(0.5, "lines"),
-            # add my addition here
-            panel.background = element_rect(
-                fill = "transparent", colour = NA
-            ),
-            plot.background = element_rect(
-                fill = "transparent", colour = NA
-            ),
-            legend.background = element_rect(
-                fill = "transparent", colour = NA
-            ),
-            legend.box.background = element_rect(
-                fill = "transparent", colour = NA
-            )
-        )
-    # TODO: get margins right
+  theme_foundation() +
+    theme(
+      line = element_line(
+        colour = "black",
+        lineend = "round",
+        linetype = "solid"
+      ),
+      rect = element_rect(
+        fill = "white",
+        colour = "black",
+        linetype = "solid"
+      ),
+      text = element_text(
+        colour = "black",
+        face = "plain",
+        family = "Helvetica",
+        size = base_size,
+        vjust = 0.5,
+        hjust = 0.5,
+        lineheight = 1
+      ),
+      panel.grid = element_blank(),
+      strip.background = element_rect(colour = NA),
+      legend.key = element_rect(colour = NA),
+      title = element_text(size = rel(1)),
+      plot.title = element_text(
+        size = rel(1.4),
+        face = "bold",
+        hjust = 0.5
+      ),
+      axis.title = element_text(
+        size = rel(1.15),
+        face = "bold"
+      ),
+      axis.text = element_text(
+        size = rel(1)
+      ),
+      strip.text = element_text(),
+      axis.ticks.length = unit(0.5, "lines"),
+      # add my addition here
+      panel.background = element_rect(
+        fill = "transparent",
+        colour = NA
+      ),
+      plot.background = element_rect(
+        fill = "transparent",
+        colour = NA
+      ),
+      legend.background = element_rect(
+        fill = "transparent",
+        colour = NA
+      ),
+      legend.box.background = element_rect(
+        fill = "transparent",
+        colour = NA
+      )
+    )
+  # TODO: get margins right
 }

@@ -3,19 +3,24 @@
 #' location-year random effects are now DIAGONAL stage-specific:
 #' each stage gets its own variance and its own per-column sum-to-zero.
 
-source(here::here("./workflow/scripts/functions/theme_better.R"))
-source(here::here("./workflow/scripts/functions/global.R"))
 library(magrittr)
 library(ggplot2)
 library(nimble)
 library(nimbleHMC)
+source(here::here("./workflow/scripts/functions/theme_better.R"))
+source(here::here("./workflow/scripts/functions/global.R"))
 
-collated_df_long <- qs2::qs_read(
-  paste0(
-    here::here("./data/scfs-data/clean/"),
-    "lice-counts-long-form-for-regression.qs2"
+# write an interactive vs pipeline bit
+if (exists("snakemake")) {
+  collated_df_long <- snakemake@input[[collated_df_long]]
+} else {
+  collated_df_long <- qs2::qs_read(
+    paste0(
+      here::here("./data/scfs-data/clean/"),
+      "lice-counts-long-form-for-regression.qs2"
+    )
   )
-)
+}
 
 # make the model itself --------------------------------------------------------
 glmm_mod <- nimble::nimbleCode({
