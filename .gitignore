@@ -25,6 +25,9 @@ cache/
 # raw data (usually too large or sensitive to commit)
 data/raw/
 
+# model build shit 
+workflow/models/build/
+
 # OS noise
 .DS_Store
 Thumbs.db

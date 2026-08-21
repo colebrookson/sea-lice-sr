@@ -28,52 +28,44 @@ glmm_mod <- nimble::nimbleCode({
   for (k in 1:Yr) {
     beta_year[k] ~ dnorm(0, sd = 1)
   }
-  beta_stage[1] <- 0
-  for (s in 2:S) {
-    beta_stage[s] ~ dnorm(0, sd = 1.5)
-  }
+  # beta_stage[1] <- 0
+  # for (s in 2:S) {
+  #   beta_stage[s] ~ dnorm(0, sd = 1.5)
+  # }
 
   # overdispersion (confirmed via prior predictive check)
   r ~ dgamma(shape = 1, rate = 0.5)
 
-  # week RE: DIAGONAL stage-specific  ----------------------------------------
-  # motile week SD ~2.1, so sigma prior widened from 0.5 to 3 to admit it
-  for (s in 1:S) {
-    sigma_week_raw[s] ~ dnorm(0, sd = 3)
-    sigma_week[s] <- abs(sigma_week_raw[s])
+  # week RE --------------------------------------------------------------------
+  # motile week SD ~2.1, so sigma prior widened from 0.5 to 3 to admit
+  sigma_week_raw ~ dnorm(0, sd = 3)
+  sigma_week <- abs(sigma_week_raw)
+  for (i in 1:W) {
+    z_week_raw[i] ~ dnorm(0, sd = 1)
   }
-  for (s in 1:S) {
-    for (i in 1:W) {
-      z_week_raw[i, s] ~ dnorm(0, sd = 1)
-    }
-    z_week_mean[s] <- sum(z_week_raw[1:W, s]) / W
-    for (i in 1:W) {
-      b_week[i, s] <- sigma_week[s] * (z_week_raw[i, s] - z_week_mean[s])
-    }
+  z_week_mean <- sum(z_week_raw[1:W]) / W
+  for (i in 1:W) {
+    b_week[i] <- sigma_week * (z_week_raw[i] - z_week_mean)
   }
 
-  # location-year RE: DIAGONAL stage-specific --------------------------------
+  # location-year RE -----------------------------------------------------------
   # one sigma per stage, one sum-to-zero per stage column; prior widened to 1
-  for (s in 1:S) {
-    sigma_ly_raw[s] ~ dnorm(0, sd = 1)
-    sigma_ly[s] <- abs(sigma_ly_raw[s])
+  sigma_ly_raw ~ dnorm(0, sd = 1)
+  sigma_ly <- abs(sigma_ly_raw)
+
+  for (j in 1:L) {
+    z_ly_raw[j] ~ dnorm(0, sd = 1)
   }
-  for (s in 1:S) {
-    for (j in 1:L) {
-      z_ly_raw[j, s] ~ dnorm(0, sd = 1)
-    }
-    z_ly_mean[s] <- sum(z_ly_raw[1:L, s]) / L
-    for (j in 1:L) {
-      b_ly[j, s] <- sigma_ly[s] * (z_ly_raw[j, s] - z_ly_mean[s])
-    }
+  z_ly_mean <- sum(z_ly_raw[1:L]) / L
+  for (j in 1:L) {
+    b_ly[j] <- sigma_ly * (z_ly_raw[j] - z_ly_mean)
   }
 
   # likelihood ---------------------------------------------------------------
   for (i in 1:N) {
     log(mu[i]) <- beta_year[year_idx[i]] +
-      beta_stage[stage_idx[i]] +
-      b_week[week_idx[i], stage_idx[i]] +
-      b_ly[ly_idx[i], stage_idx[i]] # both REs stage-indexed
+      b_week[week_idx[i]] +
+      b_ly[ly_idx[i]] # both REs stage-indexed
     p[i] <- r / (r + mu[i])
     Y[i] ~ dnegbin(p[i], r)
   }
@@ -82,14 +74,14 @@ glmm_mod <- nimble::nimbleCode({
 # data ! -----------------------------------------------------------------------
 # level counts
 Yr <- nlevels(collated_df_long$year_f)
-S <- nlevels(collated_df_long$stage)
+#S <- nlevels(collated_df_long$stage)
 W <- nlevels(collated_df_long$week_f)
 L <- nlevels(collated_df_long$ly_f)
 
 # max index must equal declared level count
 stopifnot(
   max(collated_df_long$year_idx) == Yr,
-  max(collated_df_long$stage_idx) == S,
+  #max(collated_df_long$stage_idx) == S,
   max(collated_df_long$week_idx) == W,
   max(collated_df_long$ly_idx) == L,
   collated_df_long$stage_idx[collated_df_long$stage == "mot"][1] == 1
@@ -98,7 +90,7 @@ stopifnot(
 consts <- list(
   N = nrow(collated_df_long),
   Yr = Yr,
-  S = S,
+  #S = S,
   W = W,
   L = L,
   year_idx = collated_df_long$year_idx,

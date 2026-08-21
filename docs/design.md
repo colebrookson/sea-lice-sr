@@ -48,8 +48,8 @@ $$
 \begin{aligned}
 b_j^{\text{wk}} =& \sigma_{\text{wk}}(z_j^{\text{wk}} - \bar{z}^{\text{wk}}) \\
 b_l^{\text{ly}} =& \sigma_{\text{ly}}(z_l^{\text{ly}} - \bar{z}^{\text{ly}}) \\
-\sigma_{\text{wk}} =& \lvert{\tilde{\sigma}_{\text{wk}}} \\
-\sigma_{\text{ly}} =& \lvert{\tilde{\sigma}_{\text{ly}}}
+\sigma_{\text{wk}} =& \lvert \tilde{\sigma}_{\text{wk}}\rvert \\
+\sigma_{\text{ly}} =& \lvert\tilde{\sigma}_{\text{ly}}\rvert
 \end{aligned}
 $$
 
