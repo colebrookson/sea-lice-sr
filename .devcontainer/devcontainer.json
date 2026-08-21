@@ -10,7 +10,9 @@
         "REditorSupport.r",
         "ms-azuretools.vscode-docker",
         "ms-python.python",
-        "ms-toolsai.jupyter"
+        "ms-toolsai.jupyter",
+        "mechatroner.rainbow-", 
+        "Posit.air-vscode"
       ],
       "settings": {
         "r.rterm.linux": "/usr/local/bin/arf",

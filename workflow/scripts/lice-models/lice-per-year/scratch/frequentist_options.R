@@ -6,9 +6,13 @@ source(here::here("./workflow/scripts/functions/theme_better.R"))
 source(here::here("./workflow/scripts/functions/global.R"))
 library(magrittr)
 library(ggplot2)
-library(nimble)
-library(nimbleHMC)
 
+collated_df_long_stages <- qs2::qs_read(
+  paste0(
+    here::here("./data/scfs-data/clean/"),
+    "lice-counts-long-form-all-stages-for-regression.qs2"
+  )
+)
 collated_df_long <- qs2::qs_read(
   paste0(
     here::here("./data/scfs-data/clean/"),
@@ -440,5 +444,3 @@ ys_compare <- data.frame(
   est_diff = round(as.numeric(mot_int) - mot_add, 3),
   se_ratio = round(se_of(f_ys_int, "\\.mot$") / se_of(f_ys_add, "^year_f"), 3)
 )
-print(ys_compare)
-cat("\nmax |motile year shift|:", round(max(abs(ys_compare$est_diff)), 3), "\n")

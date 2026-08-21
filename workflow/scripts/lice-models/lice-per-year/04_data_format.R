@@ -6,23 +6,34 @@ source(here::here("./workflow/scripts/functions/global.R"))
 
 if (exists("snakemake")) {
   counts_reg_path <- snakemake@inputs[["counts_reg_path"]]
-  long_form_path <- snakemake@outputs[["long_form_path"]]
-  motile_bool <- snakemake@parameters[["motile_bool"]]
+  motile_only_bool <- snakemake@parameters[["motile_bool"]]
+  if (motile_only_bool) {
+    long_form_path <- snakemake@outputs[["long_form_path"]]
+  } else {
+    long_form_path <- snakemake@outputs[["long_form_all_stages_path"]]
+  }
 } else {
   counts_reg_path <- here::here(
     "./data/scfs-data/clean/lice-counts-for-regression.csv"
   )
-  long_form_path <- paste0(
-    here::here("./data/scfs-data/clean/"),
-    "lice-counts-long-form-for-regression.qs2"
-  )
-  motile_bool <- FALSE
+  motile_only_bool <- FALSE
+  if (motile_only_bool) {
+    long_form_path <- paste0(
+      here::here("./data/scfs-data/clean/"),
+      "lice-counts-long-form-for-regression.qs2"
+    )
+  } else {
+    long_form_path <- paste0(
+      here::here("./data/scfs-data/clean/"),
+      "lice-counts-long-form-all-stages-for-regression.qs2"
+    )
+  }
 }
 collated_df <- readr::read_csv(
   counts_reg_path
 )
 
-if (!motile_bool) {
+if (motile_only_bool) {
   # get rid of the weeks we don't want here
   collated_df_long <- collated_df |>
     dplyr::filter(week %notin% c(9, 28, 33)) |>
