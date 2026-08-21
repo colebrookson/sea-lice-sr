@@ -16,12 +16,5 @@ apt-get install -y --no-install-recommends \
     libglpk-dev \
     libgit2-dev
 
-# add project-specific system deps below this line
-# e.g. for sf:
-#   libgdal-dev gdal-bin libgeos-dev libproj-dev libsqlite3-dev libudunits2-dev
-# e.g. for Stan/rstanarm:
-#   (g++ and gfortran are covered by build-essential)
-#   liblapack-dev libblas-dev
-
 apt-get clean
 rm -rf /var/lib/apt/lists/*

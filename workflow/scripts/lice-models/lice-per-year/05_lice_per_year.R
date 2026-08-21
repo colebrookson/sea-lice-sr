@@ -22,6 +22,21 @@ if (exists("snakemake")) {
   )
 }
 
+r1 <- readr::read_csv(
+    here::here("./data/scfs-data/clean/lice-counts-for-regression.csv")
+)
+
+r1 |>
+    dplyr::group_by(year) |>
+    dplyr::summarise(
+        n = dplyr::n(),
+        na_lep_mot = sum(is.na(lep_mot)),
+        na_week = sum(is.na(week)),
+        na_location = sum(is.na(location)),
+        obs_spec_mot = sum(sp_mot, na.rm = TRUE)
+    ) |>
+    print(n = Inf)
+
 # make the model itself --------------------------------------------------------
 glmm_mod <- nimble::nimbleCode({
   # year as cell means -------------------------------------------------------
