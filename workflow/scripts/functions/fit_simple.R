@@ -28,7 +28,7 @@ fit_extract_plot <- function(
   formula <- reformulate(farm_lice, response = wild_lice)
   simple_mod <- stats::lm(formula, data = df)
   r2_val <- summary(simple_mod)$r.squared
-  plot_lab <- paste("R^2 == ", round(r2_val, 2))
+  # plot_lab <- paste("R^2 == ", round(r2_val, 2))
   # wild_farm_reg <- ggplot(data = df) +
   #     geom_point(
   #         aes(
@@ -59,7 +59,7 @@ fit_extract_plot <- function(
   #     dpi = 300,
   #     height = 8, width = 11
   # )
-  return(r2_val)
+  r2_val
 }
 
 fit_all_farms_marty <- fit_extract_plot(

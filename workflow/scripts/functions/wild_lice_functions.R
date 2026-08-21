@@ -13,7 +13,7 @@
 #'
 #' @return a tibble showing the stage/counted information for given years
 lice_protocol <- function(years) {
-  tibble::tibble(year = years) %>%
+  tibble::tibble(year = years) |>
     dplyr::mutate(
       cope_counted = year >= 2002,
       cope_speciated = year >= 2005,
@@ -49,7 +49,7 @@ MOT_COLS <- c(
 #' stays NA.
 #' @param df the dataframe that we're working with
 fill_counted_stages <- function(df) {
-  df %>%
+  df |>
     dplyr::mutate(
       dplyr::across(
         dplyr::any_of(COPE_COLS),
@@ -138,7 +138,7 @@ impute_once <- function(fish_df, props, seed, by = "year") {
   set.seed(seed)
 
   df <- dplyr::left_join(fish_df, props, by = by)
-  df %>%
+  df |>
     dplyr::mutate(
       # motiles are done by re-allocating the unid_adult (and unid_pa
       # in the 2001 case)
