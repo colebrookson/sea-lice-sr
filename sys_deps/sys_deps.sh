@@ -9,6 +9,7 @@ apt-get update -qq
 #   gert / credentials         -> libgit2
 apt-get install -y --no-install-recommends \
     build-essential \
+    curl \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
