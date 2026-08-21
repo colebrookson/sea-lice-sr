@@ -36,20 +36,22 @@ COPY DESCRIPTION /home/rproject/
 RUN R -q -e "pak::meta_update()" \
     && R -q -e "pak::local_install_deps('.', ask = FALSE, upgrade = FALSE)"
 
- 
+
 # ---------------------------------------------------------------------------
 # CmdStan — layer so caches independently
 #
 # Pin the version bc sum_to_zero_vector requires >= 2.36
 # ---------------------------------------------------------------------------
-ENV CMDSTAN=/opt/cmdstan
- 
+ARG CMDSTAN_VERSION=2.39.0
+ENV CMDSTAN=/opt/cmdstan-${CMDSTAN_VERSION}
+
 RUN MAKEFLAGS="" R -q -e "cmdstanr::install_cmdstan( \
-      dir = '/opt', \
-      cores = 4, \
-      overwrite = FALSE)" \
+    dir = '/opt', \
+    version = '${CMDSTAN_VERSION}', \
+    cores = 4, \
+    overwrite = FALSE)" \
     && R -q -e "cmdstanr::set_cmdstan_path(Sys.getenv('CMDSTAN')); \
-                cat('CmdStan', cmdstanr::cmdstan_version(), '\n')"
+    cat('CmdStan', cmdstanr::cmdstan_version(), '\n')"
 
 
 # ---------------------------------------------------------------------------
