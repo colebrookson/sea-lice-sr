@@ -13,7 +13,7 @@ apt-get install -y --no-install-recommends \
     libssl-dev \
     libxml2-dev \
     libglpk-dev \
-    libgit2-dev \ 
+    libgit2-dev
 
 # add project-specific system deps below this line
 # e.g. for sf:

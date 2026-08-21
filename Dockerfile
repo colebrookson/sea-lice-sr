@@ -26,22 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # ---------------------------------------------------------------------------
-# Python environment — changes when pyproject.toml changes, nothing all that 
-# special here
-# ---------------------------------------------------------------------------
-# RUN apt-get update && apt-get install -y --no-install-recommends \
-#     python3 \
-#     python3-venv \
-#     && rm -rf /var/lib/apt/lists/*
-
-# RUN python3 -m venv /opt/venv
-# ENV PATH="/opt/venv/bin:$PATH"
-
-# COPY pyproject.toml /tmp/pyproject.toml
-# RUN pip install --no-cache-dir /tmp/pyproject.toml
-
-# ---------------------------------------------------------------------------
-# R packages — changes when DESCRIPTION changes
+# R packages
 # ---------------------------------------------------------------------------
 RUN install2.r --error --skipinstalled pak
 
@@ -50,6 +35,22 @@ COPY DESCRIPTION /home/rproject/
 
 RUN R -q -e "pak::meta_update()" \
     && R -q -e "pak::local_install_deps('.', ask = FALSE, upgrade = FALSE)"
+
+ 
+# ---------------------------------------------------------------------------
+# CmdStan — layer so caches independently
+#
+# Pin the version bc sum_to_zero_vector requires >= 2.36
+# ---------------------------------------------------------------------------
+ENV CMDSTAN=/opt/cmdstan
+ 
+RUN MAKEFLAGS="" R -q -e "cmdstanr::install_cmdstan( \
+      dir = '/opt', \
+      cores = 4, \
+      overwrite = FALSE)" \
+    && R -q -e "cmdstanr::set_cmdstan_path(Sys.getenv('CMDSTAN')); \
+                cat('CmdStan', cmdstanr::cmdstan_version(), '\n')"
+
 
 # ---------------------------------------------------------------------------
 # arf + languageserver + httpgd because gotta have a nice R interface!

@@ -24,8 +24,8 @@ Imports:
     purrr, 
     Hmisc, 
     patchwork,
-    colebrookson/MoMAColors, 
-    stan-dev/cmdstanr,
+    MoMAColors,
+    cmdstanr,
     posterior,
     bayesplot,
     lubridate,
@@ -33,3 +33,7 @@ Imports:
     glmmTMB, 
     parallel, 
     qs2
+Remotes:
+    colebrookson/MoMAColors,
+    stan-dev/cmdstanr
+    
