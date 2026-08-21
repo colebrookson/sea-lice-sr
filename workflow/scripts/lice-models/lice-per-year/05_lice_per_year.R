@@ -74,14 +74,12 @@ glmm_mod <- nimble::nimbleCode({
 # data ! -----------------------------------------------------------------------
 # level counts
 Yr <- nlevels(collated_df_long$year_f)
-#S <- nlevels(collated_df_long$stage)
 W <- nlevels(collated_df_long$week_f)
 L <- nlevels(collated_df_long$ly_f)
 
 # max index must equal declared level count
 stopifnot(
   max(collated_df_long$year_idx) == Yr,
-  #max(collated_df_long$stage_idx) == S,
   max(collated_df_long$week_idx) == W,
   max(collated_df_long$ly_idx) == L,
   collated_df_long$stage_idx[collated_df_long$stage == "mot"][1] == 1
@@ -90,7 +88,6 @@ stopifnot(
 consts <- list(
   N = nrow(collated_df_long),
   Yr = Yr,
-  #S = S,
   W = W,
   L = L,
   year_idx = collated_df_long$year_idx,
@@ -101,8 +98,6 @@ consts <- list(
 data_list <- list(Y = collated_df_long$count)
 
 # ok now do a ppc --------------------------------------------------------------
-#' Updated to the DIAGONAL structure: stage-specific week/ly sigmas at the new
-#' prior widths with per-stage centered RE draws
 prior_predictive <- function(n_sim = 500, dat = collated_df_long) {
   obs_zero <- mean(dat$count == 0)
   obs_q <- quantile(dat$count, c(0.5, 0.9, 0.99, 1))
@@ -112,7 +107,6 @@ prior_predictive <- function(n_sim = 500, dat = collated_df_long) {
   for (s in seq_len(n_sim)) {
     r_s <- rgamma(1, shape = 1, rate = 0.5)
     by <- rnorm(Yr, 0, 1)
-    bs <- c(0, rnorm(S - 1, 0, 1.5))
 
     # stage-specific week + ly sigmas at the NEW prior widths
     sig_wk <- abs(rnorm(S, 0, 1.5))
@@ -129,9 +123,8 @@ prior_predictive <- function(n_sim = 500, dat = collated_df_long) {
     }) # L x S
 
     eta <- by[dat$year_idx] +
-      bs[dat$stage_idx] +
-      bw[cbind(dat$week_idx, dat$stage_idx)] +
-      bl[cbind(dat$ly_idx, dat$stage_idx)]
+      bw[dat$week_idx] +
+      bl[dat$ly_idx]
     y <- rnbinom(length(eta), size = r_s, mu = exp(eta))
     sim_zero[s] <- mean(y == 0)
     sim_max[s] <- max(y)

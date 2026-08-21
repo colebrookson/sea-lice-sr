@@ -1,13 +1,14 @@
 Package: bati-sea-lice
 Type: Project
-Title: My R Project
+Title: Sea Lice Abundance and Pink Salmon Survival in the Broughton Archipelago
 Version: 0.0.0.9000
 Authors@R:
     person(given = "Cole",
            family = "Brookson",
            role = c("aut", "cre"),
            email = "cole.brookson@gmail.com")
-Description: A short description of what this project does.
+Description: Bayesian stock-recruit (Ricker) model that estimates mortality of 
+    pink salmon due to sea lice 
 License: MIT
 Encoding: UTF-8
 LazyData: true
@@ -24,9 +25,9 @@ Imports:
     Hmisc, 
     patchwork,
     colebrookson/MoMAColors, 
-    nimble, 
-    nimbleHMC,
-    coda, 
+    stan-dev/cmdstanr,
+    posterior,
+    bayesplot,
     lubridate,
     betareg, 
     glmmTMB, 
