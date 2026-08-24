@@ -16,7 +16,7 @@ if (exists("snakemake")) {
   counts_reg_path <- here::here(
     "./data/scfs-data/clean/lice-counts-for-regression.csv"
   )
-  motile_only_bool <- FALSE
+  motile_only_bool <- TRUE
   if (motile_only_bool) {
     long_form_path <- paste0(
       here::here("./data/scfs-data/clean/"),
@@ -38,7 +38,7 @@ if (motile_only_bool) {
   collated_df_long <- collated_df |>
     dplyr::filter(week %notin% c(9, 28, 33)) |>
     dplyr::mutate(count = lep_mot) |>
-    dplyr::filter(!is.na(count)) |>
+    #dplyr::filter(!is.na(count)) |>
     dplyr::select(obs_id, count, year, week, location) |>
     dplyr::mutate(
       # location-year from observed combinations only

@@ -1,0 +1,151 @@
+year,w,method,model
+2001,2.312224217927787,closed form,"Bateman (int, both shared)"
+2002,0.9617382051882902,closed form,"Bateman (int, both shared)"
+2003,0.17478033359181316,closed form,"Bateman (int, both shared)"
+2004,1.3995211274466905,closed form,"Bateman (int, both shared)"
+2005,0.6342610428509848,closed form,"Bateman (int, both shared)"
+2006,0.16813327180806667,closed form,"Bateman (int, both shared)"
+2007,0.08248683295047171,closed form,"Bateman (int, both shared)"
+2008,0.2880627809081867,closed form,"Bateman (int, both shared)"
+2009,0.03819899177160706,closed form,"Bateman (int, both shared)"
+2010,0.11939576531874711,closed form,"Bateman (int, both shared)"
+2011,0.02922605579928674,closed form,"Bateman (int, both shared)"
+2012,0.10421084863336727,closed form,"Bateman (int, both shared)"
+2013,0.06828842672403541,closed form,"Bateman (int, both shared)"
+2014,0.048133494746986485,closed form,"Bateman (int, both shared)"
+2015,0.39455632663894785,closed form,"Bateman (int, both shared)"
+2016,0.13662714254928363,closed form,"Bateman (int, both shared)"
+2017,0.055382532483783505,closed form,"Bateman (int, both shared)"
+2018,0.04977330536911604,closed form,"Bateman (int, both shared)"
+2019,0.17661210187657422,closed form,"Bateman (int, both shared)"
+2020,0.10574960692711424,closed form,"Bateman (int, both shared)"
+2021,0.16683931025816554,closed form,"Bateman (int, both shared)"
+2022,0.1876343983474371,closed form,"Bateman (int, both shared)"
+2023,0.02338001272955476,closed form,"Bateman (int, both shared)"
+2024,0.08018352733728865,closed form,"Bateman (int, both shared)"
+2025,0.07795554761096402,closed form,"Bateman (int, both shared)"
+2001,2.8598103477832395,observed cells,"Bateman (int, both shared)"
+2002,1.0160065598682393,observed cells,"Bateman (int, both shared)"
+2003,0.17431873934996894,observed cells,"Bateman (int, both shared)"
+2004,1.3487272959034708,observed cells,"Bateman (int, both shared)"
+2005,0.6339202616731888,observed cells,"Bateman (int, both shared)"
+2006,0.15528096800046334,observed cells,"Bateman (int, both shared)"
+2007,0.08137206427102603,observed cells,"Bateman (int, both shared)"
+2008,0.34206394080057045,observed cells,"Bateman (int, both shared)"
+2009,0.04440331137500489,observed cells,"Bateman (int, both shared)"
+2010,0.12379592376315127,observed cells,"Bateman (int, both shared)"
+2011,0.028598731897999004,observed cells,"Bateman (int, both shared)"
+2012,0.10722766037348008,observed cells,"Bateman (int, both shared)"
+2013,0.06752154371234494,observed cells,"Bateman (int, both shared)"
+2014,0.05375781924642855,observed cells,"Bateman (int, both shared)"
+2015,0.38497972236092914,observed cells,"Bateman (int, both shared)"
+2016,0.1326283474443035,observed cells,"Bateman (int, both shared)"
+2017,0.056984321468788825,observed cells,"Bateman (int, both shared)"
+2018,0.04555734019707617,observed cells,"Bateman (int, both shared)"
+2019,0.17775723623927775,observed cells,"Bateman (int, both shared)"
+2020,0.10769183850077857,observed cells,"Bateman (int, both shared)"
+2021,0.16724350385889225,observed cells,"Bateman (int, both shared)"
+2022,0.19018322654899017,observed cells,"Bateman (int, both shared)"
+2023,0.02593200748680521,observed cells,"Bateman (int, both shared)"
+2024,0.07530636476908645,observed cells,"Bateman (int, both shared)"
+2025,0.07789103837096041,observed cells,"Bateman (int, both shared)"
+2001,9.477071973127098,closed form,best from grid
+2002,4.893064636601047,closed form,best from grid
+2003,0.6667433851613069,closed form,best from grid
+2004,5.36660662937603,closed form,best from grid
+2005,3.0806609764143302,closed form,best from grid
+2006,0.8068445569564355,closed form,best from grid
+2007,0.653190798530632,closed form,best from grid
+2008,0.419771053206153,closed form,best from grid
+2009,0.09514856640237,closed form,best from grid
+2010,0.5032728457280683,closed form,best from grid
+2011,0.148345625355625,closed form,best from grid
+2012,0.39781840645458794,closed form,best from grid
+2013,0.2703426984604769,closed form,best from grid
+2014,0.20039388696016827,closed form,best from grid
+2015,1.6377376169182083,closed form,best from grid
+2016,0.450369504774068,closed form,best from grid
+2017,0.5106155019153538,closed form,best from grid
+2018,0.2332806107308031,closed form,best from grid
+2019,0.7862505592717587,closed form,best from grid
+2020,0.3334358016562476,closed form,best from grid
+2021,0.8654311610216804,closed form,best from grid
+2022,0.9574604988824701,closed form,best from grid
+2023,0.19196666779233995,closed form,best from grid
+2024,0.3819986752485661,closed form,best from grid
+2025,0.275810776278462,closed form,best from grid
+2001,2.7476212556783746,observed cells,best from grid
+2002,0.9485620338357679,observed cells,best from grid
+2003,0.16216151442074492,observed cells,best from grid
+2004,1.2928073339765058,observed cells,best from grid
+2005,0.7318493416016475,observed cells,best from grid
+2006,0.16044991925091698,observed cells,best from grid
+2007,0.08320927319633072,observed cells,best from grid
+2008,0.3160411889802403,observed cells,best from grid
+2009,0.043019413986117624,observed cells,best from grid
+2010,0.12650425093110365,observed cells,best from grid
+2011,0.029419166627389803,observed cells,best from grid
+2012,0.10704244094995373,observed cells,best from grid
+2013,0.06873062725411276,observed cells,best from grid
+2014,0.053456181637770994,observed cells,best from grid
+2015,0.4007318612146138,observed cells,best from grid
+2016,0.13689461226837438,observed cells,best from grid
+2017,0.06259542314847158,observed cells,best from grid
+2018,0.04668516432694537,observed cells,best from grid
+2019,0.1832321455031969,observed cells,best from grid
+2020,0.10507038174592401,observed cells,best from grid
+2021,0.17511392634448616,observed cells,best from grid
+2022,0.19082673528949193,observed cells,best from grid
+2023,0.02926799724267954,observed cells,best from grid
+2024,0.08322822951358551,observed cells,best from grid
+2025,0.07916624225455648,observed cells,best from grid
+2001,5.873378061966293,closed form,motile-only
+2002,3.4909793416710757,closed form,motile-only
+2003,0.9535371664004428,closed form,motile-only
+2004,6.209762068540955,closed form,motile-only
+2005,3.610061962034901,closed form,motile-only
+2006,1.0362102099446326,closed form,motile-only
+2007,0.4742673209201302,closed form,motile-only
+2008,0.696054327881876,closed form,motile-only
+2009,0.10759694015253206,closed form,motile-only
+2010,0.606572146863131,closed form,motile-only
+2011,0.1202967142829771,closed form,motile-only
+2012,0.3845364007275921,closed form,motile-only
+2013,0.28243794563393027,closed form,motile-only
+2014,0.19762350257063024,closed form,motile-only
+2015,1.802392119743255,closed form,motile-only
+2016,0.6820009249903366,closed form,motile-only
+2017,0.22020358130912202,closed form,motile-only
+2018,0.1886405688138376,closed form,motile-only
+2019,0.7209298327148276,closed form,motile-only
+2020,0.42080178559889575,closed form,motile-only
+2021,0.7567627016724238,closed form,motile-only
+2022,0.6781221823431532,closed form,motile-only
+2023,0.09478643631377642,closed form,motile-only
+2024,0.3252198482940067,closed form,motile-only
+2025,0.31682672266909073,closed form,motile-only
+2001,2.643968297245776,observed cells,motile-only
+2002,0.9403301149272546,observed cells,motile-only
+2003,0.17233735827015156,observed cells,motile-only
+2004,1.3128148596760374,observed cells,motile-only
+2005,0.7313724002478958,observed cells,motile-only
+2006,0.16303860612962814,observed cells,motile-only
+2007,0.08106558667534546,observed cells,motile-only
+2008,0.32225921768602894,observed cells,motile-only
+2009,0.043908769194178736,observed cells,motile-only
+2010,0.12758983721832973,observed cells,motile-only
+2011,0.028647951231454652,observed cells,motile-only
+2012,0.10722278205506768,observed cells,motile-only
+2013,0.0689199816435899,observed cells,motile-only
+2014,0.05353442733218337,observed cells,motile-only
+2015,0.40093220999744145,observed cells,motile-only
+2016,0.1388287458986278,observed cells,motile-only
+2017,0.057451630248962,observed cells,motile-only
+2018,0.045530020253037005,observed cells,motile-only
+2019,0.1829015731300227,observed cells,motile-only
+2020,0.1074080835403133,observed cells,motile-only
+2021,0.17430919826529345,observed cells,motile-only
+2022,0.1893080342420547,observed cells,motile-only
+2023,0.025780851266233133,observed cells,motile-only
+2024,0.08114229521285331,observed cells,motile-only
+2025,0.07981438965943914,observed cells,motile-only

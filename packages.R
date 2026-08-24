@@ -5,7 +5,8 @@
 ## DESCRIPTION text
 
 deps <- pak::local_deps(root = ".")
-pkgs <- unique(deps$package[deps$package != "R"])
+root_pkg <- read.dcf("DESCRIPTION")[1, "Package"]
+pkgs <- unique(deps$package[!deps$package %in% c("R", root_pkg)])
 
 invisible(lapply(pkgs, function(p) {
   library(p, character.only = TRUE)

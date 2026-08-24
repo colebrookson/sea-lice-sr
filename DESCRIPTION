@@ -32,7 +32,8 @@ Imports:
     betareg, 
     glmmTMB, 
     parallel, 
-    qs2
+    qs2,
+    httpgd
 Remotes:
     colebrookson/MoMAColors,
     stan-dev/cmdstanr

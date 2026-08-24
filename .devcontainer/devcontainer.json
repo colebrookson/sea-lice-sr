@@ -11,7 +11,7 @@
         "ms-azuretools.vscode-docker",
         "ms-python.python",
         "ms-toolsai.jupyter",
-        "mechatroner.rainbow-", 
+        "mechatroner.rainbow-csv", 
         "Posit.air-vscode"
       ],
       "settings": {
