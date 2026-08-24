@@ -12,7 +12,8 @@
         "ms-python.python",
         "ms-toolsai.jupyter",
         "mechatroner.rainbow-csv", 
-        "Posit.air-vscode"
+        "Posit.air-vscode",
+        "wardbrian.vscode-stan-extension"
       ],
       "settings": {
         "r.rterm.linux": "/usr/local/bin/arf",
