@@ -5,7 +5,7 @@
 #'
 #' @param ... Numeric values to be summed. Can be individual numbers or
 #'   vectors.
-#' @param na.rm Logical; should missing values (NA) be removed?
+#' @param na_rm Logical; should missing values (NA) be removed?
 #'   Defaults to \code{TRUE}.
 #'
 #' @return A numeric value representing the sum of the input values, or NA
@@ -17,12 +17,12 @@
 #' my_sum(NA, NA)
 #'
 #' @export
-my_sum <- function(..., na.rm = TRUE) {
+my_sum <- function(..., na_rm = TRUE) {
   values <- c(...) # Collect the input values
   if (all(is.na(values))) {
     NA # Return NA if all values are NA
   } else {
-    sum(values, na.rm = na.rm) # Sum ignoring NA if not all are NA
+    sum(values, na.rm = na_rm) # Sum ignoring NA if not all are NA
   }
 }
 
@@ -33,7 +33,7 @@ my_sum <- function(..., na.rm = TRUE) {
 #'
 #' @param ... Numeric values to be used in the calculation. Can be individual
 #' numbers or vectors.
-#' @param na.rm Logical; should missing values (NA) be removed?
+#' @param na_rm Logical; should missing values (NA) be removed?
 #'   Defaults to \code{TRUE}.
 #'
 #' @return A numeric value representing the standard deviation of the input
@@ -45,12 +45,12 @@ my_sum <- function(..., na.rm = TRUE) {
 #' my_sd(NA, NA)
 #'
 #' @export
-my_sd <- function(..., na.rm = TRUE) {
+my_sd <- function(..., na_rm = TRUE) {
   values <- c(...) # Collect the input values
   if (all(is.na(values))) {
-    return(NA) # Return NA if all values are NA
+    NA # Return NA if all values are NA
   } else {
-    return(sd(values, na.rm = na.rm)) # SD ignoring NA if not all are NA
+    sd(values, na.rm = na_rm) # SD ignoring NA if not all are NA
   }
 }
 
@@ -61,7 +61,7 @@ my_sd <- function(..., na.rm = TRUE) {
 #'
 #' @param ... Numeric values to be averaged. Can be individual numbers or
 #'   vectors.
-#' @param na.rm Logical; should missing values (NA) be removed?
+#' @param na_rm Logical; should missing values (NA) be removed?
 #'   Defaults to \code{TRUE}.
 #'
 #' @return A numeric value representing the mean of the input values, or NA
@@ -73,12 +73,12 @@ my_sd <- function(..., na.rm = TRUE) {
 #' my_mean(NA, NA)
 #'
 #' @export
-my_mean <- function(..., na.rm = TRUE) {
+my_mean <- function(..., na_rm = TRUE) {
   values <- c(...)
   if (all(is.na(values))) {
-    return(NA)
+    NA
   } else {
-    return(mean(values, na.rm = na.rm))
+    mean(values, na.rm = na_rm)
   }
 }
 
@@ -89,7 +89,7 @@ my_mean <- function(..., na.rm = TRUE) {
 #'
 #' @param ... Numeric values to be compared. Can be individual numbers or
 #'   vectors.
-#' @param na.rm Logical; should missing values (NA) be removed?
+#' @param na_rm Logical; should missing values (NA) be removed?
 #'   Defaults to \code{TRUE}.
 #'
 #' @return A numeric value representing the minimum of the input values, or
@@ -101,12 +101,12 @@ my_mean <- function(..., na.rm = TRUE) {
 #' my_min(NA, NA)
 #'
 #' @export
-my_min <- function(..., na.rm = TRUE) {
+my_min <- function(..., na_rm = TRUE) {
   values <- c(...)
   if (all(is.na(values))) {
-    return(NA)
+    NA
   } else {
-    return(min(values, na.rm = na.rm))
+    min(values, na.rm = na_rm)
   }
 }
 
@@ -117,7 +117,7 @@ my_min <- function(..., na.rm = TRUE) {
 #'
 #' @param ... Numeric values to be compared. Can be individual numbers or
 #'   vectors.
-#' @param na.rm Logical; should missing values (NA) be removed?
+#' @param na_rm Logical; should missing values (NA) be removed?
 #'   Defaults to \code{TRUE}.
 #'
 #' @return A numeric value representing the maximum of the input values, or
@@ -129,12 +129,12 @@ my_min <- function(..., na.rm = TRUE) {
 #' my_max(NA, NA)
 #'
 #' @export
-my_max <- function(..., na.rm = TRUE) {
+my_max <- function(..., na_rm = TRUE) {
   values <- c(...)
   if (all(is.na(values))) {
-    return(NA)
+    NA
   } else {
-    return(max(values, na.rm = na.rm))
+    max(values, na.rm = na_rm)
   }
 }
 
@@ -148,7 +148,7 @@ standardize_names <- function(df) {
   current_names <- names(df)
 
   # loop through, pull the name out, change "." to "_"
-  for (name in seq_len(length(current_names))) {
+  for (name in seq_along(current_names)) {
     current_names[name] <- gsub("\\.", "_", current_names[name])
   }
 
@@ -156,7 +156,7 @@ standardize_names <- function(df) {
   current_names <- tolower(current_names)
 
   # standardize reference to cals or leps
-  for (name in seq_len(length(current_names))) {
+  for (name in seq_along(current_names)) {
     current_names[name] <- gsub("caligus", "cal", current_names[name])
     current_names[name] <- gsub("cals", "cal", current_names[name])
     current_names[name] <- gsub("leps", "lep", current_names[name])
@@ -166,7 +166,7 @@ standardize_names <- function(df) {
   names(df) <- current_names
 
   # return dataframe renamed
-  return(df)
+  df
 }
 
 #' Save a ggplot with an optional caption and a provenance sidecar
