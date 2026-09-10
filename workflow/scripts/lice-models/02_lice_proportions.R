@@ -152,11 +152,10 @@ save_fig(
     " jittered horizontally",
     "only. Line is a binomial GLM with a logit link, Lep motiles as",
     "successes and Caligus motiles as failures, so each fish is weighted by",
-    "the number of motile lice it carries. Ribbon is a 95% interval built",
-    "on the link scale and back-transformed, so it cannot exceed [0, 1].",
-    "This model supplies the L. salmonis proportion for 2001, the only year",
-    "in which motiles were counted but never speciated; the mean predicted",
-    "proportion across 2001 fish carrying motiles is",
+    "the number of motile lice it carries. This model supplies the L. salmonis
+     proportion for 2001, the only year in which motiles were counted but",
+    "never speciated; the mean predicted proportion across 2001 fish carrying",
+    "motiles is",
     sprintf("%.3f.", p_mot_2001),
     sprintf(
       "Fitted support spans %g-%g total lice;",
@@ -165,9 +164,6 @@ save_fig(
     ),
     sprintf("%.1f%% of 2001 fish fall outside it.", 100 * mot_extrap)
   )
-)
-paste(
-  "Proportion of motile sea lice that were L. salmonis as a function of the total number"
 )
 
 save_fig(
