@@ -11,6 +11,8 @@
 path:
   raw_fish: "./data/scfs-data/raw/fish-data.csv"
   clean_fish: "./data/scfs-data/clean/standardized-fish-data.csv"
+  lep_props: "./data/scfs-data/clean/lep-proportions.csv"
+  count_reg_figs: "./figs/count-regressions"
   lice_counts: "./data/scfs-data/clean/lice-counts-for-regression.csv"
   long_lice_counts: "./data/scfs-data/clean/lice-counts-long-form-for-regression.qs2"
 

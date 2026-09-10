@@ -6,24 +6,12 @@
 source(here::here("./workflow/scripts/functions/theme_better.R"))
 source(here::here("./workflow/scripts/functions/global.R"))
 source(here::here("./workflow/scripts/functions/wild_lice_functions.R"))
+cfg <- yaml::read_yaml(here::here("config/config.yaml"))
 
 library(ggplot2)
-library(magrittr)
-
-if (exists("snakemake")) {
-  standardized_fish_path <- snakemake@inputs[["standardized_fish"]]
-  props_path <- snakemake@outputs[["props_path"]]
-  count_path <- snakemake@outputs[["count_path"]]
-} else {
-  standardized_fish_path <- here::here(
-    "./data/scfs-data/clean/standardized-fish-data.csv"
-  )
-  props_path <- here::here("./data/scfs-data/clean/lep-proportions.csv")
-  count_path <- here::here("./figs/count-regressions")
-}
 
 fish_df <- readr::read_csv(
-  standardized_fish_path
+  cfg$path$clean_fish
 )
 
 POOLED <- TRUE # see empirical_prop() docs
@@ -92,7 +80,7 @@ p_cope_0204 <- fish_df |>
 
 d01 <- fish_df |> dplyr::filter(year == 2001)
 
-# old predictor, old averaging population (should land near 0.639)
+# old predictor this is just to double check!
 m_old <- glm(
   cbind(lep_mot_obs, cal_mot_obs) ~ all_mot,
   binomial,
@@ -129,7 +117,7 @@ stopifnot(
 )
 readr::write_csv(
   props,
-  props_path
+  cfg$path$lep_props
 )
 
 # make some supplementary figures ----------------------------------------------
@@ -152,15 +140,16 @@ save_fig(
     "red2"
   ),
   name = "motile-model-predictions",
-  dir = count_path,
+  dir = cfg$path$count_reg_figs,
   width = 8,
   height = 6,
   caption = paste(
-    "Fig. S2. Proportion of motile sea lice that were L. salmonis as a",
+    "Proportion of motile sea lice that were L. salmonis as a",
     "function of the total number of lice (all stages, all species) on an",
     "individual fish. Points are the observed proportion among speciated",
     "motiles for each fish carrying at least one motile louse in a year in",
-    "which motiles were speciated (2002-present); jittered horizontally",
+    "which motiles were speciated (2002-present), not to worry,",
+    " jittered horizontally",
     "only. Line is a binomial GLM with a logit link, Lep motiles as",
     "successes and Caligus motiles as failures, so each fish is weighted by",
     "the number of motile lice it carries. Ribbon is a 95% interval built",
@@ -177,6 +166,9 @@ save_fig(
     sprintf("%.1f%% of 2001 fish fall outside it.", 100 * mot_extrap)
   )
 )
+paste(
+  "Proportion of motile sea lice that were L. salmonis as a function of the total number"
+)
 
 save_fig(
   plot_stage(
@@ -189,7 +181,7 @@ save_fig(
     "blue2"
   ),
   name = "cope-model-predictions",
-  dir = count_path,
+  dir = cfg$path$count_reg_figs,
   width = 8,
   height = 6,
   caption = paste(

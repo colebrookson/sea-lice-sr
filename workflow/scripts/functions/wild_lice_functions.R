@@ -3,7 +3,6 @@
 #' can't really tell whether a blank is a zero or missing (see SCFS data,
 #' "We also do not distinguish zeroes from missing data for the louse
 #' information"). So we do NOT infer it from the data.
-#' AUTHOR: Cole Brookson
 
 #' lice_protocol
 #'
