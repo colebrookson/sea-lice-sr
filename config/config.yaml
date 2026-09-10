@@ -16,10 +16,16 @@ path:
   lice_counts: "./data/scfs-data/clean/lice-counts-for-regression.csv"
   long_lice_counts: "./data/scfs-data/clean/lice-counts-long-form-for-regression.qs2"
   lice_imputed_reps: "./data/scfs-data/clean/lice-counts-imputed-replicates.csv"
+  scenarios: 
+    scen_2: "./data/scfs-data/clean/lice-counts-for-regression-scenario2.csv"
+    scen_2_reps: "./data/scfs-data/clean/lice-counts-imputed-replicates-scenario2.csv"
+    scen_3: "./data/scfs-data/clean/lice-counts-for-regression-scenario3.csv"
+    scen_3_props: "./data/scfs-data/clean/lep-proportions-scenario3.csv"
+    scen_3_reps: "./data/scfs-data/clean/lice-counts-imputed-replicates-scenario3.csv"
 
 # model parameters -------------------------------------------------------------
 run:
-  motile_only: True 
+  motile_only: False 
   num_M: 100
 
 # # ---------------------------------------------------------------------------

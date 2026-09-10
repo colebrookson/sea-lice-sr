@@ -3,42 +3,21 @@
 #' AUTHOR: Cole Brookson
 
 source(here::here("./workflow/scripts/functions/global.R"))
+cfg <- yaml::read_yaml(here::here("config/config.yaml"))
 
-if (exists("snakemake")) {
-  counts_reg_path <- snakemake@inputs[["counts_reg_path"]]
-  motile_only_bool <- snakemake@parameters[["motile_bool"]]
-  if (motile_only_bool) {
-    long_form_path <- snakemake@outputs[["long_form_path"]]
-  } else {
-    long_form_path <- snakemake@outputs[["long_form_all_stages_path"]]
-  }
-} else {
-  counts_reg_path <- here::here(
-    "./data/scfs-data/clean/lice-counts-for-regression.csv"
-  )
-  motile_only_bool <- TRUE
-  if (motile_only_bool) {
-    long_form_path <- paste0(
-      here::here("./data/scfs-data/clean/"),
-      "lice-counts-long-form-for-regression.qs2"
-    )
-  } else {
-    long_form_path <- paste0(
-      here::here("./data/scfs-data/clean/"),
-      "lice-counts-long-form-all-stages-for-regression.qs2"
-    )
-  }
-}
 collated_df <- readr::read_csv(
-  counts_reg_path
+  cfg$path$lice_counts
 )
 
-if (motile_only_bool) {
+# we can format this where we're either going to regress on only the motiles
+# OR on all the stages so we have a gate for that here
+
+# big ugly if ------------------------------------------------------------------
+if (cfg$run$motile_only) {
   # get rid of the weeks we don't want here
   collated_df_long <- collated_df |>
     dplyr::filter(week %notin% c(9, 28, 33)) |>
     dplyr::mutate(count = lep_mot) |>
-    #dplyr::filter(!is.na(count)) |>
     dplyr::select(obs_id, count, year, week, location) |>
     dplyr::mutate(
       # location-year from observed combinations only
@@ -82,7 +61,7 @@ if (motile_only_bool) {
       names_prefix = "lep_", # so values are mot/cope/chal
       values_to = "count"
     ) |>
-    # drop the 2001 cope NA rows (only NA cell, per the audit)
+    # drop the 2001 cope NA rows (only NA cell)
     dplyr::filter(!is.na(count)) |>
     dplyr::select(obs_id, count, stage, year, week, location) |>
     dplyr::mutate(
@@ -96,7 +75,7 @@ if (motile_only_bool) {
       ly_f = droplevels(ly)
     )
 
-  # integer index vectors for NIMBLE
+  # integer index vectors for ease
   collated_df_long <- collated_df_long |>
     dplyr::mutate(
       year_idx = as.integer(year_f),
@@ -105,7 +84,6 @@ if (motile_only_bool) {
       ly_idx = as.integer(ly_f)
     )
 
-  # level maps — idx -> label, so posteriors map back
   year_levels <- tibble::tibble(
     idx = seq_len(nlevels(collated_df_long$year_f)),
     year = levels(collated_df_long$year_f)
@@ -127,5 +105,5 @@ if (motile_only_bool) {
 # a couple quick data checks ---------------------------------------------------
 qs2::qs_save(
   collated_df_long,
-  long_form_path
+  cfg$path$long_lice_counts
 )
