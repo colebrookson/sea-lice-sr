@@ -12,7 +12,7 @@ cfg <- yaml::read_yaml(here::here("./config/config.yaml"))
 
 fish_df <- readr::read_csv(cfg$path$clean_fish)
 
-POOLED <- TRUE # this is for empirical_prop()
+POOLED <- cfg$run$lpy$pooled # this is for empirical_prop()
 
 # refit the scenario 1 ---------------------------------------------------------
 #' this is literally only so this runs without having to source elsewhere

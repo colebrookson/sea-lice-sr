@@ -22,11 +22,18 @@ path:
     scen_3: "./data/scfs-data/clean/lice-counts-for-regression-scenario3.csv"
     scen_3_props: "./data/scfs-data/clean/lep-proportions-scenario3.csv"
     scen_3_reps: "./data/scfs-data/clean/lice-counts-imputed-replicates-scenario3.csv"
+    scen_4: "./data/scfs-data/clean/lice-counts-for-regression-scenario4-%s.csv"
+    scen_4_props_point: "./data/scfs-data/clean/lep-proportions-scenario4-point.csv"
+    scen_4_props_lower: "./data/scfs-data/clean/lep-proportions-scenario4-lower.csv"
+    scen_4_reps: "./data/scfs-data/clean/lice-counts-imputed-replicates-scenario4-%s.csv"
+    scen_5: "./data/scfs-data/clean/lice-counts-for-regression-scenario5.csv"
 
 # model parameters -------------------------------------------------------------
 run:
   motile_only: False 
   num_M: 100
+  lpy: # this is lice per year 
+    pooled: True
 
 # # ---------------------------------------------------------------------------
 # # Model parameters - one can imagine what these do

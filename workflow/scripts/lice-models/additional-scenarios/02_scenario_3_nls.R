@@ -15,7 +15,7 @@ cfg <- yaml::read_yaml(here::here("./config/config.yaml"))
 
 fish_df <- readr::read_csv(cfg$path$clean_fish)
 
-POOLED <- TRUE
+POOLED <- cfg$run$lpy$pooled
 
 # yearly motile summaries ------------------------------------------------------
 #' X = mean motiles/fish (all species) over ALL fish that year and Y = pooled
@@ -138,7 +138,7 @@ save_fig(
     "b = 0 fixed, c estimated, relating the yearly pooled proportion of",
     "speciated motiles that were L. salmonis (Y) to the yearly mean number",
     "of motiles per fish across all species (X). Orange points are the",
-    "speciated years (2002-2021) the curve was fit to; the purple point is",
+    "speciated years (2002-2025) the curve was fit to; the purple point is",
     "the model-predicted 2001 value, applied to 2001's unidentified",
     "motiles. All chalimus and all unidentified copepodites are counted as",
     "L. salmonis in every year.",
