@@ -7,21 +7,9 @@
 source(here::here("./workflow/scripts/functions/theme_better.R"))
 source(here::here("./workflow/scripts/functions/global.R"))
 source(here::here("./workflow/scripts/functions/wild_lice_functions.R"))
-library(magrittr)
+cfg <- yaml::read_yaml(here::here("config/config.yaml"))
 
-if (exists("snakemake")) {
-  fish_data_path <- snakemake@inputs[["fish_data"]]
-  standardized_fish_path <- snakemake@outputs[["standardized_fish"]]
-} else {
-  fish_data_path <- here::here("./data/scfs-data/raw/fish-data.csv")
-  standardized_fish_path <- here::here(
-    "./data/scfs-data/clean/standardized-fish-data.csv"
-  )
-}
-
-raw <- readr::read_csv(
-  fish_data_path
-) |>
+raw <- readr::read_csv(cfg$path$raw_fish) |>
   standardize_names() |>
   dplyr::select(
     year,
@@ -115,5 +103,5 @@ fish_df <- fish_df |>
 
 readr::write_csv(
   fish_df,
-  standardized_fish_path
+  cfg$path$clean_fish
 )
