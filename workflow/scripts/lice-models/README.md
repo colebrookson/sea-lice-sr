@@ -35,13 +35,3 @@ This approach is more biologically realistic than assigning fractional louse cou
 We estimate *L. salmonis* chalimus-stage lice by applying the **average** of the *L. salmonis* proportions for copepodites and motiles.
 
 **Special case (2001)**: Since copepodites were counted as chalimus in 2001, we estimate the chalimus *L. salmonis* proportion using only the motile *L. salmonis* proportion.
-
-## Data Structure
-
-The analysis expects the following columns:
-- `year`: Sampling year
-- `lep_cop`: Count of identified *L. salmonis* copepodites
-- `all_cop`: Total count of copepodites
-- `lep_mot`: Count of identified *L. salmonis* motiles  
-- `all_mot`: Total count of motiles
-- Life stage indicators (copepodite, motile, chalimus)
