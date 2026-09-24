@@ -35,7 +35,7 @@ ggplot(data = df) +
     colour = "black",
     shape = 21
   ) +
-  facet_wrap(~area, ncol = 4, scales = "free_y") +
+  facet_wrap(~area, ncol = 4) +
   scale_x_continuous(
     breaks = unique(df$Year),
     labels = unique(df$Year)

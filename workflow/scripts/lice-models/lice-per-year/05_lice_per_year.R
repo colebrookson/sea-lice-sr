@@ -1,41 +1,27 @@
-#' DESCRIPTION: here I'm going to write out the relatively simple GLMM that
-#' we've used before for these data so I can fit the model. Both week and
-#' location-year random effects are now DIAGONAL stage-specific:
-#' each stage gets its own variance and its own per-column sum-to-zero.
+#' DESCRIPTION: fit the model that's written in stan to get the estimated
+#' values (without doing a joint fit) of the lice per year in the various ways
 
-library(magrittr)
-library(ggplot2)
-library(nimble)
-library(nimbleHMC)
 source(here::here("./workflow/scripts/functions/theme_better.R"))
 source(here::here("./workflow/scripts/functions/global.R"))
+source(here::here("./workflow/scripts/functions/wild_lice_functions.R"))
+cfg <- yaml::read_yaml(here::here("config/config.yaml"))
 
-# write an interactive vs pipeline bit
-if (exists("snakemake")) {
-  collated_df_long <- snakemake@input[[collated_df_long]]
-} else {
-  collated_df_long <- qs2::qs_read(
-    paste0(
-      here::here("./data/scfs-data/clean/"),
-      "lice-counts-long-form-for-regression.qs2"
-    )
-  )
-}
+collated_df_long <- qs2::qs_read(here::here(cfg$path$long_lice_counts))
 
 r1 <- readr::read_csv(
-    here::here("./data/scfs-data/clean/lice-counts-for-regression.csv")
+  here::here("./data/scfs-data/clean/lice-counts-for-regression.csv")
 )
 
 r1 |>
-    dplyr::group_by(year) |>
-    dplyr::summarise(
-        n = dplyr::n(),
-        na_lep_mot = sum(is.na(lep_mot)),
-        na_week = sum(is.na(week)),
-        na_location = sum(is.na(location)),
-        obs_spec_mot = sum(sp_mot, na.rm = TRUE)
-    ) |>
-    print(n = Inf)
+  dplyr::group_by(year) |>
+  dplyr::summarise(
+    n = dplyr::n(),
+    na_lep_mot = sum(is.na(lep_mot)),
+    na_week = sum(is.na(week)),
+    na_location = sum(is.na(location)),
+    obs_spec_mot = sum(sp_mot, na.rm = TRUE)
+  ) |>
+  print(n = Inf)
 
 # make the model itself --------------------------------------------------------
 glmm_mod <- nimble::nimbleCode({
