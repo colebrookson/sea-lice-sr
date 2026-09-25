@@ -5,12 +5,6 @@
 source(here::here("./workflow/scripts/functions/global.R"))
 source(here::here("./workflow/scripts/functions/wild_lice_functions.R"))
 cfg <- yaml::read_yaml(here::here("config/config.yaml"))
-point_val_out_path <- here::here(
-  "./data/scfs-data/clean/lice-counts-for-regression.csv"
-)
-replicates_out_path <- here::here(
-  "./data/scfs-data/clean/lice-counts-imputed-replicates.csv"
-)
 
 fish_df <- readr::read_csv(cfg$path$clean_fish)
 props <- readr::read_csv(cfg$path$lep_props)
