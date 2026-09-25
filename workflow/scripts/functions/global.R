@@ -169,19 +169,17 @@ standardize_names <- function(df) {
   df
 }
 
-#' Save a ggplot with an optional caption and a provenance sidecar
+#' Save a ggplot with an optional caption & porvenance
 #'
-#' Writes a figure to disk in up to three coordinated forms from a single
-#' call: a clean image, a caption-annotated image with the note rendered
-#' into a footer band, and a markdown sidecar recording the note alongside
-#' machine provenance (timestamp, git commit, output dimensions). The clean
-#' and captioned images let a figure be viewed either bare or self-documenting,
-#' while the sidecar is the durable, greppable, version-controllable record of
-#' how and when the figure was produced.
+#' Writes a figure to disk in up to three forms from a single
+#' call:
+#'  1. a clean image
+#'  2. a caption-annotated image with the note rendered into a footer band, and
+#'  3. a markdown sidecar recording the note alongside machine provenance
+#'     (timestamp, git commit, output dimensions).
 #'
 #' @param plot A ggplot object to be saved.
-#' @param name Character scalar giving the base filename, without directory or
-#'   extension. All emitted files share this stub: `<name>.<device>`,
+#' @param name Character scalar giving the `<name>.<device>`,
 #'   `<name>_captioned.<device>`, and `<name>.md`.
 #' @param caption Optional character scalar. When supplied, a captioned image
 #'   is written with the text wrapped into a footer band beneath the panel, and
@@ -204,30 +202,9 @@ standardize_names <- function(df) {
 #' @details
 #' The footer band is allocated at roughly 0.18 inches per wrapped line and
 #' appended below the panel via [patchwork::wrap_plots()]. Git provenance is
-#' captured through \pkg{gert} when available and degrades quietly to a plain
-#' note when the working directory is not a repository or the package is not
-#' installed, so a missing commit never causes the save itself to fail.
+#' captured through \pkg{gert}
 #'
-#' @section Side effects:
-#' Writes one to three files under `dir` and prints nothing. The captioned
-#' image is written only when `caption` is non-`NULL`; the sidecar only when
-#' `sidecar` is `TRUE`.
-#'
-#' @return The path stub (directory and `name`, without extension) is returned
-#'   invisibly, so calls can be chained or the location captured without
-#'   cluttering the console.
-#'
-#' @section Dependencies:
-#' \pkg{ggplot2}, \pkg{stringr}, and \pkg{patchwork} are required; \pkg{gert}
-#' is optional and used only for git provenance.
-#'
-#' @examples
-#' \dontrun{
-#' save_fig(
-#'   p_abundance, "lice_by_month_abundance", height = 8,
-#'   caption = "Monthly mean louse abundance across all sampled fish; ..."
-#' )
-#' }
+#' @return The path stub (directory and `name`, without extension)
 #'
 #' @export
 save_fig <- function(

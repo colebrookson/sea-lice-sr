@@ -8,20 +8,29 @@ cfg <- yaml::read_yaml(here::here("config/config.yaml"))
 
 collated_df_long <- qs2::qs_read(here::here(cfg$path$long_lice_counts))
 
-r1 <- readr::read_csv(
-  here::here("./data/scfs-data/clean/lice-counts-for-regression.csv")
+# collated_df_long |>
+
+model <- cmdstanr::cmdstan_model(
+  cfg$path$models$lice_per_year
+)
+model$print()
+
+# set the data list 
+data_list <- list(
+  N = nrow(collated_df_long), # number of obs
+  N_ys = length(unique(collated_df_long$ys_f)), # no. of year x stage
+  N_ly = length(unique(collated_df_long$ly_f)), # location year combos 
+  N_s = length(unique(collated_df_long$stage)), # number of stages 
+  N_wk = length(# weeks
+y # response data
+ys_idx # gets the index of that 1,...,N_ys 
+ly_idx # gets the index of that 1,...,N_ly
+stage_idx # different, just the three stages
+wk_idx # which week 
+
 )
 
-r1 |>
-  dplyr::group_by(year) |>
-  dplyr::summarise(
-    n = dplyr::n(),
-    na_lep_mot = sum(is.na(lep_mot)),
-    na_week = sum(is.na(week)),
-    na_location = sum(is.na(location)),
-    obs_spec_mot = sum(sp_mot, na.rm = TRUE)
-  ) |>
-  print(n = Inf)
+
 
 # make the model itself --------------------------------------------------------
 glmm_mod <- nimble::nimbleCode({

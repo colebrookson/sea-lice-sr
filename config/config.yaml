@@ -28,6 +28,12 @@ path:
     scen_4_props_lower: "./data/scfs-data/clean/lep-proportions-scenario4-lower.csv"
     scen_4_reps: "./data/scfs-data/clean/lice-counts-imputed-replicates-scenario4-%s.csv"
     scen_5: "./data/scfs-data/clean/lice-counts-for-regression-scenario5.csv"
+  models: 
+    lice_per_year: "./workflow/models/lice_per_year.stan"
+
+# data decisions ---------------------------------------------------------------
+lice_data: 
+  weeks_exclude: [9, 28, 33] # these are the weeks we exclude due to understampling 
 
 # model parameters -------------------------------------------------------------
 run:

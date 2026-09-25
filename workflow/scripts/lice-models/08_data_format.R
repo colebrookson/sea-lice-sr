@@ -16,19 +16,21 @@ collated_df <- readr::read_csv(
 if (cfg$run$motile_only) {
   # get rid of the weeks we don't want here
   collated_df_long <- collated_df |>
-    dplyr::filter(week %notin% c(9, 28, 33)) |>
+    dplyr::filter(week %notin% cfg$lice_data$weeks_exclude) |>
     dplyr::mutate(count = lep_mot) |>
     dplyr::select(obs_id, count, year, week, location) |>
     dplyr::mutate(
       # location-year from observed combinations only
       ly = factor(paste(location, year, sep = "_")),
+      # no year x stage here cos no stage !
       # factor the grouping vars AFTER
       year_f = droplevels(factor(year)),
       week_f = droplevels(factor(week)),
       ly_f = droplevels(ly),
+      ys_f = droplevels(ys),
       year_idx = as.integer(year_f),
       week_idx = as.integer(week_f),
-      ly_idx = as.integer(ly_f)
+      ly_idx = as.integer(ly_f),
     )
   stopifnot(
     !anyNA(collated_df_long$count),
@@ -51,10 +53,13 @@ if (cfg$run$motile_only) {
     idx = seq_len(nlevels(collated_df_long$ly_f)),
     ly = levels(collated_df_long$ly_f)
   )
+  # ys_levels <- tibble::tibble(
+  #   idx = seq_len(nlevels(collated_df_long$))
+  # )
 } else {
   # get rid of the weeks we don't want here
   collated_df_long <- collated_df |>
-    dplyr::filter(week %notin% c(9, 28, 33)) |>
+    dplyr::filter(week %notin% cfg$lice_data$weeks_exclude) |>
     tidyr::pivot_longer(
       cols = c(lep_mot, lep_cope, lep_chal),
       names_to = "stage",
@@ -69,15 +74,17 @@ if (cfg$run$motile_only) {
       stage = factor(stage, levels = c("mot", "cope", "chal")),
       # location-year from observed combinations only
       ly = factor(paste(location, year, sep = "_")),
+      # year-stage from observed combinations only!
+      ys = factor(paste(year, stage, sep = "_")),
       # factor the grouping vars AFTER
       year_f = droplevels(factor(year)),
       week_f = droplevels(factor(week)),
-      ly_f = droplevels(ly)
-    )
-
-  # integer index vectors for ease
-  collated_df_long <- collated_df_long |>
-    dplyr::mutate(
+      ly_f = droplevels(ly),
+      ys_f = droplevels(ys),
+      year_idx = as.integer(year_f),
+      week_idx = as.integer(week_f),
+      ly_idx = as.integer(ly_f),
+      ys_idx = as.integer(ys_f),
       year_idx = as.integer(year_f),
       week_idx = as.integer(week_f),
       stage_idx = as.integer(stage),
