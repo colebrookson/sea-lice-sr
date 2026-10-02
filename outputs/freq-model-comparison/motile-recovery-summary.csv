@@ -1,0 +1,3 @@
+comparison,max_abs_diff,rmse
+Bateman vs motile-only,1.3297723458341055,0.8261756359365979
+best-from-grid vs motile-only,0.8009313160627185,0.3257523430291088

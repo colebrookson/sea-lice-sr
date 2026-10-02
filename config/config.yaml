@@ -1,0 +1,61 @@
+# every parameter that we chose at some given point is defined here 
+# because that makes it a bit less stiff overall 
+
+
+# ---------------------------------------------------------------------------
+# Datasets
+#
+# Each entry becomes a wildcard value {dataset} in the pipeline, and {type} is a 
+# second wildcard that the piepline can use
+# ---------------------------------------------------------------------------
+path:
+  raw_fish: "./data/scfs-data/raw/fish-data.csv"
+  clean_fish: "./data/scfs-data/clean/standardized-fish-data.csv"
+  lep_props: "./data/scfs-data/clean/lep-proportions.csv"
+  count_reg_figs: "./figs/count-regressions"
+  lice_counts: "./data/scfs-data/clean/lice-counts-for-regression.csv"
+  long_lice_counts: "./data/scfs-data/clean/lice-counts-long-form-for-regression.qs2"
+  lice_imputed_reps: "./data/scfs-data/clean/lice-counts-imputed-replicates.csv"
+  farm_data: "./data/broughton-farm-data/all-options-compiled.csv"
+  scenarios: 
+    scen_2: "./data/scfs-data/clean/lice-counts-for-regression-scenario2.csv"
+    scen_2_reps: "./data/scfs-data/clean/lice-counts-imputed-replicates-scenario2.csv"
+    scen_3: "./data/scfs-data/clean/lice-counts-for-regression-scenario3.csv"
+    scen_3_props: "./data/scfs-data/clean/lep-proportions-scenario3.csv"
+    scen_3_reps: "./data/scfs-data/clean/lice-counts-imputed-replicates-scenario3.csv"
+    scen_4: "./data/scfs-data/clean/lice-counts-for-regression-scenario4-%s.csv"
+    scen_4_props_point: "./data/scfs-data/clean/lep-proportions-scenario4-point.csv"
+    scen_4_props_lower: "./data/scfs-data/clean/lep-proportions-scenario4-lower.csv"
+    scen_4_reps: "./data/scfs-data/clean/lice-counts-imputed-replicates-scenario4-%s.csv"
+    scen_5: "./data/scfs-data/clean/lice-counts-for-regression-scenario5.csv"
+  models: 
+    lice_per_year: "./workflow/models/lice_per_year.stan"
+
+# data decisions ---------------------------------------------------------------
+lice_data: 
+  weeks_exclude: [9, 28, 33] # these are the weeks we exclude due to understampling 
+
+# model parameters -------------------------------------------------------------
+run:
+  motile_only: False 
+  num_M: 100
+  lpy: # this is lice per year 
+    pooled: True
+  yearly_model: 
+    # for the sub-sampling, this it mostly to test the model 
+    subsample: True
+    seed: 1234
+    chains: 4
+    parallel_chains: 4
+    refresh: 100
+    iter_sampling: 1000
+    iter_warmup: 500
+
+# # ---------------------------------------------------------------------------
+# # Model parameters - one can imagine what these do
+# # ---------------------------------------------------------------------------
+# model:
+#   iter_warmup: 500
+#   iter_sampling: 1000
+#   chains: 4
+#   seed: 42

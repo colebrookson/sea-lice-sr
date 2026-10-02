@@ -1,0 +1,70 @@
+"""
+Main Snakefile
+
+Run from project root:
+    snakemake                # full run
+    snakemake -n             # dry run
+    snakemake --dag | dot -Tsvg > docs/dag.svg
+
+    # test run (verifies Snakemake config + DAG resolution, no real computation):
+    snakemake --configfile test/config.yaml --cores 1
+
+Inputs:   resources/
+Outputs:  results/
+Config:   config/config.yaml
+Scripts:  workflow/scripts/
+Rules:    workflow/rules/*.smk
+"""
+
+from pathlib import Path
+
+configfile: "config/config.yaml"
+
+TYPES = list(config["datasets"].keys())
+DATASETS = {type_: list(ds.keys()) for type_, ds in config["datasets"].items()}
+
+TYPE_DATASET_PAIRS = [
+    (type_, dataset)
+    for type_, datasets in DATASETS.items()
+    for dataset in datasets
+]
+
+def result(*args):
+    return str(Path("results") / Path(*args))
+
+wildcard_constraints:
+    type    = r"[A-Za-z0-9_\-]+",
+    dataset = r"[A-Za-z0-9_\-]+",
+
+# ---------------------------------------------------------------------------
+# Rule modules — uncomment as rules crystallize
+# ---------------------------------------------------------------------------
+# include: "rules/process.smk"
+# include: "rules/analyze.smk"
+# include: "rules/report.smk"
+
+
+# ---------------------------------------------------------------------------
+# Test rule — proves Snakemake resolves the config and DAG correctly.
+# Remove once real rules exist.
+# ---------------------------------------------------------------------------
+rule test_sentinel:
+    """Touch a sentinel file for each dataset"""
+    output:
+        touch(result("test/{type}/{dataset}.ok"))
+    shell:
+        "echo 'ok: {wildcards.type}/{wildcards.dataset}'"
+
+
+# ---------------------------------------------------------------------------
+# Default target
+# ---------------------------------------------------------------------------
+rule all:
+    input:
+        # Replace with real outputs as rules crystallize, e.g.:
+        #   expand(result("processed/{type}/{dataset}.rds"), zip,
+        #          type=[t for t, d in TYPE_DATASET_PAIRS],
+        #          dataset=[d for t, d in TYPE_DATASET_PAIRS]),
+        #   result("report/report.html"),
+        [result(f"test/{type_}/{dataset}.ok") for type_, dataset in TYPE_DATASET_PAIRS],
+    default_target: True

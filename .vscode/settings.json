@@ -1,0 +1,4 @@
+{
+    "makefile.configureOnOpen": true,
+    "r.plot.useHttpgd": true
+}

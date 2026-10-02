@@ -1,0 +1,20 @@
+#:schema https://raw.githubusercontent.com/eitsupi/arf/main/artifacts/arf.schema.json
+
+[startup]
+r_source = "auto"
+show_banner = false
+
+[editor]
+mode = "emacs"
+auto_match = true
+auto_suggestions = "all"
+
+[editor.key_map]
+"alt-hyphen" = " <- "
+"alt-p" = " |> "
+
+[prompt]
+format = "{status}R {version}> "
+
+[r]
+auto_width = true
