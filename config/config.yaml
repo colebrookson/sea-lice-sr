@@ -41,6 +41,15 @@ run:
   num_M: 100
   lpy: # this is lice per year 
     pooled: True
+  yearly_model: 
+    # for the sub-sampling, this it mostly to test the model 
+    subsample: True
+    seed: 1234
+    chains: 4
+    parallel_chains: 4
+    refresh: 100
+    iter_sampling: 2000
+    iter_warmup: 500
 
 # # ---------------------------------------------------------------------------
 # # Model parameters - one can imagine what these do

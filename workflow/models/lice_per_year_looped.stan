@@ -19,15 +19,6 @@ transformed data {
    // the scaled constants for the priors go here 
    real scale_wk = inv_sqrt(1 - inv(N_wk));
    real scale_ly = inv_sqrt(1 - inv(N_ly));
-   // we should probably have this be vectorized, so i'm going to put flat 
-   // indices on this instead. This means that row i stage s [i, s] is at 
-   // (s - 1) * n_rows + i 
-   array[N] int wk_s_idx;
-   array[N] int ly_s_idx;
-   for (n in 1:N) {
-      wk_s_idx[n] = (stage_idx[n] - 1) * N_wk + wk_idx[n];
-      ly_s_idx[n] = (stage_idx[n] - 1) * N_ly + ly_idx[n];
-   }
 }
 
 parameters {
@@ -36,7 +27,7 @@ parameters {
    vector<lower=0>[N_s] sigma_ly;// std dev (marginal) on location x year RE (\sigma_j^{\ell})
    array[N_s] sum_to_zero_vector[N_wk] z_wk; // standardized RE for week (z^{w}_{u,j})
    array[N_s] sum_to_zero_vector[N_ly] z_ly; // standardized RE for location-year (z^{\ell}_{v,j})
-   vector<lower=0>[N_s] r; // dispersion parameter (r), should be one per stage
+   real<lower=0> r; // dispersion parameter (r)
 }
 
 transformed parameters {
@@ -50,6 +41,7 @@ transformed parameters {
 }
 
 model {
+    vector[N] eta;
     // PRIORS 
     beta ~ normal(0, 5);
     // these need a loop since they're multi-dimensional
@@ -59,14 +51,17 @@ model {
     }
 
     sigma_wk ~ normal(0, 3);
-    sigma_ly ~ normal(0, 3);
+    sigma_ly ~ normal(0, 1);
     r ~ gamma(1, 0.5);
 
-    // LINEAR PREDICTOR (do vectorized)
-    vector[N] eta = beta[ys_idx] + 
-                    to_vector(b_wk)[wk_s_idx] + 
-                    to_vector(b_ly)[ly_s_idx];
+    // LINEAR PREDICTOR 
+
+    for(n in 1:N) {
+        eta[n] = beta[ys_idx[n]] + 
+                    b_wk[wk_idx[n], stage_idx[n]] + 
+                    b_ly[ly_idx[n], stage_idx[n]];
+    }
 
     // the likelihood
-    y ~ neg_binomial_2_log(eta, r[stage_idx]); // eta bc its log scale 
+    y ~ neg_binomial_2_log(eta, r); // eta bc its log scale 
 }
