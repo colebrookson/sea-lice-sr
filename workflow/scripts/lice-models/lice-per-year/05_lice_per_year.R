@@ -36,3 +36,5 @@ fit_model <- model$sample(
   iter_sampling = cfg$run$yearly_model$iter_sampling,
   iter_warmup = cfg$run$yearly_model$iter_warmup
 )
+#' running this with 1000 iter, 500 warmup took 4210.8s
+qs2::qs_save(fit_model, here::here(cfg$path$mod_obs$lice_per_year))

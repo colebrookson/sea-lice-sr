@@ -30,6 +30,8 @@ path:
     scen_5: "./data/scfs-data/clean/lice-counts-for-regression-scenario5.csv"
   models: 
     lice_per_year: "./workflow/models/lice_per_year.stan"
+  mod_obs:
+    lice_per_year: "./outputs/yearly-lice-model-objects/fit-model.qs2"
 
 # data decisions ---------------------------------------------------------------
 lice_data: 
