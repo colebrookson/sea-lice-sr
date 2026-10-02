@@ -27,7 +27,7 @@ parameters {
    vector<lower=0>[N_s] sigma_ly;// std dev (marginal) on location x year RE (\sigma_j^{\ell})
    array[N_s] sum_to_zero_vector[N_wk] z_wk; // standardized RE for week (z^{w}_{u,j})
    array[N_s] sum_to_zero_vector[N_ly] z_ly; // standardized RE for location-year (z^{\ell}_{v,j})
-   real<lower=0> r; // dispersion parameter (r)
+   vector<lower=0>[N_s] r; // dispersion parameter (r)
 }
 
 transformed parameters {
@@ -51,7 +51,7 @@ model {
     }
 
     sigma_wk ~ normal(0, 3);
-    sigma_ly ~ normal(0, 1);
+    sigma_ly ~ normal(0, 3);
     r ~ gamma(1, 0.5);
 
     // LINEAR PREDICTOR 
@@ -63,5 +63,5 @@ model {
     }
 
     // the likelihood
-    y ~ neg_binomial_2_log(eta, r); // eta bc its log scale 
+    y ~ neg_binomial_2_log(eta, r[stage_idx]); // eta bc its log scale 
 }
