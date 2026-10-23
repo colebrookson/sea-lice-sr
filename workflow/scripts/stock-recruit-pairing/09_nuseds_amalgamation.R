@@ -7,8 +7,6 @@
 
 # read in all the objects ------------------------------------------------------
 
-source(here::here("./workflow/scripts/functions/theme_better.R"))
-source(here::here("./workflow/scripts/functions/global.R"))
 cfg <- yaml::read_yaml(here::here("config/config.yaml"))
 
 psf_cleaned <- readr::read_csv(here::here(cfg$path$psf_cleaned_nuseds))
