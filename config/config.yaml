@@ -19,6 +19,7 @@ path:
   farm_data: "./data/broughton-farm-data/all-options-compiled.csv"
   nuseds: "./data/dfo-data/raw/NuSEDS/raw-all-area-nuseds.csv"
   psf_catch: "./data/PSF-PSE/all-psf-catch-data.csv"
+  van_will_reconstruction: "./data/exploitation-rates/ISC Pink Reconstructions Summary (Through 2021).xlsx"
   psf_cleaned_nuseds: "./data/PSF-PSE/cleaned-nuseds/2_nuseds_cuid_streamid_2026-02-20.csv"
   spawners: "./data/for-model-runs/spawners.csv"
   cu_river_helper: "./data/dfo-data/raw/helper-data-river-cu-match.csv"
