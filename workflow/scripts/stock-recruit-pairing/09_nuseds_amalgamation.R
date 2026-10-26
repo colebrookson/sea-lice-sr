@@ -211,4 +211,4 @@ stopifnot(identical(
   7696
 ))
 
-readr::write_csv(spawners, here::here(cfg$path$spawners))
+readr::write_csv(spawners, here::here(cfg$path$nuseds_amalgamed))

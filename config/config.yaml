@@ -21,7 +21,8 @@ path:
   psf_catch: "./data/PSF-PSE/all-psf-catch-data.csv"
   van_will_reconstruction: "./data/exploitation-rates/ISC Pink Reconstructions Summary (Through 2021).xlsx"
   psf_cleaned_nuseds: "./data/PSF-PSE/cleaned-nuseds/2_nuseds_cuid_streamid_2026-02-20.csv"
-  spawners: "./data/for-model-runs/spawners.csv"
+  nuseds_amalgamed: "./data/dfo-data/clean/nuseds_amalgamated_spawners.csv"
+  pink_sr_unfiltered: "./data/exploitation-rates/pink-river-sr-unfiltered.csv"
   cu_river_helper: "./data/dfo-data/raw/helper-data-river-cu-match.csv"
   scenarios: 
     scen_2: "./data/scfs-data/clean/lice-counts-for-regression-scenario2.csv"
